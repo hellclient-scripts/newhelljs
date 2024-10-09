@@ -7,7 +7,7 @@
     App.Data.Room.Name = ""
     App.Data.Room.Objects = new objectModule.List()
     App.Data.Room.Exits = []
-    App.Map = new mapModule.Map()
+    App.Map = new mapModule.Map(app.Positions["Room"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
     }

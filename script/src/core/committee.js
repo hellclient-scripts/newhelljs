@@ -8,7 +8,6 @@
   app.Positions["Quest"]=app.Committee.RegisterPosition("Quest")
   app.Committee.EventBus.BindEvent("core.newquest",function(){app.Positions["Quest"].StartNewTerm()})
   app.Positions["Room"]=app.Committee.RegisterPosition("Room")
-  app.Committee.EventBus.BindEvent("core.roomname",function(){app.Positions["Room"].StartNewTerm()})
   app.Positions["Combat"]=app.Committee.RegisterPosition("Combat")
   app.Committee.EventBus.BindEvent("core.newcombat",function(){app.Positions["Combat"].StartNewTerm()})
   app.Positions["Move"]=app.Committee.RegisterPosition("Move")

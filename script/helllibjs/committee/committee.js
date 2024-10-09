@@ -198,7 +198,7 @@
     }
     class Timer {
         constructor(duration, callback, enabled, norepeat) {
-            this.Duration = duration
+            this.Duration = duration||0
             this.Callback = callback
             this.NoRepeat = (norepeat == true)
             this.Enabled = (enabled == true)
@@ -209,7 +209,7 @@
             if (!isNaN(offset)) {
                 offset = 0
             }
-            this.Last = (new Date).getTime() + 0
+            this.Last = (new Date).getTime() + offset
         }
         Enable(e) {
             this.Enabled = (e == true)

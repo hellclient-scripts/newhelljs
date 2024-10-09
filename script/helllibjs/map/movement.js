@@ -2,6 +2,41 @@
     let module = {}
     module.CheckRoomCmd = "l"
     let dfsModule = app.RequireModule("helllibjs/map/dfs.js")
+    class Locate {
+        DFS = null
+        OnFound(move, map) {
+            if (map.Room.ID) {
+                if (this.DFS) {
+                    this.DFS = null
+                    App.RaiseEvent(new App.Event("lib.map.roomfound", move))
+                }
+            }
+        }
+        OnStepTimeout(move, map) {
+            if (this.DFS != null) {
+                let level=this.DFS.Skip()
+                if (level == null) {
+                    map.CancelMove()
+                    return
+                }
+                this.DFS = level.Next()
+                move.Pending = [map.NewStep(this.DFS.Command)]
+                move.Walk(map)
+            }
+        }
+        Next(move, map) {
+            if (this.DFS == null) {
+                this.DFS = new dfsModule.DFS().New()
+                App.RaiseEvent(new App.Event("lib.map.roommiss", move))
+                return [map.NewStep(module.CheckRoomCmd)]
+            }
+            this.DFS = this.DFS.Arrive(map.Room.Exits).Next()
+            if (this.DFS == null) {
+                return []
+            }
+            return [map.NewStep(this.DFS.Command)]
+        }
+    }
     class Path {
         constructor(path) {
             this.Raw = path
@@ -12,8 +47,8 @@
             this.Path = []
         }
         Next(move, map) {
-            if (move.StartCommand){
-                move.StartCommand=""
+            if (move.StartCommand) {
+                move.StartCommand = ""
                 return [move.StartCommand]
             }
             if (this.Path.length) {
@@ -39,42 +74,34 @@
             }
         }
         Target = null
-        DFS = null
+        Locate = new Locate()
         Path = null
+        OnStepTimeout(move, map) {
+            this.Locate.OnStepTimeout(move, map)
+        }
         Retry(move, map) {
             this.Path = null
         }
         Next(move, map) {
             if (this.Path != null) {
-                if (move.StartCommand){
-                    move.StartCommand=""
+                if (move.StartCommand) {
+                    move.StartCommand = ""
                     return [move.StartCommand]
                 }
                 return this.Path.shift()
             }
             if (map.Room.ID) {
-                if (this.DFS) {
-                    this.DFS = null
-                    App.RaiseEvent("lib.map.roomfound",move)
-                }
+                this.Locate.OnFound(move, map)
                 let result = map.GetPath(map.Room.ID, move.Option.Fly, this.Target, move.Option.MapperOptions)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
-                return this.Next(move.map)
+                return this.Next(move, map)
             }
-            if (this.DFS == null) {
-                this.DFS = new dfsModule.DFS().New()
-                App.RaiseEvent("lib.map.roommiss",move)
-                return [map.NewStep(module.CheckRoomCmd)]
-            }
-            this.DFS = this.DFS.Arrive(map.Room.Exits).Next()
-            if (this.DFS == null) {
-                return []
-            }
-            return [map.NewStep(this.DFS.Command)]
+            return this.Locate.Next(move, map)
         }
         ApplyTo(move, map) {
             move.Retry = this.Retry.bind(this)
             move.Next = this.Next.bind(this)
+            move.OnStepTimeout = this.OnStepTimeout.bind(this)
             move.Data.Movement = this
         }
     }
@@ -87,8 +114,11 @@
         }
         Raw = []
         Rooms = {}
-        DFS = null
+        Locate = new Locate()
         Path = null
+        OnStepTimeout(move, map) {
+            this.Locate.OnStepTimeout(move, map)
+        }
         Retry(move, map) {
             this.Path = null
         }
@@ -97,12 +127,9 @@
                 return this.Path.shift()
             }
             if (map.Room.ID) {
-                if (this.DFS) {
-                    this.DFS = null
-                    App.RaiseEvent("lib.map.roomfound",move)
-                }
-                if (this.Rooms[map.Room.ID]&&move.StartCommand){
-                    move.StartCommand=""
+                this.Locate.OnFound(move, map)
+                if (this.Rooms[map.Room.ID] && move.StartCommand) {
+                    move.StartCommand = ""
                     return [move.StartCommand]
                 }
                 delete (this.Rooms[map.Room.ID])
@@ -112,19 +139,9 @@
                 }
                 let result = map.GetPath(map.Room.ID, move.Option.Fly, keys, move.Option.MapperOptions)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
-                return this.Next(move.map)
+                return this.Next(move, map)
             }
-            if (this.DFS == null) {
-                this.DFS = new dfsModule.DFS().New()
-                App.RaiseEvent("lib.map.roommiss",move)
-                return [map.NewStep(module.CheckRoomCmd)]
-            }
-            this.DFS = this.DFS.Arrive(map.Room.Exits).Next()
-            if (this.DFS == null) {
-                return []
-            }
-            return [map.NewStep(this.DFS.Command)]
-
+            return this.Locate.Next(move, map)
         }
         ApplyTo(move, map) {
             this.Raw.forEach(roomid => {
@@ -132,6 +149,7 @@
             })
             move.Retry = this.Retry.bind(this)
             move.Next = this.Next.bind(this)
+            move.OnStepTimeout = this.OnStepTimeout.bind(this)
             move.Data.Movement = this
         }
     }
@@ -139,6 +157,7 @@
     module.To = To
     module.Rooms = Rooms
     module.MaxStep = 5
+    module.Locate=Locate
     let DefaultChecker = function (step, move, map) {
         return dfsModule.Backward[step.Command] != null
     }
@@ -176,9 +195,9 @@
     module.SingleStep = function (move, map) {
         move.Option.MutlipleStep = false
     }
-    module.StartCommand=function(cmd){
-        return function(move,map){
-            move.StartCommand=cmd
+    module.StartCommand = function (cmd) {
+        return function (move, map) {
+            move.StartCommand = cmd
         }
     }
     module.MutlipleStepConverter = new MutlipleStepConverter()
