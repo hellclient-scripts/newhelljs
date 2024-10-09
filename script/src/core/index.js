@@ -10,5 +10,5 @@
     app.Include("src/core/item.js")
     app.Include("src/core/mapper.js")
     app.Include("src/core/sender.js")
-
+    app.Include("src/core/maze.js")
 })(App)

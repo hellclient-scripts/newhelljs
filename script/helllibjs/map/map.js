@@ -37,12 +37,20 @@
             return this
         }
     }
+    let DefaultCheckEnterMaze = function (map, move, step) {
+            let maze = map.Mazes[map.Room.Name]
+            if (maze && maze.CheckEnter(maze, move, this, step)) {
+                return maze
+            }
+        return null
+    }
     class Map {
         constructor(position) {
             this.Position = position
             this.Movement = movementModule
             this.StepTimeout = module.DefaultStepTimeout
         }
+        CheckEnterMaze=DefaultCheckEnterMaze
         Position = null
         Room = new Room()
         Move = null
@@ -51,6 +59,7 @@
         Movement = null
         StepPlan = null
         StepTimeout = 0
+        Mazes = {}
         EnterNewRoom() {
             this.Room = new Room()
             this.Position.StartNewTerm()
@@ -91,6 +100,11 @@
                 this.Move.OnWalking(this)
             }
         }
+        TrySteps(steps) {
+            if (this.Move != null) {
+                this.Move.TrySteps(this, steps)
+            }
+        }
         OnStepTimeout() {
             if (this.Move != null) {
                 this.Move.StepTimeout(this)
@@ -121,6 +135,12 @@
         NewStep(command, target) {
             return new Step(command, target)
         }
+        NewMaze() {
+            return new Maze()
+        }
+        RegisterMaze(name, maze) {
+            this.Mazes[name] = maze
+        }
     }
     class Step {
         constructor(command, target) {
@@ -144,7 +164,7 @@
     let DefaultMoveOnRoom = function (move, map, step) {
 
     }
-    let DefaultMoveOnArrive = function (move, map, step) {
+    let DefaultMoveOnArrive = function (move, map) {
         move.Walk(map)
     }
 
@@ -168,11 +188,18 @@
         Option = new Option()
         #walking = []
         Pending = null
+        #maze = null
         Walk(map) {
             let steps
+            if (this.#maze && this.#maze.CheckEscaped(this.#maze, this, map)) {
+                this.#maze = null
+            }
             if (this.Pending && this.Pending.length) {
                 steps = this.Pending
                 this.Pending = null
+            } else if (this.#maze) {
+                this.#maze.Walk(this.#maze, this, map)
+                return
             } else {
                 steps = this.Next(this, map)
             }
@@ -180,13 +207,16 @@
                 map.FinishMove()
                 return
             }
-            this.#walking = steps
-            steps.forEach(step => {
-                this.Vehicle.Send(step, map)
-            });
-            if (map.StepPlan) {
-                map.StepPlan.Execute()
+            if (steps.length == 1 && this.#maze == null && map.Room.ID) {
+                let maze = map.CheckEnterMaze(map, this, steps[0])
+                if (maze != null) {
+                    this.#maze = maze
+                    maze.NextRoom = steps[0].Next
+                    maze.Walk(maze, this, map)
+                    return
+                }
             }
+            this.TrySteps(map, steps)
         }
         StepTimeout(map) {
             this.OnStepTimeout(this, map)
@@ -208,6 +238,10 @@
             if (map.StepPlan) {
                 map.StepPlan.Execute()
             }
+        }
+        TrySteps(map, steps) {
+            this.#walking = steps
+            this.Resend(map)
         }
         Resend(map) {
             if (this.#walking && this.#walking.length) {
@@ -276,6 +310,34 @@
 
             })
             this.Map.StartMove(move)
+        }
+    }
+    let DefaultMazeCheckEnter = function (maze, move, map, steps) {
+        return false
+    }
+    let DefaultMazeEscaped = function (maze, move, map) {
+        return true
+    }
+    let DefaultMazeWalk = function (maze, move, map) {
+        return
+    }
+    class Maze {
+        Data = null
+        CheckEnter = DefaultMazeCheckEnter
+        CheckEscaped = DefaultMazeEscaped
+        Walk = DefaultMazeWalk
+        NextRoom = ""
+        WithCheckEnter(fn) {
+            this.CheckEnter = fn
+            return this
+        }
+        WithCheckEscaped(fn) {
+            this.CheckEscaped = fn
+            return this
+        }
+        WithWalk(fn) {
+            this.Walk = fn
+            return this
         }
     }
     module.Map = Map
