@@ -445,6 +445,52 @@ Timers = []
   OmitFromOutput = false
   OmitFromCommandHistory = false
 
+[[Aliases]]
+  ID = "d1fv62osn8i7nf726vpqu6"
+  Name = "queue"
+  Enabled = true
+  Match = "#(to|wait|do|loop)(\\s|\\|\\|).*"
+  Send = ""
+  Script = "App.UserQueue.OnAlias"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1fv6bbo0pupo8726vq611"
+  Name = "App.Alias.Stop"
+  Enabled = true
+  Match = "#stop"
+  Send = ""
+  Script = "App.Alias.Stop"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
 [[RequiredParams]]
   Name = "id"
   Desc = "用户的id"

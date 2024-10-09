@@ -1,4 +1,6 @@
 (function (app) {
+    let mapModule = app.RequireModule("helllibjs/map/map.js")
+
     App.Move = {}
     App.Move.NewPath = function (path, ...initers) {
         return App.Map.NewRoute(new App.Map.Movement.Path(path.map(value => App.Map.NewStep(value))), ...initers)
@@ -40,4 +42,24 @@
             App.Map.OnWalking()
         })
     })
+    mapModule.DefaultOnFinish=function(move,map){
+        app.Next()
+    }
+    mapModule.DefaultOnCamce=function(move,map){
+        app.Fail()
+    }
+    App.Move.NewToCommand=function(target, ...initers){
+        return App.Commands.NewCommand("to",{Target:target,Initers:initers})
+    }
+    app.Commands.RegisterExecutor("to",function(commands,running){
+        running.OnStart=function(arg){
+            App.Move.NewTo(running.Command.Data.Target,running.Command.Data.Initers).Execute()
+        }
+    })
+    App.Move.To=function(target){
+        app.Commands.Execute(App.Move.NewToCommand(target))
+        app.Next()
+    }
+
+
 })(App)

@@ -13,6 +13,6 @@
   app.Positions["Move"]=app.Committee.RegisterPosition("Move")
   app.Committee.EventBus.BindEvent("core.newmove",function(){app.Positions["Move"].StartNewTerm()})
   app.Positions["Command"]=app.Committee.RegisterPosition("Command")
-  app.Committee.EventBus.BindEvent("core.newcommand",function(){app.Positions["Command"].StartNewTerm()})
+  app.Positions["CommandQueue"]=app.Committee.RegisterPosition("CommandQueue")
   app.Plan=committeeModule.Plan
 })(App)

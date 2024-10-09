@@ -207,7 +207,7 @@
             this.Stack = (new Error()).stack
         }
         Reset(offset) {
-            if (!isNaN(offset)) {
+            if (isNaN(offset)) {
                 offset = 0
             }
             this.Last = (new Date).getTime() + offset
