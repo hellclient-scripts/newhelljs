@@ -11,6 +11,16 @@
         Count=1
         Name=""
     }
+    module.DataParaser=function(obj){
+        if (obj.Data==null){
+            obj.Data=new ObjectData()
+            obj.Data.IDLower=obj.ID.toLowerCase()
+            let result=module.CNumber.Convert(obj.Label)
+            obj.Data.Count=result.Count
+            obj.Data.Unit=result.Unit
+            obj.Data.Name=result.Name
+        }
+    }
     class Object{
         constructor(label,id,raw){
             this.ID=id
@@ -18,14 +28,7 @@
             this.#raw=raw
         }
         GetData(){
-            if (this.Data==null){
-                this.Data=new ObjectData()
-                this.Data.IDLower=this.ID.toLowerCase()
-                let result=module.CNumber.Convert(this.Label)
-                this.Data.Count=result.Count
-                this.Data.Unit=result.Unit
-                this.Data.Name=result.Name
-            }
+            module.DataParaser(this)
             return this.Data
         }
         GetRaw(){

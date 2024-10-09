@@ -2,6 +2,7 @@
     let movementModule = app.RequireModule("helllibjs/map/movement.js")
     let module = {}
     module.DefaultStepTimeout = 3000
+    module.DefaultRetryDelay = 500
     class Room {
         ID = ""
         Name = ""
@@ -38,10 +39,10 @@
         }
     }
     let DefaultCheckEnterMaze = function (map, move, step) {
-            let maze = map.Mazes[map.Room.Name]
-            if (maze && maze.CheckEnter(maze, move, this, step)) {
-                return maze
-            }
+        let maze = map.Mazes[map.Room.Name]
+        if (maze && maze.CheckEnter(maze, move, this, step)) {
+            return maze
+        }
         return null
     }
     class Map {
@@ -49,8 +50,9 @@
             this.Position = position
             this.Movement = movementModule
             this.StepTimeout = module.DefaultStepTimeout
+            this.RetryDelay = module.DefaultRetryDelay
         }
-        CheckEnterMaze=DefaultCheckEnterMaze
+        CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
         Room = new Room()
         Move = null
@@ -59,6 +61,7 @@
         Movement = null
         StepPlan = null
         StepTimeout = 0
+        RetryDelay = 0
         Mazes = {}
         EnterNewRoom() {
             this.Room = new Room()
@@ -81,7 +84,7 @@
             }
             app.RaiseEvent(new app.Event("lib.map.inittags", this))
         }
-        GetPath(from, fly, to, options) {
+        GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
                 to = [to]
             }
@@ -100,6 +103,13 @@
                 this.Move.OnWalking(this)
             }
         }
+        OnWrongway() {
+            this.Room.ID = ""
+            if (this.Move != null) {
+                this.Move.Retry(this.Move, this)
+                this.Move.Walk(this.Move, this)
+            }
+        }
         TrySteps(steps) {
             if (this.Move != null) {
                 this.Move.TrySteps(this, steps)
@@ -110,6 +120,13 @@
                 this.Move.StepTimeout(this)
             }
 
+        }
+        Resend() {
+            this.Position.Wait(this.RetryDelay, () => {
+                if (this.Move) {
+                    this.Move.Resend(this)
+                }
+            })
         }
         FinishMove() {
             if (this.Move != null) {

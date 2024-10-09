@@ -81,6 +81,7 @@
         }
         Retry(move, map) {
             this.Path = null
+            this.Locate=null
         }
         Next(move, map) {
             if (this.Path != null) {
@@ -92,7 +93,7 @@
             }
             if (map.Room.ID) {
                 this.Locate.OnFound(move, map)
-                let result = map.GetPath(map.Room.ID, move.Option.Fly, this.Target, move.Option.MapperOptions)
+                let result = map.GetMapperPath(map.Room.ID, move.Option.Fly, this.Target, move.Option.MapperOptions)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
@@ -120,6 +121,7 @@
             this.Locate.OnStepTimeout(move, map)
         }
         Retry(move, map) {
+            this.Locate=null
             this.Path = null
         }
         Next(move, map) {

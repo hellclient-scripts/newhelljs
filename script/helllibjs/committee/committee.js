@@ -67,16 +67,17 @@
             }
         }
         OnTime() {
-            if (this.Finished) { return }
+            if (this.Finished) { return true}
             for (let timer of this.#timers) {
                 if (!timer.OnTime()) {
+
                     this.#endWithResult(new TaskResult(this, "timer", null, timer.Name, timer.Data))
                     return true
                 }
             }
         }
         OnEvent(event) {
-            if (this.Finished) { return }
+            if (this.Finished) { return true}
             if (event.Name == app.Consts.EventNameLine) {
                 for (let trigger of this.#triggers) {
                     if (!trigger.OnEvent(event)) {
@@ -263,7 +264,7 @@
                     finished.push(task)
                 }
             })
-            this.RemoveTasks(finished)
+            this.RemoveTasks(...finished)
             this.#timers.forEach(function (timer) {
                 timer.OnTime()
             })
@@ -272,11 +273,11 @@
             let finished = []
             this.#tasks.forEach(task => {
                 if (task.OnEvent(event)) {
+
                     finished.push(task)
                 }
             })
-            this.RemoveTasks(finished)
-            this.EventBus.RaiseEvent(event)
+            this.RemoveTasks(...finished)
             if (event.Name == app.Consts.EventNameLine) {
                 this.#triggers.forEach(function (trigger) {
                     trigger.OnEvent(event)
@@ -289,13 +290,11 @@
             }
             let result = []
             let filter = {}
-            tasks.forEach(function (task) {
-                filter[task] = true
-            })
+
             this.#tasks.forEach(function (t) {
-                if (!filter[t]) {
-                    result.push(t)
-                }
+                    if (!t.Finished){
+                        result.push(t)
+                    }
             })
             this.#tasks = result
         }
@@ -353,6 +352,14 @@
             let task = new Task(callback)
             this.Term.BindTask(task)
             return task
+        }
+        Wait(delay,callback){
+            let task=this.NewTask(result=>{
+                if (result.Type=="timer"){
+                    callback()
+                }
+            })
+            task.NewTimer(delay)
         }
         BindEvent(eventname, handler) {
             this.Term.EventBus.BindEvent(eventname, handler)
