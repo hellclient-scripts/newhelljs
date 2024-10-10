@@ -1,4 +1,4 @@
-(function (app) {
+(function (App) {
     let module = {}
     class RunningCommand {
         constructor(cmd) {
@@ -30,6 +30,7 @@
         Commands = []
         Flush() {
             this.Commands = []
+            return this
         }
         WithFinishCommand(cmd) {
             this.FinishCommand = cmd
@@ -45,9 +46,11 @@
         }
         Append(...commands) {
             this.Commands = this.Commands.concat(commands)
+            return this
         }
         Insert(...commands) {
             this.Commands = commands.concat(this.Commands)
+            return this
         }
         Clone() {
             return new Queue(this.EntryCommand).
@@ -62,6 +65,7 @@
         PositionCommand = null
         PositionQueue = null
         Current = null
+        NeedEntry=false
         Queues = []
         #registeredExecutor = {}
         #registeredOnEvent = {}
@@ -91,24 +95,24 @@
                 if (!autocreate) {
                     return null
                 }
-                this.Queues.push(new Queue())
+                this.#push(new Queue())
             }
             return this.Queues[this.Queues.length - 1]
         }
         NewCommand(name, data) {
             if (this.#registeredExecutor[name] == null) {
-                throw "Command executor[" + name + "] not registered"
+                throw new Error("Command executor[" + name + "] not registered")
             }
             return new Command(name, data)
         }
-        NewCommandFunction(fn){
+        NewFunctionCommand(fn){
             return this.NewCommand(this.CommandNameFunction,fn)
         }
 
-        NewCommandDo(cmd){
+        NewDoCommand(cmd){
             return this.NewCommand(this.CommandNameDo,cmd)
         }
-        NewCommandWait(delay){
+        NewWaitCommand(delay){
             return this.NewCommand(this.CommandNameWait,delay)
         }
         RegisterExecutor(name, executor) {
@@ -134,28 +138,29 @@
             this.CurrentQueue(true).Append(...commands)
         }
         #enter() {
-            if (this.Queues.length) {
-                let queue = this.Queues[this.Queues.length]
-                if (queue.EntryCommand) {
-                    this.Execute(queue.EntryCommand)
-                    return true
-                }
-            }
-            return false
+            this.NeedEntry=true
         }
         #pop() {
             if (this.Queues.length) {
                 this.Queues.pop()
                 this.PositionQueue.StartNewTerm()
-                if (this.#enter()) {
-                    return
-                }
+                this.#enter()
             }
-            this.Next()
+        }
+        #push(queue){
+            this.Queues.push(queue)
+            this.#enter()
         }
         Next() {
             let queue = this.CurrentQueue()
             if (queue) {
+                if (this.NeedEntry){
+                    this.NeedEntry=false
+                    if (queue.EntryCommand){
+                        this.Execute(queue.EntryCommand)
+                        return                        
+                    }
+                }
                 if (queue.Commands.length) {
                     this.Execute(queue.Commands.shift())
                     return
@@ -185,16 +190,30 @@
                     return
                 }
                 this.#pop()
+                App.Next()
             }
+        }
+        NewQueue(entrycmd){
+            return new Queue(entrycmd)
+        }
+        Push(queue){
+            if (!queue){
+                queue=new Queue()
+            }
+            this.#push(queue)
+            return queue
+        }
+        PushCommands(...cmd){
+            let queue=new Queue()
+            queue.Append(...cmd)
+            this.#push(queue)
+            return queue
         }
         Rollback(snap) {
             this.Queues = snap.Queues
             let queue = this.CurrentQueue()
             if (queue) {
-                if (this.#enter()) {
-                    return
-                }
-                this.Next()
+                this.#enter()
             }
         }
         Snap(arg) {
@@ -231,7 +250,7 @@
     }
     module.ExecutorDo = function (commands, running) {
         running.OnStart = function (arg) {
-            app.Send(running.Command.Data)
+            App.Send(running.Command.Data)
             commands.Next()
         }
     }

@@ -1,7 +1,7 @@
-(function (app) {
+(function (App) {
     let module = {}
     module.CheckRoomCmd = "l"
-    let dfsModule = app.RequireModule("helllibjs/map/dfs.js")
+    let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
     class Locate {
         DFS = null
         OnFound(move, map) {
@@ -93,11 +93,16 @@
             }
             if (map.Room.ID) {
                 this.Locate.OnFound(move, map)
-                let result = map.GetMapperPath(map.Room.ID, move.Option.Fly, this.Target, move.Option.MapperOptions)
+                let result = move.GetPath(map,map.Room.ID,this.Target)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
+        }
+        OnStepTimeout(move, map){
+            if (this.Locate){
+                this.Locate.OnStepTimeout(move,map)
+            }
         }
         ApplyTo(move, map) {
             move.Retry = this.Retry.bind(this)
@@ -117,12 +122,14 @@
         Rooms = {}
         Locate = new Locate()
         Path = null
-        OnStepTimeout(move, map) {
-            this.Locate.OnStepTimeout(move, map)
-        }
         Retry(move, map) {
             this.Locate=null
             this.Path = null
+        }
+        OnStepTimeout(move, map){
+            if (this.Locate){
+                this.Locate.OnStepTimeout(move,map)
+            }
         }
         Next(move, map) {
             if (this.Path != null && this.Path.length) {
@@ -139,7 +146,7 @@
                 if (keys.length == 0) {
                     return null
                 }
-                let result = map.GetPath(map.Room.ID, move.Option.Fly, keys, move.Option.MapperOptions)
+                let result = move.GetPath(map,map.Room.ID,keys[0])
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
@@ -171,7 +178,7 @@
             let current = []
             path.forEach(step => {
                 if (!move.Option.MutlipleStep) {
-                    result.push(step)
+                    result.push([step])
                     return
                 }
                 if (this.Checker(step, move, map)) {

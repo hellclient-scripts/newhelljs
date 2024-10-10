@@ -1,6 +1,6 @@
-(function (app) {
+(function (App) {
     let module = {}
-    let eventModule = app.RequireModule("helllibjs/event/event.js")
+    let eventModule = App.RequireModule("helllibjs/event/event.js")
     class Plan {
         constructor(position, initfn, callback) {
             this.Position = position
@@ -78,7 +78,7 @@
         }
         OnEvent(event) {
             if (this.Finished) { return true}
-            if (event.Name == app.Consts.EventNameLine) {
+            if (event.Name == App.Consts.EventNameLine) {
                 for (let trigger of this.#triggers) {
                     if (!trigger.OnEvent(event)) {
                         this.#endWithResult(new TaskResult(this, "trigger", event, trigger.Name, trigger.Data))
@@ -278,7 +278,7 @@
                 }
             })
             this.RemoveTasks(...finished)
-            if (event.Name == app.Consts.EventNameLine) {
+            if (event.Name == App.Consts.EventNameLine) {
                 this.#triggers.forEach(function (trigger) {
                     trigger.OnEvent(event)
                 })

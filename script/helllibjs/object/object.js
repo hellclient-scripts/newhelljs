@@ -1,5 +1,5 @@
 (function(app){
-    let cnumberModule = app.RequireModule("helllibjs/cnumber/cnumber.js")
+    let cnumberModule = App.RequireModule("helllibjs/cnumber/cnumber.js")
 
     let module={}
     module.CNumber=new cnumberModule.CNumber()
@@ -48,6 +48,9 @@
     class List{
         constructor(){
         }
+        IsNotEmpty(){
+            return this.Items.length>0
+        }
         Items=[]
         Append(item){
             this.Items.push(item)
@@ -88,6 +91,12 @@
                 }
             })
             return result
+        }
+        First(){
+            if (this.Items.length){
+                return this.Items[0]
+            }
+            return null
         }
     }
     module.Object=Object

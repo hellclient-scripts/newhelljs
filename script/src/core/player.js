@@ -1,4 +1,4 @@
-(function (app) {
+(function (App) {
     App.Data.Player = {
         HP: {},
         Special: {},
@@ -11,7 +11,7 @@
     var matcherHPLine4 = /^│【饮水】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[.+\]\s+│【经验】\s+(-?\d+)\s+│$/
     var matcherHPLine5 = /^│\s+│【体会】\s+(-?\d+)\s+│$/
     var matcherHPEnd = /^└─+.+─+─┘$/
-    var PlanOnHP = new app.Plan(App.Positions.Connect,
+    var PlanOnHP = new App.Plan(App.Positions.Connect,
         function (task) {
             task.NewTrigger(matcherHPLine1, function (trigger, result, event) {
                 App.Data.Player.HP["当前精气"] = result[1] - 0
@@ -61,7 +61,7 @@
     }
     matcherSpecial = /^\S+\(([a-z]+)\)$/
     App.BindEvent("core.hp", App.Core.OnHP)
-    var PlanOnSpecial = new app.Plan(App.Positions.Connect,
+    var PlanOnSpecial = new App.Plan(App.Positions.Connect,
         function (task) {
             task.NewTrigger(matcherSpecial, function (trigger, result, event) {
                 App.Data.Player.Special[result[1]] = true
@@ -102,7 +102,7 @@
     App.BindEvent("core.score",App.Core.OnScore)
     var matcherScoreEnd = /^└─+┴─+.+─+┘$/
     var matcherScoreFamily=/│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│/
-    var PlanOnScore = new app.Plan(App.Positions.Connect,
+    var PlanOnScore = new App.Plan(App.Positions.Connect,
         function(task){
             task.NewTrigger(matcherScoreFamily,function(trigger,result,event){
                 App.Data.Player.Score["门派"]=result[3]
@@ -126,7 +126,7 @@
     var matcherSkillsType=/^├─+.+项([^─]+)─+┼─+┼─+┼─+┤$/
     var matcherSkills=/^│(  |□)(\S+)\s+│(\S+)\s+│【.+】│\s*(\d+) \/\s*(\d+)\s*│$/
     var matcherSkillsEnd=/^└─*┴─*┴─*┴─*┘$/
-    var PlanOnSkills = new app.Plan(App.Positions.Connect,
+    var PlanOnSkills = new App.Plan(App.Positions.Connect,
         function(task){
             task.NewTrigger(matcherSkillsType,function(trigger,result,event){
                 LastType=result[1]

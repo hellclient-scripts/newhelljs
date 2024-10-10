@@ -93,32 +93,32 @@
             this.#filters[filtername] = fn
         }
         static CreateAppliction() {
-            let app = {}
-            app.Engine = new Engine(app)
-            app.Consts = new Consts()
-            app.Include = function (name) {
-                return app.Engine.Include(name)
+            let App = {}
+            App.Engine = new Engine(App)
+            App.Consts = new Consts()
+            App.Include = function (name) {
+                return App.Engine.Include(name)
             }
-            app.RequireModule = function (name) {
-                return app.Engine.RequireModule(app, name)
+            App.RequireModule = function (name) {
+                return App.Engine.RequireModule(App, name)
             }
-            app.LineEvent = function (name) {
-                return app.Engine.LineEvent(name)
+            App.LineEvent = function (name) {
+                return App.Engine.LineEvent(name)
             }
-            app.FilterLineEvent = function (filtername, eventname) {
-                return app.Engine.FilterLineEvent(filtername, eventname)
+            App.FilterLineEvent = function (filtername, eventname) {
+                return App.Engine.FilterLineEvent(filtername, eventname)
             }
-            app.RaiseEvent = function (event) {
-                app.Engine.OnEvent(event)
+            App.RaiseEvent = function (event) {
+                App.Engine.OnEvent(event)
             }
-            app.BindEvent = function (eventname, callback) {
-                app.Engine.EventBus.BindEvent(eventname, callback)
+            App.BindEvent = function (eventname, callback) {
+                App.Engine.EventBus.BindEvent(eventname, callback)
             }
-            app.Send=function(cmd,group){
+            App.Send=function(cmd,group){
                 Send(cmd)
             }
-            app.Event=app.Engine.#eventmodule.Event
-            return app
+            App.Event=App.Engine.#eventmodule.Event
+            return App
         }
     }
     return Engine

@@ -1,4 +1,4 @@
-(function (app) {
+(function (App) {
     let module = {}
     const ModeNormal = 0
     const ModeComment = 1

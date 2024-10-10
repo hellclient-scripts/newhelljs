@@ -1,4 +1,4 @@
-(function (app) {
+(function (App) {
     let module = {}
     class Result {
         constructor(count, unit, name) {

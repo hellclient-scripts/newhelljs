@@ -422,6 +422,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1fv6n79t7ee4e726vqd4d"
+  Name = "core.onecho"
+  Enabled = true
+  Match = "^这里没有 -echo- (.*)\\.(.*)。$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.FilterLineEvent(\"core.onecho\",\"core.echo\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -449,7 +480,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop)(\\s|\\|\\|).*"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0

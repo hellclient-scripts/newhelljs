@@ -1,6 +1,6 @@
-(function (app) {
-    app.Alias={}
-    app.Alias.Stop=function(n,l,w){
-        app.Stop()
+(function (App) {
+    App.Alias={}
+    App.Alias.Stop=function(n,l,w){
+        App.Stop()
     }
 })(App)

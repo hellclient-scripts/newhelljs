@@ -1,5 +1,5 @@
-(function (app) {
-    app.Map.RegisterMaze("南疆沙漠",app.Map.NewMaze().WithCheckEnter(
+(function (App) {
+    App.Map.RegisterMaze("南疆沙漠",App.Map.NewMaze().WithCheckEnter(
         function (maze, move, map, step) {
             if (map.Room.Name == "南疆沙漠") {
                 maze.Data = step
@@ -13,7 +13,7 @@
         }
     ).WithWalk(
         function (maze, move, map) {
-            app.Send("drink shui dai")
+            App.Send("drink shui dai")
             map.TrySteps([maze.Data])
         }
     ))

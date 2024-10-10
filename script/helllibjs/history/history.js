@@ -1,6 +1,6 @@
 (function(app){
-    let ring=app.Include("helllibjs/lib/container/ring.js")
-    let line=app.Include("helllibjs/lib/line/line.js")
+    let ring=App.Include("helllibjs/lib/container/ring.js")
+    let line=App.Include("helllibjs/lib/line/line.js")
     class History{
         constructor(size){
             this.Lines=ring.New(size)
@@ -32,9 +32,9 @@
             return result
         }
         static Install(size){
-            app.History=new History(size)
-            app.Engine.BindEventHandler(function(event){
-                app.History.OnEvent(event)
+            App.History=new History(size)
+            App.Engine.BindEventHandler(function(event){
+                App.History.OnEvent(event)
             })
         }
         Size=0

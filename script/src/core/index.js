@@ -1,23 +1,25 @@
 (function(app){
-    app.Stop=function(){
+    App.Stop=function(){
         Note("停止继续任务")
-        app.RaiseEvent(new app.Event("core.stop"))
+        App.RaiseEvent(new App.Event("core.stop"))
     }
-    app.Core={}
-    app.Positions={}
-    app.Include("src/core/init.js")
-    app.Include("src/core/committee.js")
-    app.Include("src/core/commands.js")
-    app.Include("src/core/connect.js")
-    app.Include("src/core/player.js")
-    app.Include("src/core/room.js")
-    app.Include("src/core/move.js")
-    app.Include("src/core/item.js")
-    app.Include("src/core/mapper.js")
-    app.Include("src/core/sender.js")
-    app.Include("src/core/maze.js")
-    app.Include("src/core/userqueue.js")
-    app.Include("src/core/alias.js")
-    app.Include("src/core/food.js")
-
+    App.Core={}
+    App.Positions={}
+    App.Include("src/core/init.js")
+    App.Include("src/core/committee.js")
+    App.Include("src/core/commands.js")
+    App.Include("src/core/userqueue.js")
+    App.Include("src/core/connect.js")
+    App.Include("src/core/player.js")
+    App.Include("src/core/room.js")
+    App.Include("src/core/move.js")
+    App.Include("src/core/item.js")
+    App.Include("src/core/mapper.js")
+    App.Include("src/core/sender.js")
+    App.Include("src/core/maze.js")
+    App.Include("src/core/response.js")
+    App.Include("src/core/alias.js")
+    App.Include("src/core/goods.js")
+    App.Include("src/core/prepare.js")    
+    App.Include("src/core/zone.js")
 })(App)

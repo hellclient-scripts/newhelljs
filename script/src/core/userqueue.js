@@ -1,5 +1,5 @@
-(function (app) {
-    let userqueueModule=app.RequireModule("helllibjs/command/userqueue.js")
+(function (App) {
+    let userqueueModule=App.RequireModule("helllibjs/command/userqueue.js")
     App.UserQueue={}
     App.UserQueue.OnAlias=function(n,l,w){
         App.UserQueue.UserQueue.Exec(l)
@@ -11,11 +11,11 @@
     App.UserQueue.UserQueue.RegisterCommand("#to",function(uq,data){
         uq.Commands.Append(
             App.Move.NewToCommand(data.split(",")),
-            uq.Commands.NewCommandFunction(function(){uq.Next()}),
+            uq.Commands.NewFunctionCommand(function(){uq.Next()}),
         )
         uq.Commands.Next()
     })
-    app.BindEvent("core.stop",function(){
+    App.BindEvent("core.stop",function(){
         App.UserQueue.UserQueue.Stop()
     })
 })(App)

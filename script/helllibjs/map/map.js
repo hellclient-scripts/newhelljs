@@ -1,5 +1,5 @@
-(function (app) {
-    let movementModule = app.RequireModule("helllibjs/map/movement.js")
+(function (App) {
+    let movementModule = App.RequireModule("helllibjs/map/movement.js")
     let module = {}
     module.DefaultStepTimeout = 3000
     module.DefaultRetryDelay = 500
@@ -63,6 +63,46 @@
         StepTimeout = 0
         RetryDelay = 0
         Mazes = {}
+        Trace(fr,cmd){
+            if (fr!=""){
+                let exits=Mapper.getexits(fr+"")
+                for (var i=0;i<exits.length;i++){
+                    if (exits[i].command==cmd){
+                        return exits[i].to
+                    }
+                }
+            }
+            return ""    
+        }
+        TracePath(fr,...commands){
+            let result=[]
+            if (!fr){
+                return null
+            }
+            let current=fr
+            for(let cmd of commands){
+                let to=this.Trace(current,cmd)
+                if (!to){
+                    return null
+                }
+                result.push(new Step(cmd,to))
+                current=to
+            }
+            return result
+        }
+        TraceRooms(fr,...commands){
+            let result=[fr]
+            let current=fr
+            for(let cmd of commands){
+                let to=this.Trace(current,cmd)
+                if (!to){
+                    return null
+                }
+                result.push(to)
+                current=to
+            }
+            return result
+        }
         EnterNewRoom() {
             this.Room = new Room()
             this.Position.StartNewTerm()
@@ -82,7 +122,7 @@
             if (this.Move != null) {
                 this.Move.InitTags(this)
             }
-            app.RaiseEvent(new app.Event("lib.map.inittags", this))
+            App.RaiseEvent(new App.Event("lib.map.inittags", this))
         }
         GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
@@ -235,12 +275,16 @@
             }
             this.TrySteps(map, steps)
         }
+        GetPath(map,from,to){
+            map.InitTags()
+            return map.GetMapperPath(from,this.Option.Fly,to,this.Option.MapperOptions)
+        }
         StepTimeout(map) {
             this.OnStepTimeout(this, map)
         }
         OnWalking(map) {
             if (this.#walking.length == 0) {
-                this.OnArrive(this, map, step)
+                this.OnArrive(this, map)
                 return
             }
             let step = this.#walking.shift()
@@ -249,7 +293,7 @@
             }
             this.OnRoom(this, map, step)
             if (this.#walking.length == 0) {
-                this.OnArrive(this, map, step)
+                this.OnArrive(this, map)
                 return
             }
             if (map.StepPlan) {
@@ -272,18 +316,19 @@
         }
         InitTags(map) {
             if (this.Option != null) {
-                this.Option.Tags.forEach((value, key) => {
+                for (var key in this.Option.Tags){
+                    let value=Option.Tags[key]
                     if (value != null) {
                         map.SetTag(key, value)
                     }
-                })
+                }
                 this.Vehicle.OnInitTags(this, map)
                 this.OnInitTags(this, map)
             }
         }
     }
     let DefaultVehicleSend = function (step, map) {
-        app.Send(step.Command, true)
+        App.Send(step.Command, true)
     }
     class Vehicle {
         Send = DefaultVehicleSend

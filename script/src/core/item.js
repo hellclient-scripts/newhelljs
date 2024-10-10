@@ -1,5 +1,5 @@
-(function (app) {
-    let objectModule = app.RequireModule("helllibjs/object/object.js")
+(function (App) {
+    let objectModule = App.RequireModule("helllibjs/object/object.js")
 
     App.Core.Item = {}
     App.Data.Item = {}
@@ -25,11 +25,11 @@
     App.BindEvent("core.item", App.Core.Item.OnItem)
     let matcheritem = /^(  |□|○)(.+)\(([^\(\)]+)\)$/
     let matcherend = /^目前携带了(.+)件物品。$/
-    let PlanOnItem = new app.Plan(
+    let PlanOnItem = new App.Plan(
         App.Positions.Connect,
         function (task) {
             task.NewTrigger(matcheritem, function (task, result, event) {
-                let item=new objectModule.Object(result[2],result[3],app.History.CurrentOutput)
+                let item=new objectModule.Object(result[2],result[3],App.History.CurrentOutput)
                 switch (result[1]) {
                     case "□":
                         item.Mode = 1

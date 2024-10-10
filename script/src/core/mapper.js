@@ -1,5 +1,5 @@
-(function (app) {
-    let roomshModule=app.RequireModule("helllibjs/roomsh/roomsh.js")
+(function (App) {
+    let roomshModule=App.RequireModule("helllibjs/roomsh/roomsh.js")
     App.RoomsH=new roomshModule.File()
     let mapfile="data/rooms.h"
     Note("加载地图文件"+mapfile)

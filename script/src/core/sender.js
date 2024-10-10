@@ -1,5 +1,5 @@
-(function (app) {
-    let senderModule=app.RequireModule("helllibjs/sender/sender.js")
+(function (App) {
+    let senderModule=App.RequireModule("helllibjs/sender/sender.js")
     App.Sender=new senderModule.Sender()
     let re=/;/g
     let re2=/[！·。]/g
@@ -19,7 +19,7 @@
                 result.push(cmds)
             }
         });
-        return [[cmd]]
+        return result
     }
     App.Send=function(cmd,Grouped){
         App.Sender.Send(cmd,Grouped)

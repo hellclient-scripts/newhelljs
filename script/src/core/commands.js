@@ -1,21 +1,23 @@
-(function (app) {
-    let commandModule=app.RequireModule("helllibjs/command/command.js")
-    app.Commands=new commandModule.Commands()
-    app.Commands.PositionCommand=app.Positions["Command"]
-    app.Commands.PositionQueue=app.Positions["CommandQueue"]
-    app.Commands.InitCommon()
-    app.Commands.RegisterExecutor("manual",function(commands,running){
+(function (App) {
+    let commandModule=App.RequireModule("helllibjs/command/command.js")
+    App.Commands=new commandModule.Commands()
+    App.Commands.PositionCommand=App.Positions["Command"]
+    App.Commands.PositionQueue=App.Positions["CommandQueue"]
+    App.Commands.InitCommon()
+    App.Commands.RegisterExecutor("manual",function(commands,running){
         running.OnStart=function(arg){
             Note("进入手动模式")
         }
     })
-    let cmdManual=app.Commands.NewCommand("manual")
-    app.Commands.EmptyCommand=cmdManual
-    app.Next=function(){app.Commands.Next()}
-    app.Fail=function(){app.Commands.Fail()}
-    app.Finish=function(){app.Commands.Finish()}
-    app.Append=function(...commands){app.Commands.Append(...commands)}
-    app.Insert=function(...commands){app.Commands.Insert(...commands)}
-    app.Execute=function(command,arg){app.Commands.Execute(command,arg)}
-    app.Next()
+    let cmdManual=App.Commands.NewCommand("manual")
+    App.Commands.EmptyCommand=cmdManual
+    App.Next=function(){App.Commands.Next()}
+    App.Fail=function(){App.Commands.Fail()}
+    App.Finish=function(){App.Commands.Finish()}
+    App.Append=function(...commands){App.Commands.Append(...commands)}
+    App.Insert=function(...commands){App.Commands.Insert(...commands)}
+    App.Execute=function(command,arg){App.Commands.Execute(command,arg)}
+    App.Push=function(entrycmd){return App.Commands.Push(entrycmd)}
+    App.PushCommands=function(...commands){return App.Commands.PushCommands(...commands)}
+    App.Next()
 })(App)

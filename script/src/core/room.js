@@ -1,13 +1,13 @@
-(function (app) {
-    let objectModule = app.RequireModule("helllibjs/object/object.js")
-    let mapModule = app.RequireModule("helllibjs/map/map.js")
+(function (App) {
+    let objectModule = App.RequireModule("helllibjs/object/object.js")
+    let mapModule = App.RequireModule("helllibjs/map/map.js")
 
     App.Core.Room = {}
     App.Data.Room = {}
     App.Data.Room.Name = ""
     App.Data.Room.Objects = new objectModule.List()
     App.Data.Room.Exits = []
-    App.Map = new mapModule.Map(app.Positions["Room"])
+    App.Map = new mapModule.Map(App.Positions["Room"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
     }
@@ -31,17 +31,17 @@
             let result = [...event.Data.Wildcards[1].matchAll(reExit)].map(data => data[0]).sort()
             // App.Data.Room.Exits = result
             App.Map.Room.WithExits(result)
-            App.RaiseEvent(new app.Event("room.onexit"))
+            App.RaiseEvent(new App.Event("room.onexit"))
             PlanOnExit.Execute()
         })
     }
     App.BindEvent("core.onexit", App.Core.Room.OnExit)
     let matcherOnHeal = /^    (\S{2,8})正坐在地下(修炼内力)。$/
     let matcherOnObj = /^    ((\S+) )?(\S*「.+」)?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
-    var PlanOnExit = new app.Plan(App.Positions.Connect,
+    var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
             task.NewTrigger(matcherOnObj, function (trigger, result, event) {
-                let item = new objectModule.Object(result[4], result[5], app.History.CurrentOutput).
+                let item = new objectModule.Object(result[4], result[5], App.History.CurrentOutput).
                     WithParam("身份", result[2]).
                     WithParam("外号", result[3]).
                     WithParam("描述", result[6] || "").
@@ -52,7 +52,7 @@
                 return true
             })
             task.NewTrigger(matcherOnHeal, function (trigger, result, event) {
-                let item = new objectModule.Object(result[1], "", app.History.CurrentOutput).
+                let item = new objectModule.Object(result[1], "", App.History.CurrentOutput).
                     WithParam("动作", "result[2]")
                 App.Map.Room.Data.Objects.Append(item)
                 event.Context.Set("core.room.onobject", true)
@@ -70,7 +70,7 @@
                         App.Map.Room.ID=idlist[0]
                     }
                 }
-                App.RaiseEvent(new app.Event("core.roomentry"))
+                App.RaiseEvent(new App.Event("core.roomentry"))
             }
         })
 
