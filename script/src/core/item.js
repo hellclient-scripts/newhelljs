@@ -12,8 +12,11 @@
         App.Data.Item.Weight = 0
         App.Data.Item.Count = 0
     }
+    let checkerI=App.Checker.Register("i","i",30000)
+
     App.BindEvent("core.noitem", App.Core.Item.NoItem)
     App.Core.Item.OnItem = function (event) {
+        checkerI.Reset()
         event.Context.Propose("", function () {
             App.Data.Item = {}
             App.Data.Item.List = new objectModule.List()
@@ -48,6 +51,7 @@
             })
         },
         function (result) {
+            checkerI.Reset()
         },
     )
 })(App)

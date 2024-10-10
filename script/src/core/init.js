@@ -14,4 +14,11 @@
     Metronome.settick(1100)
     Metronome.setinterval(50)
     Metronome.setbeats(numcmds/2)
+    App.InitCommad="score;hp;cha;i;set no_more"
+    App.Init=function(){
+        if (App.InitCommad){
+            App.Send(App.InitCommad)
+            App.InitCommad=""
+        }
+    }
 })(App)

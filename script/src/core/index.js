@@ -9,6 +9,7 @@
     App.Include("src/core/committee.js")
     App.Include("src/core/commands.js")
     App.Include("src/core/userqueue.js")
+    App.Include("src/core/checker.js")
     App.Include("src/core/connect.js")
     App.Include("src/core/player.js")
     App.Include("src/core/room.js")

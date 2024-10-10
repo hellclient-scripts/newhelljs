@@ -5,12 +5,14 @@
         Score:{},
         Skills:{},
     }
+    let checkerHP=App.Checker.Register("hp","yun recover;yun regenerate;hp",5000)
     var matcherHPLine1 = /^│【精气】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[\s*(-?\d+)%\]\s+│【精力】\s+(-?\d+)\s+ \/\s*(-?\d+)\s+\(\+\s*(\d+)\)\s+│$/
     var matcherHPLine2 = /^│【气血】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[\s*(-?\d+)%\]\s+│【内力】\s+(-?\d+)\s+ \/\s*(-?\d+)\s+\(\+\s*(\d+)\)\s+│$/
     var matcherHPLine3 = /^│【食物】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[.+\]\s+│【潜能】\s+(-?\d+)\s+│$/
     var matcherHPLine4 = /^│【饮水】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[.+\]\s+│【经验】\s+(-?\d+)\s+│$/
     var matcherHPLine5 = /^│\s+│【体会】\s+(-?\d+)\s+│$/
     var matcherHPEnd = /^└─+.+─+─┘$/
+    
     var PlanOnHP = new App.Plan(App.Positions.Connect,
         function (task) {
             task.NewTrigger(matcherHPLine1, function (trigger, result, event) {
@@ -51,7 +53,7 @@
             task.NewTrigger(matcherHPEnd)
         },
         function (result) {
-            Dump(App.Data.Player.HP)
+            checkerHP.Reset()
         })
     App.Core.OnHP = function (event) {
         event.Context.Propose("", function () {
@@ -74,7 +76,6 @@
             task.NewTimer(5000)
         },
         function (result) {
-            Dump(App.Data.Player.Special)
         })
     App.Core.OnSpecial = function (event) {
         event.Context.Propose("", function () {
@@ -99,6 +100,8 @@
         })
 
     }
+    let checkerScore=App.Checker.Register("score","score",600000)
+
     App.BindEvent("core.score",App.Core.OnScore)
     var matcherScoreEnd = /^└─+┴─+.+─+┘$/
     var matcherScoreFamily=/│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│/
@@ -112,7 +115,7 @@
             task.NewTrigger(matcherScoreEnd)
         },
         function(result){
-            Dump(App.Data.Player.Score)
+            checkerScore.Reset()
         })
     var LastType=""
     App.Core.OnSkills=function(event){
@@ -122,6 +125,8 @@
             PlanOnSkills.Execute()
         })
     }
+    let checkerSkills=App.Checker.Register("skills","skills",600000)
+
     App.BindEvent("core.skills",App.Core.OnSkills)
     var matcherSkillsType=/^├─+.+项([^─]+)─+┼─+┼─+┼─+┤$/
     var matcherSkills=/^│(  |□)(\S+)\s+│(\S+)\s+│【.+】│\s*(\d+) \/\s*(\d+)\s*│$/
@@ -147,6 +152,7 @@
             task.NewTrigger(matcherSkillsEnd)
         },
         function(result){
+            checkerSkills.Reset()
         })
         App.Core.OnNoSkill=function(event){
             event.Context.Propose("", function () {

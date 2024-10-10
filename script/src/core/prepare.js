@@ -10,7 +10,29 @@
     App.NewPrepareCommand = function (id) {
         return App.Commands.NewCommand("prepare", id)
     }
+    let eventBeforeCheck=new App.Event("core.beforecheck")
     App.Prepare = function (id) {
+        App.RaiseEvent(eventBeforeCheck)
+        let checks = App.Checker.Check()
+        if (checks.length == 0) {
+            AfterCheck(id)
+            return
+        }
+        App.PushCommands(
+            App.Commands.NewFunctionCommand(function () {
+                checks.forEach(check => {
+                    check()
+                });
+                App.Next()
+            }),
+            App.NewSyncCommand(),
+            App.Commands.NewFunctionCommand(function () {
+                AfterCheck(id)
+            }),
+        )
+        App.Next()
+    }
+    let AfterCheck = function (id) {
         id = id || ""
         let submit = App.Proposals.Submit(id)
         if (submit) {
@@ -20,6 +42,7 @@
             )
         }
         App.Next()
+
     }
     App.Proposals.Register("cash", App.Proposals.NewProposal(function (proposals, exclude) {
         let cash = App.Data.Item.List.FindByName("一千两银票").First()
@@ -44,7 +67,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("cun " + Math.floor((num - (App.Params.GoldMax - App.Params.GoldKeep)) / 2) + " gold;i"),
+                    App.Commands.NewDoCommand("cun " + Math.floor((num - (App.Params.GoldMax - App.Params.GoldKeep) / 2)) + " gold;i"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )
@@ -60,7 +83,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("qu " + Math.floor(((App.Params.GoldMax - App.Params.GoldKeep) - num) / 2) + " gold;i"),
+                    App.Commands.NewDoCommand("qu " + Math.floor(((App.Params.GoldMax - App.Params.GoldKeep) / 2 - num)) + " gold;i"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )

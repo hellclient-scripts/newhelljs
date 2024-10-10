@@ -2,8 +2,13 @@
     let userqueueModule=App.RequireModule("helllibjs/command/userqueue.js")
     App.UserQueue={}
     App.UserQueue.OnAlias=function(n,l,w){
-        App.UserQueue.UserQueue.Exec(l)
+        App.UserQueue.Exec(l)
     }
+    App.UserQueue.Exec=function(cmd){
+        App.Init()
+        App.UserQueue.UserQueue.Exec(cmd)
+    }
+    
     App.UserQueue.UserQueue=new userqueueModule.UserQueue(App.Commands)
     App.UserQueue.UserQueue.RegisterCommand("#wait",userqueueModule.Wait)
     App.UserQueue.UserQueue.RegisterCommand("#loop",userqueueModule.Loop)
