@@ -13,7 +13,7 @@
         }
     ).WithWalk(
         function (maze, move, map) {
-            App.Send("drink shui dai")
+            App.Eat(true)
             map.TrySteps([maze.Data])
         }
     ))
