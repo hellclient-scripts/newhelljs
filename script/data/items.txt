@@ -1,2 +1,23 @@
 shui dai|shui dai|牛皮水袋|buy|27|buy shui dai from xiao er
 gan liang|gan liang|干粮|buy|27|buy 5 gan liang from xiao er
+long bow|long bow|长弓|buy|66|buy long bow from tie jiang
+long sword|long sword|长剑|buy|66|buy long sword from tie jiang
+iron blade|iron blade|钢刀|buy|66|buy iron blade from tie jiang
+arrow|arrow|狼牙箭|66|buy|buy 狼牙箭 from tie jiang
+gangbiao|gangbiao|钢镖|66|buy|buy 钢镖 from tie jiang
+armor|armor|铁甲|66|buy|buy 铁甲 from tie jiang
+tiegun|tiegun|铁棍|66|buy|buy 铁棍 from tie jiang
+hammer|hammer|铁锤|66|buy|buy 铁锤 from tie jiang
+dagger|dagger|普通匕首|66|buy|buy 普通匕首 from tie jiang
+zhujian|zhujian|竹剑|961|buy|buy 竹剑 from seller
+zhubang|zhubang|竹棒|961|buy|buy 竹棒 from seller
+hulu|hulu|葫芦|961|buy|buy 葫芦 from seller
+tie lianzi|tie lianzi|铁莲子|682|buy|buy 铁莲子 from tang huai
+feihuang shi|feihuang shi|飞蝗石|682|buy|buy 飞蝗石 from tang huai
+mu dao|mu dao|木刀|161|buy|buy 木刀 from mu jiang
+mu jian|mu jian|木剑|161|buy|buy 木剑 from mu jiang
+mu gun|mu gun|木棍|161|buy|buy 木棍 from mu jiang
+diao gan|diao gan|木棍|2717|buy|buy 钓竿 from huo ji
+baoguo|baoguo|包裹|62|buy|buy 包裹 from yang yongfu
+budai|budai|麻布袋|62|buy|buy 麻布袋 from yang yongfu
+yanbo|yanbo|研钵|65|buy|buy 研钵 from ping yizhi

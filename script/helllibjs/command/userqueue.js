@@ -67,7 +67,9 @@
                 this.All.push(new QueueItem(module.Do,text))
             });
             this.Remain=[...this.All]
-            this.Commands.Push()
+            this.Commands.Push().WithFailCommand(()=>{
+                this.Next()
+            })
             this.Next()
         }
         Stop(){

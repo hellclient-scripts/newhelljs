@@ -23,8 +23,13 @@
                 cb()
             }
         })
-        task.NewTrigger("此服务已经暂停。").WithName("sync")
+        task.NewTrigger("此服务已经暂停。",function(){
+            OmitOutput()
+        }).WithName("sync")
         App.Send("mail")
+    }
+    App.Sync=function(cb){
+        sync(cb)
     }
     App.Commands.RegisterExecutor("nobusy", function (commands, running) {
         running.OnStart = function (arg) {

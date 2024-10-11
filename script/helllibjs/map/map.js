@@ -63,43 +63,43 @@
         StepTimeout = 0
         RetryDelay = 0
         Mazes = {}
-        Trace(fr,cmd){
-            if (fr!=""){
-                let exits=Mapper.getexits(fr+"")
-                for (var i=0;i<exits.length;i++){
-                    if (exits[i].command==cmd){
+        Trace(fr, cmd) {
+            if (fr != "") {
+                let exits = Mapper.getexits(fr + "")
+                for (var i = 0; i < exits.length; i++) {
+                    if (exits[i].command == cmd) {
                         return exits[i].to
                     }
                 }
             }
-            return ""    
+            return ""
         }
-        TracePath(fr,...commands){
-            let result=[]
-            if (!fr){
+        TracePath(fr, ...commands) {
+            let result = []
+            if (!fr) {
                 return null
             }
-            let current=fr
-            for(let cmd of commands){
-                let to=this.Trace(current,cmd)
-                if (!to){
+            let current = fr
+            for (let cmd of commands) {
+                let to = this.Trace(current, cmd)
+                if (!to) {
                     return null
                 }
-                result.push(new Step(cmd,to))
-                current=to
+                result.push(new Step(cmd, to))
+                current = to
             }
             return result
         }
-        TraceRooms(fr,...commands){
-            let result=[fr]
-            let current=fr
-            for(let cmd of commands){
-                let to=this.Trace(current,cmd)
-                if (!to){
+        TraceRooms(fr, ...commands) {
+            let result = [fr]
+            let current = fr
+            for (let cmd of commands) {
+                let to = this.Trace(current, cmd)
+                if (!to) {
                     return null
                 }
                 result.push(to)
-                current=to
+                current = to
             }
             return result
         }
@@ -218,8 +218,9 @@
     let DefaultMoveNext = function (move, map) {
         return []
     }
+    let DefaultMoveOnStepFinish = function (move, map, step) {
+    }
     let DefaultMoveOnRoom = function (move, map, step) {
-
     }
     let DefaultMoveOnArrive = function (move, map) {
         move.Walk(map)
@@ -242,6 +243,7 @@
         OnCancel = module.DefaultOnCancel
         OnInitTags = DefaultOnInitTags
         OnStepTimeout = DefaultOnStepTimeout
+        OnStepFinsih = DefaultMoveOnStepFinish
         Option = new Option()
         #walking = []
         Pending = null
@@ -275,9 +277,9 @@
             }
             this.TrySteps(map, steps)
         }
-        GetPath(map,from,to){
+        GetPath(map, from, to) {
             map.InitTags()
-            return map.GetMapperPath(from,this.Option.Fly,to,this.Option.MapperOptions)
+            return map.GetMapperPath(from, this.Option.Fly, to, this.Option.MapperOptions)
         }
         StepTimeout(map) {
             this.OnStepTimeout(this, map)
@@ -290,6 +292,11 @@
             let step = this.#walking.shift()
             if (step.Target) {
                 map.Room.ID = step.Target
+            }
+            if (this.Maze) {
+                this.OnStepFinsih(this.Maze, map, step)
+            }else{
+                this.OnStepFinsih(this, map, step)
             }
             this.OnRoom(this, map, step)
             if (this.#walking.length == 0) {
@@ -316,8 +323,8 @@
         }
         InitTags(map) {
             if (this.Option != null) {
-                for (var key in this.Option.Tags){
-                    let value=Option.Tags[key]
+                for (var key in this.Option.Tags) {
+                    let value = Option.Tags[key]
                     if (value != null) {
                         map.SetTag(key, value)
                     }
@@ -388,6 +395,7 @@
         CheckEnter = DefaultMazeCheckEnter
         CheckEscaped = DefaultMazeEscaped
         Walk = DefaultMazeWalk
+        OnStepFinsih=DefaultMoveOnStepFinish
         NextRoom = ""
         WithCheckEnter(fn) {
             this.CheckEnter = fn
@@ -396,6 +404,9 @@
         WithCheckEscaped(fn) {
             this.CheckEscaped = fn
             return this
+        }
+        WithOnStepFinsih(fn){
+            this.OnStepFinsih=fn
         }
         WithWalk(fn) {
             this.Walk = fn

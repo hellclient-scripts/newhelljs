@@ -94,9 +94,9 @@
             }
 
         }
-        Cancel() {
+        Cancel(type) {
             if (this.Finished) { return }
-            this.#endWithResult(new TaskResult(this, "cancel", null, "", null))
+            this.#endWithResult(new TaskResult(this, type?type:"cancel", null, "", null))
         }
     }
     class Group {

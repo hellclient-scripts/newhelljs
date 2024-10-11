@@ -1,6 +1,14 @@
 (function(app){
     let ring=App.Include("helllibjs/lib/container/ring.js")
     let line=App.Include("helllibjs/lib/line/line.js")
+    class Line{
+        constructor(text,output){
+            this.Line=text
+            this.Output=output
+        }
+        Line=""
+        Output=null
+    }
     class History{
         constructor(size){
             this.Lines=ring.New(size)
@@ -10,11 +18,11 @@
             if (event.Name=="line"){
                 this.Current=event.Data.Output
                 this.CurrentOutput=line.Line.FromOutput(JSON.parse(DumpOutput(1))[0])
-                this.Lines=this.Lines.Next().WithValue({
-                    Line:this.Current,
-                    Output:this.CurrentOutput,
-                })
+                this.Lines=this.Lines.Next().WithValue(new Line(this.Current,this.CurrentOutput))
             }
+        }
+        GetLine(){
+            return new Line(this.Current,this.CurrentOutput)
         }
         GetLast(n){
             let result=[]
