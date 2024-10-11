@@ -24,4 +24,6 @@
     App.Include("src/core/prepare.js")  
     App.Include("src/core/ask.js")  
     App.Include("src/core/zone.js")
+    App.Include("src/core/quests.js")
+
 })(App)

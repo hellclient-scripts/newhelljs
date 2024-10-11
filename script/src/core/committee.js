@@ -6,7 +6,6 @@
   App.Positions["Connect"]=App.Committee.RegisterPosition("Connect")
   App.Committee.EventBus.BindEvent("connected",function(){App.Positions["Connect"].StartNewTerm()})
   App.Positions["Quest"]=App.Committee.RegisterPosition("Quest")
-  App.Committee.EventBus.BindEvent("core.newquest",function(){App.Positions["Quest"].StartNewTerm()})
   App.Positions["Room"]=App.Committee.RegisterPosition("Room")
   App.Positions["Combat"]=App.Committee.RegisterPosition("Combat")
   App.Committee.EventBus.BindEvent("core.newcombat",function(){App.Positions["Combat"].StartNewTerm()})
