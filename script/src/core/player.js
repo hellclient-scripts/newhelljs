@@ -231,7 +231,6 @@
             task.NewTrigger(matcherHPMEnd)
         },
         function (result) {
-            Dump(App.Data.Player.HPM)
             checkerHPM.Reset()
         })
 

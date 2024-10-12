@@ -4,13 +4,13 @@
 
     module.DefaultParser = function (quests, line) {
         let result = []
-        let data = line.Split(module.Sep)
+        let data = line.split(module.Sep)
         data.forEach(q => {
             q = q.trim()
             if (q == null) {
                 return
             }
-            let r = quests.NewRunningQuest()
+            let r = new RunningQuest()
             let qdata = SplitN(q, ">>", 2)
             let qinfo = qdata.pop().trim()
             if (qdata.length) {
@@ -33,7 +33,10 @@
             this.ID = id
         }
         InCooldown() {
-            return (new Date()) < this.CooldownTo
+            return (new Date()).getTime() < this.CooldownTo
+        }
+        Cooldown(interval){
+            this.CooldownTo = (new Date()).getTime() + (interval ? interval : 0)
         }
         CooldownTo = 0
         ID = ""
@@ -75,7 +78,7 @@
         }
         Cooldown(id, interval) {
             let q = this.#registered[id]
-            q.CooldownTo = (new Date()).getTime() + interval ? interval : 0
+            q.Cooldown(interval)
         }
         Stop() {
             this.Stopped = true
@@ -85,7 +88,7 @@
                 this.Stopped = false
                 this.Queue = quests
                 this.Remain = [...this.Queue]
-                this.Commands.Push(this.#nextcommand).WithFailCommand(this.#nextcommand)
+                this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             }
             this.Commands.Next()
         }
@@ -97,9 +100,9 @@
             this.Position.StartNewTerm()
             while(this.Remain.length) {
                 let r=this.Remain.shift()
-                if (r.Checker.Check()){
+                if (!this.#registered[r.ID].InCooldown() && r.Checker()){
                     this.Commands.PushCommands(
-                        this.Commands.NewFunctionCommand(function(){
+                        this.Commands.NewFunctionCommand(()=>{
                             let q=this.#registered[r.ID]
                             if (q==null){
                                 throw new Error("Quest "+r.ID+" not found")
@@ -122,7 +125,7 @@
             App.Next()
         }
         StartLine(line) {
-            this.StartRunningQuests(this.Parser(line))
+            this.StartRunningQuests(this.Parser(this,line))
         }
         NewQuest(id) {
             return new Quest(id)

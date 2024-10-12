@@ -81,7 +81,7 @@
         }
         Retry(move, map) {
             this.Path = null
-            this.Locate=null
+            this.Locate.DFS=null
         }
         Next(move, map) {
             if (this.Path != null) {
@@ -123,8 +123,8 @@
         Locate = new Locate()
         Path = null
         Retry(move, map) {
-            this.Locate=null
             this.Path = null
+            this.Locate.DFS=null
         }
         OnStepTimeout(move, map){
             if (this.Locate){

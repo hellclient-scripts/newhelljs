@@ -20,16 +20,19 @@
         OnEvent = null
     }
     class Queue {
-        constructor(entrycmd) {
-            this.EntryCommand = entrycmd
+        constructor(readycmd) {
+            this.ReadyCommand = readycmd
         }
         Context = {}
         FinishCommand = null
         FailCommand = null
-        EntryCommand = null
+        ReadyCommand = null
         Commands = []
         Flush() {
             this.Commands = []
+            this.ReadyCommand=null
+            this.FinishCommand=null
+            this.FailCommand=null
             return this
         }
         WithFinishCommand(cmd) {
@@ -38,6 +41,10 @@
         }
         WithFailCommand(cmd) {
             this.FailCommand = cmd
+            return this
+        }
+        WithReadyCommand(cmd){
+            this.ReadyCommand=cmd
             return this
         }
         WithContext(ctx) {
@@ -53,7 +60,7 @@
             return this
         }
         Clone() {
-            return new Queue(this.EntryCommand).
+            return new Queue(this.ReadyCommand).
                 WithFinishCommand(this.FinishCommand).
                 WithFailCommand(this.FailCommand).
                 WithContext(this.Context)
@@ -65,7 +72,7 @@
         PositionCommand = null
         PositionQueue = null
         Current = null
-        NeedEntry=false
+        NeedReady=false
         Queues = []
         #registeredExecutor = {}
         #registeredOnEvent = {}
@@ -138,7 +145,7 @@
             this.CurrentQueue(true).Append(...commands)
         }
         #enter() {
-            this.NeedEntry=true
+            this.NeedReady=true
         }
         #pop() {
             if (this.Queues.length) {
@@ -154,10 +161,10 @@
         Next() {
             let queue = this.CurrentQueue()
             if (queue) {
-                if (this.NeedEntry){
-                    this.NeedEntry=false
-                    if (queue.EntryCommand){
-                        this.Execute(queue.EntryCommand)
+                if (this.NeedReady){
+                    this.NeedReady=false
+                    if (queue.ReadyCommand){
+                        this.Execute(queue.ReadyCommand)
                         return                        
                     }
                 }
@@ -174,27 +181,30 @@
             let queue = this.CurrentQueue()
             if (queue) {
                 if (queue.FailCommand) {
+                    let cmd=queue.FailCommand
                     queue.Flush()
-                    this.Execute(queue.FailCommand)
+                    this.Execute(cmd)
                     return
                 }
                 this.#pop()
+                this.Next()
             }
         }
         Pop() {
             let queue = this.CurrentQueue()
             if (queue) {
                 if (queue.FinishCommand) {
+                    let cmd=queue.FinishCommand
                     queue.Flush()
-                    this.Execute(queue.FinishCommand)
+                    this.Execute(cmd)
                     return
                 }
                 this.#pop()
-                App.Next()
+                this.Next()
             }
         }
-        NewQueue(entrycmd){
-            return new Queue(entrycmd)
+        NewQueue(readycmd){
+            return new Queue(readycmd)
         }
         Push(queue){
             if (!queue){

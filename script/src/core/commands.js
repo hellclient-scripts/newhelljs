@@ -13,11 +13,11 @@
     App.Commands.EmptyCommand=cmdManual
     App.Next=function(){App.Commands.Next()}
     App.Fail=function(){App.Commands.Fail()}
-    App.Finish=function(){App.Commands.Finish()}
+    App.Pop=function(){App.Commands.Pop()}
     App.Append=function(...commands){App.Commands.Append(...commands)}
     App.Insert=function(...commands){App.Commands.Insert(...commands)}
     App.Execute=function(command,arg){App.Commands.Execute(command,arg)}
-    App.Push=function(entrycmd){return App.Commands.Push(entrycmd)}
+    App.Push=function(readycmd){return App.Commands.Push(readycmd)}
     App.PushCommands=function(...commands){return App.Commands.PushCommands(...commands)}
     App.Next()
 })(App)

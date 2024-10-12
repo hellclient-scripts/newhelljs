@@ -3,6 +3,7 @@
     const ModeNormal = 0
     const ModeComment = 1
     const ModeError = 2
+    module.CostToken="$"
     class Line {
         constructor(data) {
             this.Raw = data
@@ -41,6 +42,7 @@
             path.excludetags = this.ExcludeTags
             path.command = this.Command
             Mapper.addpath(this.From,path)
+            return path
         }
     }
     class File {
@@ -80,7 +82,7 @@
                     if (exitdata==""){
                         return
                     }
-                    let exit = parsepath(line.ID, exitdata)
+                    let exit = this.ParsePath(line.ID, exitdata)
                     if (exit.Enabled && exit.Mode == ModeNormal) {
                         if (this.BlockedPath[exit.From] && this.BlockedPath[exit.From][exit.To]) {
                             exit.Enabled = false
@@ -98,6 +100,7 @@
         Raw = []
         BlockedID = {}
         BlockedPath = {}
+        ParsePath=parsepath
     }
     parsepath = function (fr, str) {
         let exit = new Exit(str)
@@ -107,7 +110,7 @@
         var etags
         var s
         exit.From = fr
-        s = split2(str, "$")
+        s = split2(str, module.CostToken)
         str = s[0]
         delay = s[1]
         if (delay) {
@@ -153,5 +156,6 @@
         return s
     }
     module.File = File
+    module.Parsepath=parsepath
     return module
 })

@@ -11,12 +11,19 @@
     App.Move.NewRooms = function (rooms, ...initers) {
         return App.Map.NewRoute(new App.Map.Movement.Rooms(rooms), ...initers)
     }
+    App.Move.LongtimeStepDelay=60*1000
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
-            task.NewTimer(App.Map.StepTimeout).WithName("timeout")
+            let tt=task.NewTimer(App.Map.StepTimeout).WithName("timeout")
+            task.NewCatcher("core.longtimestep",function(){
+                tt.Reset(App.Move.LongtimeStepDelay)
+                return true
+            })
             task.NewCatcher("core.wrongway").WithName("wrongway")
             task.NewCatcher("core.walkbusy").WithName("walkbusy")
+            task.NewCatcher("core.walkresend").WithName("walkresend")
+            task.NewCatcher("core.walkretry").WithName("walkretry")
         },
         function (result) {
             switch (result.Type) {
@@ -28,10 +35,17 @@
                             App.Map.OnStepTimeout()
                             break
                         case "wrongway":
-                            App.Map.OnWrongway()
+                            App.Map.Room.ID=""
+                            App.Map.Retry()
                             break
                         case "walkbusy":
                             App.Map.Resend()
+                            break
+                        case "walkresend":
+                            App.Map.Resend(0)
+                            break
+                        case "walkretry":
+                            App.Map.Retry()
                             break
                     }
             }

@@ -1,6 +1,8 @@
 (function (App) {
     let roomshModule=App.RequireModule("helllibjs/roomsh/roomsh.js")
+    roomshModule.CostToken="%"
     App.RoomsH=new roomshModule.File()
+
     let mapfile="data/rooms.h"
     Note("加载地图文件"+mapfile)
     App.RoomsH.Load(ReadLines(mapfile))

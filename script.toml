@@ -395,7 +395,7 @@ Timers = []
   ID = "d1fv5jkjvdotit726vp8pf"
   Name = "core.walkbusy"
   Enabled = true
-  Match = "^(你现在正忙着呢。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
+  Match = "^(你现在正忙着呢。|你突然发现眼前的景象有些迷乱。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
   Send = ""
   ColourChangeType = 0
   Colour = 0
@@ -484,6 +484,68 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1fvcv20fk6t9372l29nab"
+  Name = "core.ride.nohorse"
+  Enabled = true
+  Match = "你还没有座骑！"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.FilterLineEvent(\"core.ride.nohorse\",\"core.walkretry\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1fvdiuhjk8uej72l2ersa"
+  Name = "core.faint"
+  Enabled = true
+  Match = "你的眼前一黑，接著什么也不知道了...."
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent('core.faint')"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -553,6 +615,29 @@ Timers = []
   OmitFromOutput = false
   OmitFromCommandHistory = false
 
+[[Aliases]]
+  ID = "d1fvd8m57s7g4i72l2d67r"
+  Name = "App.Core.Quest.OnAlias"
+  Enabled = true
+  Match = "#q(\\s*.+)$"
+  Send = ""
+  Script = "App.Core.Quest.OnAlias"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
 [[RequiredParams]]
   Name = "id"
   Desc = "用户的id"
@@ -567,3 +652,8 @@ Timers = []
   Name = "num_cmds"
   Desc = "每心跳指令数"
   Intro = "应该是2的倍数，留空默认"
+
+[[RequiredParams]]
+  Name = "cmd_ride"
+  Desc = "骑坐骑的指令"
+  Intro = "比如ride bao-feiji。\n留空则不尝试rideto。\n如果不需要召唤坐骑，可以设为t"

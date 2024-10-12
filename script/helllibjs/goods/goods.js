@@ -35,7 +35,7 @@
         GetGood(key) {
             return this.#items[key]
         }
-        GetGoodByName(name) {
+        GetGoodsByName(name) {
             let result = []
             for (let key in this.#items) {
                 let item = this.#items[key]
@@ -45,7 +45,7 @@
             }
             return result
         }
-        GetGoodByID(id) {
+        GetGoodsByID(id) {
             let result = []
             for (let key in this.#items) {
                 let item = this.#items[key]

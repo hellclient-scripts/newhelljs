@@ -2,7 +2,7 @@
     let movementModule = App.RequireModule("helllibjs/map/movement.js")
     let module = {}
     module.DefaultStepTimeout = 3000
-    module.DefaultRetryDelay = 500
+    module.DefaultResendDelay = 500
     class Room {
         ID = ""
         Name = ""
@@ -50,19 +50,23 @@
             this.Position = position
             this.Movement = movementModule
             this.StepTimeout = module.DefaultStepTimeout
-            this.RetryDelay = module.DefaultRetryDelay
+            this.ResendDelay = module.DefaultResendDelay
         }
         CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
         Room = new Room()
+        #tagsIniter=[]
         Move = null
         #tags = {}
         Data = {}
         Movement = null
         StepPlan = null
         StepTimeout = 0
-        RetryDelay = 0
+        ResendDelay = 0
         Mazes = {}
+        AppendTagsIniter(fn){
+            this.#tagsIniter.push(fn)
+        }
         Trace(fr, cmd) {
             if (fr != "") {
                 let exits = Mapper.getexits(fr + "")
@@ -110,6 +114,7 @@
         }
         FlashTags() {
             this.#tags = {}
+            Mapper.flashtags()
         }
         SetTag(name, value, force) {
             let old = this.#tags[name]
@@ -122,7 +127,14 @@
             if (this.Move != null) {
                 this.Move.InitTags(this)
             }
-            App.RaiseEvent(new App.Event("lib.map.inittags", this))
+            this.#tagsIniter.forEach(fn=>{
+                fn(this)
+            })
+            for (var key in this.#tags) {
+                if (this.#tags[key]) {
+                    Mapper.settag(key,true)
+                }
+            }
         }
         GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
@@ -143,11 +155,10 @@
                 this.Move.OnWalking(this)
             }
         }
-        OnWrongway() {
-            this.Room.ID = ""
+        Retry() {
             if (this.Move != null) {
                 this.Move.Retry(this.Move, this)
-                this.Move.Walk(this.Move, this)
+                this.Move.Walk(this)
             }
         }
         TrySteps(steps) {
@@ -161,8 +172,17 @@
             }
 
         }
-        Resend() {
-            this.Position.Wait(this.RetryDelay, () => {
+        Resend(delay) {
+            if (delay == null) {
+                delay = this.ResendDelay
+            }
+            if (delay <= 0) {
+                if (this.Move) {
+                    this.Move.Resend(this)
+                }
+                return
+            }
+            this.Position.Wait(delay, () => {
                 if (this.Move) {
                     this.Move.Resend(this)
                 }
@@ -277,8 +297,10 @@
             }
             this.TrySteps(map, steps)
         }
-        GetPath(map, from, to) {
-            map.InitTags()
+        GetPath(map, from, to,skipinit) {
+            if (!skipinit){
+                map.InitTags()
+            }
             return map.GetMapperPath(from, this.Option.Fly, to, this.Option.MapperOptions)
         }
         StepTimeout(map) {
@@ -295,7 +317,7 @@
             }
             if (this.Maze) {
                 this.OnStepFinsih(this.Maze, map, step)
-            }else{
+            } else {
                 this.OnStepFinsih(this, map, step)
             }
             this.OnRoom(this, map, step)
@@ -395,7 +417,7 @@
         CheckEnter = DefaultMazeCheckEnter
         CheckEscaped = DefaultMazeEscaped
         Walk = DefaultMazeWalk
-        OnStepFinsih=DefaultMoveOnStepFinish
+        OnStepFinsih = DefaultMoveOnStepFinish
         NextRoom = ""
         WithCheckEnter(fn) {
             this.CheckEnter = fn
@@ -405,8 +427,8 @@
             this.CheckEscaped = fn
             return this
         }
-        WithOnStepFinsih(fn){
-            this.OnStepFinsih=fn
+        WithOnStepFinsih(fn) {
+            this.OnStepFinsih = fn
         }
         WithWalk(fn) {
             this.Walk = fn

@@ -14,7 +14,9 @@
             App.Send("bai")
             return true
         })
-        task.NewTrigger("指令格式：apprentice | bai [cancel]|<对象>").WithName("nobusy")
+        task.NewTrigger("指令格式：apprentice | bai [cancel]|<对象>",function(){
+            OmitOutput()
+        }).WithName("nobusy")
         App.Send("bai")
     }
     let sync = function (cb) {

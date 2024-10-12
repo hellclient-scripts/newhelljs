@@ -27,8 +27,11 @@ var onResponse=function(type,id,data){
 var onkeyup=function(key){
 
 }
-Dump=function(data){
+NoteJSON=function(data){
     print(JSON.stringify(data,null,2))
+}
+Dump=function(data){
+    NoteJSON(data)
 }
 var onTime=function(){
     App.Engine.OnTime()
