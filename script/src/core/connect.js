@@ -20,8 +20,8 @@
     let matcherTooFast=/^你距上一次退出时间只有.+秒钟，请稍候再登录。$/
     var PlanOnConnected = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherEnter).WithName("enter")
-            task.NewTrigger(matcherReenter).WithName("reenter")
+            task.AddTrigger(matcherEnter).WithName("enter")
+            task.AddTrigger(matcherReenter).WithName("reenter")
         },
         function (result) {
             switch (result.Type) {

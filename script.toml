@@ -573,7 +573,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare)((\\s|\\|\\|).*)?$"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare|kill)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0
@@ -657,3 +657,8 @@ Timers = []
   Name = "cmd_ride"
   Desc = "骑坐骑的指令"
   Intro = "比如ride bao-feiji。\n留空则不尝试rideto。\n如果不需要召唤坐骑，可以设为t"
+
+[[RequiredParams]]
+  Name = "combat"
+  Desc = "战斗指令"
+  Intro = ""

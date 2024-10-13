@@ -117,6 +117,7 @@
             App.Send=function(cmd,group){
                 Send(cmd)
             }
+            App.Userspace={}
             App.Event=App.Engine.#eventmodule.Event
             return App
         }

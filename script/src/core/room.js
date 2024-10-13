@@ -40,7 +40,7 @@
     let matcherOnObj = /^    ((\S+) )?(\S*「.+」)?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
     var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherOnObj, function (trigger, result, event) {
+            task.AddTrigger(matcherOnObj, function (trigger, result, event) {
                 let item = new objectModule.Object(result[4], result[5], App.History.CurrentOutput).
                     WithParam("身份", result[2]).
                     WithParam("外号", result[3]).
@@ -51,7 +51,7 @@
                 event.Context.Set("core.room.onobject", true)
                 return true
             })
-            task.NewTrigger(matcherOnHeal, function (trigger, result, event) {
+            task.AddTrigger(matcherOnHeal, function (trigger, result, event) {
                 let item = new objectModule.Object(result[1], "", App.History.CurrentOutput).
                     WithParam("动作", "result[2]")
                 App.Map.Room.Data.Objects.Append(item)
@@ -59,7 +59,7 @@
                 return true
             })
 
-            task.NewCatcher("line", function (catcher, event) {
+            task.AddCatcher("line", function (catcher, event) {
                 return event.Context.Get("core.room.onobject")
             })
         }, function (result) {

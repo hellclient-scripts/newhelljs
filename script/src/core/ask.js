@@ -21,41 +21,41 @@
     let matcherFail = /^(这个地方不能讲话。|这里没有这个人。|.+对着.+自言自语....|你自己自言自语。|你现在的精神不太好，没法和别人套瓷。)$/
     let PlanOnAsk = new App.Plan(App.Positions.Connect,
         function (task) {
-            App.Sync(function () { task.Cancel("sync") })
-            task.NewTrigger(matcherAsk, function (result) {
+            App.Sync(function () {task.Cancel("sync") })
+            task.AddTrigger(matcherAsk, function (result) {
                 if (App.Data.Ask.Mode == 0) {
                     App.Data.Name = result[1]
                     App.Data.Ask.Mode = 1
                 }
                 return true
             })
-            task.NewTrigger(matcherUnknown, function (result) {
+            task.AddTrigger(matcherUnknown, function (result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "unknown"
                     App.Data.Ask.Mode = 2
                 }
                 return true
             })
-            task.NewTrigger(matcherRetry, function (result) {
+            task.AddTrigger(matcherRetry, function (result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "retry"
                     App.Data.Ask.Mode = 2
                 }
                 return true
             })
-            task.NewTrigger(matcherFail, function (result) {
+            task.AddTrigger(matcherFail, function (result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "fail"
                     App.Data.Ask.Mode = 2
                 }
                 return true
             })
-            task.NewCatcher("line", function (catcher, event) {
+            task.AddCatcher("line", function (catcher, event) {
                 if (App.Data.Ask.Mode != 0) {
                     App.Data.Ask.LineNumber++
                 }
                 if (App.Data.Ask.Mode == 1 && App.Data.Ask.LineNumber > 1) {
-                    if (App.Data.Ask.Answers.length > (App.Data.Ask.Length > 0 ? App.Data.Ask.Length : MaxAnswer)) {
+                    if (App.Data.Ask.Answers.length >= (App.Data.Ask.Length > 0 ? App.Data.Ask.Length : MaxAnswer)) {
                         App.Data.Ask.Mode = 2
                         return true
                     }

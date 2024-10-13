@@ -31,7 +31,7 @@
     let PlanOnItem = new App.Plan(
         App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcheritem, function (task, result, event) {
+            task.AddTrigger(matcheritem, function (task, result, event) {
                 let item=new objectModule.Object(result[2],result[3],App.History.CurrentOutput)
                 switch (result[1]) {
                     case "□":
@@ -46,7 +46,7 @@
                 App.Data.Item.List.Append(item)
                 return true
             })
-            task.NewTrigger(matcherend, function (task, result, event) {
+            task.AddTrigger(matcherend, function (task, result, event) {
                 App.Data.Item.Count=objectModule.CNumber.ParseNumber(result[1])
             })
         },

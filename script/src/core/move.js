@@ -15,15 +15,15 @@
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
-            let tt=task.NewTimer(App.Map.StepTimeout).WithName("timeout")
-            task.NewCatcher("core.longtimestep",function(){
+            let tt=task.AddTimer(App.Map.StepTimeout).WithName("timeout")
+            task.AddCatcher("core.longtimestep",function(){
                 tt.Reset(App.Move.LongtimeStepDelay)
                 return true
             })
-            task.NewCatcher("core.wrongway").WithName("wrongway")
-            task.NewCatcher("core.walkbusy").WithName("walkbusy")
-            task.NewCatcher("core.walkresend").WithName("walkresend")
-            task.NewCatcher("core.walkretry").WithName("walkretry")
+            task.AddCatcher("core.wrongway").WithName("wrongway")
+            task.AddCatcher("core.walkbusy").WithName("walkbusy")
+            task.AddCatcher("core.walkresend").WithName("walkresend")
+            task.AddCatcher("core.walkretry").WithName("walkretry")
         },
         function (result) {
             switch (result.Type) {

@@ -1,31 +1,35 @@
 (function (App) {
 
-    let checkbusy = function (delay, cb) {
+    let checkbusy = function (delay,offset, cb) {
         delay = delay - 0
         if (isNaN(delay) || delay <= 0) {
             delay = 1000
         }
-        let task = App.Positions["Connect"].NewTask(function (result) {
+        offset=offset-0
+        if (isNaN(offset)) {
+            offset=0
+        }        
+        let task = App.Positions["Connect"].AddTask(function (result) {
             if (result.Name == "nobusy") {
                 cb()
             }
         })
-        task.NewTimer(delay, function () {
+        task.AddTimer(delay, function () {
             App.Send("bai")
             return true
-        })
-        task.NewTrigger("指令格式：apprentice | bai [cancel]|<对象>",function(){
+        }).Reset(offset)
+        task.AddTrigger("指令格式：apprentice | bai [cancel]|<对象>",function(){
             OmitOutput()
         }).WithName("nobusy")
         App.Send("bai")
     }
     let sync = function (cb) {
-        let task = App.Positions["Connect"].NewTask(function (result) {
+        let task = App.Positions["Connect"].AddTask(function (result) {
             if (result.Name == "sync") {
                 cb()
             }
         })
-        task.NewTrigger("此服务已经暂停。",function(){
+        task.AddTrigger("此服务已经暂停。",function(){
             OmitOutput()
         }).WithName("sync")
         App.Send("mail")
@@ -35,11 +39,11 @@
     }
     App.Commands.RegisterExecutor("nobusy", function (commands, running) {
         running.OnStart = function (arg) {
-            checkbusy(running.Command.Data, function () { App.Next() })
+            checkbusy(running.Command.Data.Delay,running.Command.Data.Offset, function () { App.Next() })
         }
     })
-    App.NewNobusyCommand = function (delay) {
-        return App.Commands.NewCommand("nobusy", delay)
+    App.NewNobusyCommand = function (delay,offset) {
+        return App.Commands.NewCommand("nobusy", {Delay:delay,Offset:offset})
     }
     App.UserQueue.UserQueue.RegisterCommand("#nobusy", function (uq, data) {
         uq.Commands.Append(

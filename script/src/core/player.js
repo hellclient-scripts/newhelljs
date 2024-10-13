@@ -25,7 +25,7 @@
 
     var PlanOnHP = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherHPLine1, function (trigger, result, event) {
+            task.AddTrigger(matcherHPLine1, function (trigger, result, event) {
                 App.Data.Player.HP["当前精气"] = result[1] - 0
                 App.Data.Player.HP["精气上限"] = result[2] - 0
                 App.Data.Player.HP["精气百分比"] = result[3] - 0
@@ -34,7 +34,7 @@
                 App.Data.Player.HP["加精"] = result[6] - 0
                 return true
             })
-            task.NewTrigger(matcherHPLine2, function (trigger, result, event) {
+            task.AddTrigger(matcherHPLine2, function (trigger, result, event) {
                 App.Data.Player.HP["当前气血"] = result[1] - 0
                 App.Data.Player.HP["精气气血"] = result[2] - 0
                 App.Data.Player.HP["气血百分比"] = result[3] - 0
@@ -43,24 +43,24 @@
                 App.Data.Player.HP["加力"] = result[6] - 0
                 return true
             })
-            task.NewTrigger(matcherHPLine3, function (trigger, result, event) {
+            task.AddTrigger(matcherHPLine3, function (trigger, result, event) {
                 App.Data.Player.HP["当前食物"] = result[1] - 0
                 App.Data.Player.HP["最大食物"] = result[2] - 0
                 App.Data.Player.HP["潜能"] = result[3] - 0
                 return true
             })
-            task.NewTrigger(matcherHPLine4, function (trigger, result, event) {
+            task.AddTrigger(matcherHPLine4, function (trigger, result, event) {
                 App.Data.Player.HP["当前饮水"] = result[1] - 0
                 App.Data.Player.HP["最大饮水"] = result[2] - 0
                 App.Data.Player.HP["经验"] = result[3] - 0
                 return true
             })
-            task.NewTrigger(matcherHPLine5, function (trigger, result, event) {
+            task.AddTrigger(matcherHPLine5, function (trigger, result, event) {
                 App.Data.Player.HP["体会"] = result[1] - 0
                 return true
             })
-            task.NewTimer(5000)
-            task.NewTrigger(matcherHPEnd)
+            task.AddTimer(5000)
+            task.AddTrigger(matcherHPEnd)
         },
         function (result) {
             checkerHP.Reset()
@@ -79,15 +79,15 @@
     matcherSpecial = /^\S+\(([a-z]+)\)$/
     var PlanOnSpecial = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherSpecial, function (trigger, result, event) {
+            task.AddTrigger(matcherSpecial, function (trigger, result, event) {
                 App.Data.Player.Special[result[1]] = true
                 event.Context.Set("core.player.onspecial", true)
                 return true
             })
-            task.NewCatcher("line", function (catcher, event) {
+            task.AddCatcher("line", function (catcher, event) {
                 return event.Context.Get("core.player.onspecial")
             })
-            task.NewTimer(5000)
+            task.AddTimer(5000)
         },
         function (result) {
         })
@@ -121,12 +121,12 @@
     var matcherScoreFamily = /│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│/
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherScoreFamily, function (trigger, result, event) {
+            task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
                 App.Data.Player.Score["门派"] = result[3]
                 return true
             })
-            task.NewTimer(5000)
-            task.NewTrigger(matcherScoreEnd)
+            task.AddTimer(5000)
+            task.AddTrigger(matcherScoreEnd)
         },
         function (result) {
             checkerScore.Reset()
@@ -158,11 +158,11 @@
     var matcherSkillsEnd = /^└─*┴─*┴─*┴─*┘$/
     var PlanOnSkills = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherSkillsType, function (trigger, result, event) {
+            task.AddTrigger(matcherSkillsType, function (trigger, result, event) {
                 LastType = result[1]
                 return true
             })
-            task.NewTrigger(matcherSkills, function (trigger, result, event) {
+            task.AddTrigger(matcherSkills, function (trigger, result, event) {
                 let skill = {}
                 skill.ID = result[3]
                 skill["名称"] = result[2]
@@ -173,8 +173,8 @@
                 App.Data.Player.Skills[skill.ID] = skill
                 return true
             })
-            task.NewTimer(5000)
-            task.NewTrigger(matcherSkillsEnd)
+            task.AddTimer(5000)
+            task.AddTrigger(matcherSkillsEnd)
         },
         function (result) {
             checkerSkills.Reset()
@@ -207,28 +207,28 @@
 
     var PlanOnHPM = new App.Plan(App.Positions.Connect,
         function (task) {
-            task.NewTrigger(matcherHMP1, function (trigger, result, event) {
+            task.AddTrigger(matcherHMP1, function (trigger, result, event) {
                 App.Data.Player.HPM["精力上限"] = result[1] - 0
                 App.Data.Player.HPM["内力上限"] = result[2] - 0
                 return true
             })
-            task.NewTrigger(matcherHMP2, function (trigger, result, event) {
+            task.AddTrigger(matcherHMP2, function (trigger, result, event) {
                 App.Data.Player.HPM["潜能上限"] = result[1] - 0
                 App.Data.Player.HPM["体会上限"] = result[2] - 0
                 return true
             })
-            task.NewTrigger(matcherHMP3, function (trigger, result, event) {
+            task.AddTrigger(matcherHMP3, function (trigger, result, event) {
                 App.Data.Player.HPM["当前等级"] = result[1] - 0
                 App.Data.Player.HPM["升级所需"] = result[2] - 0
                 return true
             })
-            task.NewTrigger(matcherHMP4, function (trigger, result, event) {
+            task.AddTrigger(matcherHMP4, function (trigger, result, event) {
                 App.Data.Player.HPM["最大加怒"] = result[1] - 0
                 App.Data.Player.HPM["最大加力"] = result[2] - 0
                 return true
             })
-            task.NewTimer(5000)
-            task.NewTrigger(matcherHPMEnd)
+            task.AddTimer(5000)
+            task.AddTrigger(matcherHPMEnd)
         },
         function (result) {
             checkerHPM.Reset()

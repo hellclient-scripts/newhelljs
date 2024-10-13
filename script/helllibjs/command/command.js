@@ -30,9 +30,9 @@
         Commands = []
         Flush() {
             this.Commands = []
-            this.ReadyCommand=null
-            this.FinishCommand=null
-            this.FailCommand=null
+            this.ReadyCommand = null
+            this.FinishCommand = null
+            this.FailCommand = null
             return this
         }
         WithFinishCommand(cmd) {
@@ -43,8 +43,8 @@
             this.FailCommand = cmd
             return this
         }
-        WithReadyCommand(cmd){
-            this.ReadyCommand=cmd
+        WithReadyCommand(cmd) {
+            this.ReadyCommand = cmd
             return this
         }
         WithContext(ctx) {
@@ -72,13 +72,14 @@
         PositionCommand = null
         PositionQueue = null
         Current = null
-        NeedReady=false
+        NeedReady = false
         Queues = []
         #registeredExecutor = {}
         #registeredOnEvent = {}
         CommandNameFunction = "function"
         CommandNameDo = "do"
         CommandNameWait = "wait"
+        CommandNamePlan = "plan"
         OnEvent(event) {
             if (this.Current) {
                 let onEvent = this.Current.Command.OnEvent
@@ -112,15 +113,18 @@
             }
             return new Command(name, data)
         }
-        NewFunctionCommand(fn){
-            return this.NewCommand(this.CommandNameFunction,fn)
+        NewFunctionCommand(fn) {
+            return this.NewCommand(this.CommandNameFunction, fn)
         }
 
-        NewDoCommand(cmd){
-            return this.NewCommand(this.CommandNameDo,cmd)
+        NewDoCommand(cmd) {
+            return this.NewCommand(this.CommandNameDo, cmd)
         }
-        NewWaitCommand(delay){
-            return this.NewCommand(this.CommandNameWait,delay)
+        NewWaitCommand(delay) {
+            return this.NewCommand(this.CommandNameWait, delay)
+        }
+        NewPlanCommand(plan) {
+            return this.NewCommand(this.CommandNamePlan, plan)
         }
         RegisterExecutor(name, executor) {
             this.#registeredExecutor[name] = executor
@@ -145,7 +149,7 @@
             this.CurrentQueue(true).Append(...commands)
         }
         #enter() {
-            this.NeedReady=true
+            this.NeedReady = true
         }
         #pop() {
             if (this.Queues.length) {
@@ -154,18 +158,18 @@
                 this.#enter()
             }
         }
-        #push(queue){
+        #push(queue) {
             this.Queues.push(queue)
             this.#enter()
         }
         Next() {
             let queue = this.CurrentQueue()
             if (queue) {
-                if (this.NeedReady){
-                    this.NeedReady=false
-                    if (queue.ReadyCommand){
+                if (this.NeedReady) {
+                    this.NeedReady = false
+                    if (queue.ReadyCommand) {
                         this.Execute(queue.ReadyCommand)
-                        return                        
+                        return
                     }
                 }
                 if (queue.Commands.length) {
@@ -181,7 +185,7 @@
             let queue = this.CurrentQueue()
             if (queue) {
                 if (queue.FailCommand) {
-                    let cmd=queue.FailCommand
+                    let cmd = queue.FailCommand
                     queue.Flush()
                     this.Execute(cmd)
                     return
@@ -194,7 +198,7 @@
             let queue = this.CurrentQueue()
             if (queue) {
                 if (queue.FinishCommand) {
-                    let cmd=queue.FinishCommand
+                    let cmd = queue.FinishCommand
                     queue.Flush()
                     this.Execute(cmd)
                     return
@@ -203,18 +207,18 @@
                 this.Next()
             }
         }
-        NewQueue(readycmd){
+        NewQueue(readycmd) {
             return new Queue(readycmd)
         }
-        Push(queue){
-            if (!queue){
-                queue=new Queue()
+        Push(queue) {
+            if (!queue) {
+                queue = new Queue()
             }
             this.#push(queue)
             return queue
         }
-        PushCommands(...cmd){
-            let queue=new Queue()
+        PushCommands(...cmd) {
+            let queue = new Queue()
             queue.Append(...cmd)
             this.#push(queue)
             return queue
@@ -251,6 +255,9 @@
             if (this.CommandNameWait) {
                 this.RegisterExecutor(this.CommandNameWait, module.ExecutorWait)
             }
+            if (this.CommandNamePlan) {
+                this.RegisterExecutor(this.CommandNamePlan, module.ExecutorPlan)
+            }
         }
     }
     module.ExecutorFunction = function (commands, running) {
@@ -275,7 +282,11 @@
             })
         }
     }
-
+    module.ExecutorPlan = function (commands, running) {
+        running.OnStart = function (arg) {
+            running.Command.Data.Execute()
+        }
+    }
     module.Commands = Commands
     return module
 })

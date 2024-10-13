@@ -11,7 +11,7 @@
         InitFunc = null
         Callback = null
         Execute() {
-            let task = this.Position.NewTask(this.Callback)
+            let task = this.Position.AddTask(this.Callback)
             if (this.InitFunc) {
                 this.InitFunc(task)
             }
@@ -19,15 +19,13 @@
         }
     }
     class TaskResult {
-        constructor(task, type, event, name, data) {
+        constructor(task, type, name, data) {
             this.Type = type
             this.Task = task
-            this.Event = event
             this.Name = name || ""
             this.Data = data
         }
         Type = ""
-        Event = null
         Data = null
         Name = ""
         Task = null
@@ -45,17 +43,17 @@
         #timers = []
         #triggers = []
         #catchers = []
-        NewTimer(duration, callback, disabled, norepeat) {
+        AddTimer(duration, callback, disabled, norepeat) {
             let timer = new Timer(duration, callback, !disabled, norepeat)
             this.#timers.push(timer)
             return timer
         }
-        NewTrigger(matcher, callback, disabled) {
+        AddTrigger(matcher, callback, disabled) {
             let trigger = new Trigger(matcher, callback, !disabled)
             this.#triggers.push(trigger)
             return trigger
         }
-        NewCatcher(eventname, callback) {
+        AddCatcher(eventname, callback) {
             let catcher = new Catcher(eventname, callback)
             this.#catchers.push(catcher)
             return catcher
@@ -67,28 +65,27 @@
             }
         }
         OnTime() {
-            if (this.Finished) { return true}
+            if (this.Finished) { return true }
             for (let timer of this.#timers) {
                 if (!timer.OnTime()) {
-
-                    this.#endWithResult(new TaskResult(this, "timer", null, timer.Name, timer.Data))
+                    this.#endWithResult(new TaskResult(this, "timer", timer.Name, timer.Data))
                     return true
                 }
             }
         }
         OnEvent(event) {
-            if (this.Finished) { return true}
+            if (this.Finished) { return true }
             if (event.Name == App.Consts.EventNameLine) {
                 for (let trigger of this.#triggers) {
                     if (!trigger.OnEvent(event)) {
-                        this.#endWithResult(new TaskResult(this, "trigger", event, trigger.Name, trigger.Data))
+                        this.#endWithResult(new TaskResult(this, "trigger", trigger.Name, trigger.Data))
                         return true
                     }
                 }
             }
             for (let catcher of this.#catchers) {
                 if (!catcher.OnEvent(event)) {
-                    this.#endWithResult(new TaskResult(this, "catcher", event, catcher.Name, catcher.Data))
+                    this.#endWithResult(new TaskResult(this, "catcher", catcher.Name, catcher.Data))
                     return true
                 }
             }
@@ -96,7 +93,7 @@
         }
         Cancel(type) {
             if (this.Finished) { return }
-            this.#endWithResult(new TaskResult(this, type?type:"cancel", null, "", null))
+            this.#endWithResult(new TaskResult(this, type ? type : "cancel", null, "", null))
         }
     }
     class Group {
@@ -199,7 +196,7 @@
     }
     class Timer {
         constructor(duration, callback, enabled, norepeat) {
-            this.Duration = duration||0
+            this.Duration = duration || 0
             this.Callback = callback
             this.NoRepeat = (norepeat == true)
             this.Enabled = (enabled == true)
@@ -292,9 +289,9 @@
             let filter = {}
 
             this.#tasks.forEach(function (t) {
-                    if (!t.Finished){
-                        result.push(t)
-                    }
+                if (!t.Finished) {
+                    result.push(t)
+                }
             })
             this.#tasks = result
         }
@@ -338,28 +335,28 @@
             this.Term.End()
             this.Term = new Term()
         }
-        NewTimer(duration, callback, disabled, norepeat) {
+        AddTimer(duration, callback, disabled, norepeat) {
             let timer = new Timer(duration, callback, !disabled, norepeat)
             this.Term.BindTimer(timer)
             return timer
         }
-        NewTrigger(matcher, callback, disabled) {
+        AddTrigger(matcher, callback, disabled) {
             let trigger = new Trigger(matcher, callback, !disabled)
             this.Term.BindTrigger(trigger)
             return trigger
         }
-        NewTask(callback) {
+        AddTask(callback) {
             let task = new Task(callback)
             this.Term.BindTask(task)
             return task
         }
-        Wait(delay,callback){
-            let task=this.NewTask(result=>{
-                if (result.Type=="timer"){
+        Wait(delay, callback) {
+            let task = this.AddTask(result => {
+                if (result.Type == "timer") {
                     callback()
                 }
             })
-            task.NewTimer(delay)
+            task.AddTimer(delay)
         }
         BindEvent(eventname, handler) {
             this.Term.EventBus.BindEvent(eventname, handler)

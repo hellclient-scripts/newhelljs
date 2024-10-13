@@ -1,4 +1,4 @@
-(function (App) {
+$.module(function (App) {
     App.Quest.Beiqi = {}
     App.Quest.Beiqi.Data = {}
     App.Quest.Beiqi.Delay = 5 * 60 * 1000
@@ -144,4 +144,4 @@
         App.Next()
     }
     App.Quests.Register(Quest)
-})(App)
+})
