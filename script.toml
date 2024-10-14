@@ -667,3 +667,13 @@ Timers = []
   Name = "sell"
   Desc = "道具处理指令"
   Intro = ""
+
+[[RequiredParams]]
+  Name = "items"
+  Desc = "物品配置"
+  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nlong word * 2"
+
+[[RequiredParams]]
+  Name = "weapon"
+  Desc = "武器"
+  Intro = "武器相关设置"

@@ -41,6 +41,8 @@
             msg += "总伤 " + dam + " 秒伤 " + (dam / duration).toFixed(2)
         }
         Note(msg)
+        App.Send("hp")
+        App.Commands.Execute(App.NewSyncCommand())
         App.Next()
     }
     App.Core.Combat.Kill = function (id, tags) {

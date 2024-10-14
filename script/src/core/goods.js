@@ -1,5 +1,7 @@
 (function (App) {
     let goodsModule = App.RequireModule("helllibjs/goods/goods.js")
+    let actionModule = App.RequireModule("helllibjs/conditions/action.js")
+
     App.Core.Goods = {}
     App.Goods = new goodsModule.Goods()
     let file = "data/items.txt"
@@ -43,4 +45,44 @@
     App.BindEvent("core.beforecheck", function (event) {
         App.Eat()
     })
+
+    App.Core.Goods.Items = []
+    App.Core.Goods.Load = function () {
+        App.Core.Goods.Items = []
+        let items = []
+        App.Core.Assets.GoodsRules = "#carry "
+        App.LoadVariable("items").forEach(data => {
+            let item = actionModule.Parse(data).ParseNumber()
+            if (item.Data) {
+                if (App.Goods.GetGood(item.Data) == null) {
+                    Note("物品 " + item.Data + " 未招到。")
+                    return
+                }
+                App.Core.Goods.Items.push(item)
+                items.push(item.Data)
+            }
+        })
+        if (items.length) {
+            App.Core.Assets.GoodsRules = [App.Core.Assets.ParseRule("#carry " + items.join(","))]
+        }
+    }
+    App.Core.Goods.Load()
+
+    App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, exclude) {
+        for (item of App.Core.Goods.Items) {
+            let num = isNaN(item.Number) ? 1 : (item.Number-0)
+            let count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()
+            if (count < num) {
+                return function () {
+                    App.Commands.PushCommands(
+                        App.Goods.NewBuyCommand(item.Data),
+                        App.NewNobusyCommand(),
+                    )
+                    App.Next()
+                }
+            }
+        }
+        return null
+    }))
+
 })(App)

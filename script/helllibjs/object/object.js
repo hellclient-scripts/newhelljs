@@ -98,6 +98,19 @@
             }
             return null
         }
+        Last(){
+            if (this.Items.length){
+                return this.Items[this.Items.length-1]
+            }
+            return null
+        }
+        Sum(){
+            let result=0
+            this.Items.forEach(item=>{
+                result=result+item.GetData().Number()
+            })
+            return result
+        }
     }
     module.Object=Object
     module.List=List

@@ -6,6 +6,7 @@
     App.Core.Assets.Conditions = new conditionsModule.Conditions()
     App.Core.Assets.Rules = []
     App.Core.Assets.StaticRules = []
+    App.Core.Assets.GoodsRules = []
     App.Core.Assets.MatchFunction = function (rule, asset) {
         switch (rule.Data.Name) {
             case "any":
@@ -43,7 +44,7 @@
         App.Core.Assets.StaticRules.push(App.Core.Assets.ParseRule(data))
     })
     App.Core.Assets.Maintain = function (item, rules) {
-        return App.Assets.Maintain(item, rules || [], App.Core.Assets.Rules, App.Core.Assets.StaticRules)
+        return App.Assets.Maintain(item, rules || [], App.Core.Assets.GoodsRules, App.Core.Assets.Rules, App.Core.Assets.StaticRules)
     }
     App.Core.Assets.NeedCarry = function (item, rules) {
         let result = App.Core.Assets.Maintain(item, rules)

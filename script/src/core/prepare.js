@@ -158,9 +158,16 @@
         "qu",
         "silver",
         "coin",
+        "jinchuanyao",
+        "yangjingdan",
         "food",
         "drink",
+        "inspire",
+        "dazuo",
+        "heal",
+        "tuna",
         "assets",
+        "item",
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)

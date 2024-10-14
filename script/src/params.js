@@ -15,4 +15,11 @@
     CashMax:200,
     CashKeep:30,
     LocBank:"23",
+    HealBelow:75,
+    InspireBleow:75,
+    NeiliMin:75,
+    JingliMin:50,
+    LocDazuo:"1927",
+    NumDazuo:0,
+    NumTuna:0,
 }})()
