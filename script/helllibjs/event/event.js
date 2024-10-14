@@ -8,7 +8,6 @@
         #proposals=[]
         #proposalsLate=[]
         #proposalsLater=[]
-        #usedname={}
         Set(name,data){
             this.Data[name]=data
         }
@@ -19,20 +18,20 @@
             }
             return result
         }
-        Propose(name,callback){
-            return this.#propose(this.#proposals,name,callback)
+        Propose(callback){
+            return this.#propose(this.#proposals,callback)
         }
-        ProposeEarly(name,callback){
-            return this.#propose(this.#proposalsEarly,name,callback)
+        ProposeEarly(callback){
+            return this.#propose(this.#proposalsEarly,callback)
         }
-        ProposeEarlier(name,callback){
-            return this.#propose(this.#proposalsEarlier,name,callback)
+        ProposeEarlier(callback){
+            return this.#propose(this.#proposalsEarlier,callback)
         }
-        ProposeLate(name,callback){
-            return this.#propose(this.#proposalsLate,name,callback)
+        ProposeLate(callback){
+            return this.#propose(this.#proposalsLate,callback)
         }
-        ProposeLater(name,callback){
-            return this.#propose(this.#proposalsLater,name,callback)
+        ProposeLater(callback){
+            return this.#propose(this.#proposalsLater,callback)
         }
         Execute(){
             [this.#proposalsEarlier,this.#proposalsEarly,this.#proposals,this.#proposalsLate,this.#proposalsLater].forEach(proposals => {
@@ -41,11 +40,7 @@
                 })
             });
         }
-        #propose(proposals,name,callback) {
-            if (name && this.#usedname[name]){
-                return false
-            }
-            this.#usedname[name]=true
+        #propose(proposals,callback) {
             proposals.push(callback)
             return true
         }

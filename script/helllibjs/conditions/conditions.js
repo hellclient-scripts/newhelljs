@@ -2,7 +2,7 @@
     let module={}
     module.Parse=function(line){
         let result=[]
-        line.split(line,",").forEach(cond => {
+        line.split(",").forEach(cond => {
             cond=cond.trim()
             if (cond==""){
                 return
@@ -20,9 +20,9 @@
         return result
     }
     class Matcher {
-        constructor(id,matcher){
+        constructor(id,match){
             this.ID=id
-            this.Matcher=matcher
+            this.Match=match
         }
         ID = ""
         Match = null
@@ -35,8 +35,8 @@
     class Conditions {
         #registered = []
         Parse=module.Parse
-        NewMatcher(id,matcher){
-            return new Matcher(id,matcher)
+        NewMatcher(id,match){
+            return new Matcher(id,match)
         }
         NewCondition(){
             return new Condition()
@@ -44,10 +44,10 @@
         RegisterMatcher(matcher){
             this.#registered[matcher.ID]=matcher
         }
-        Check(...conditions) {
+        Check(conditions,target) {
             for (let condition of conditions) {
                 let matcher = this.#registered[condition.Type]
-                let result = matcher == null ? false : matcher.Match(condition.Data)
+                let result = (matcher == null) ? false : matcher.Match(condition.Data,target)
                 if (condition.Exclude) { result = !result }
                 if (!result){
                     return false
@@ -55,13 +55,13 @@
             }
             return true
         }
-        CheckLine(line){
-            return this.Check(this.Parse(line))
+        CheckLine(line,target){
+            return this.Check(this.Parse(line),target)
         }
-        NewChecker(line){
+        NewChecker(line,target){
             let conditions=this.Parse(line)
             return ()=>{
-                return Conditions.Check(conditions)
+                return this.Check(conditions,target)
             }
         }
     }

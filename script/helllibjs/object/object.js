@@ -6,7 +6,6 @@
     class ObjectData{
         constructor(){
         }
-        IDLower=""
         Unit=""
         Count=1
         Name=""
@@ -14,7 +13,6 @@
     module.DataParaser=function(obj){
         if (obj.Data==null){
             obj.Data=new ObjectData()
-            obj.Data.IDLower=obj.ID.toLowerCase()
             let result=module.CNumber.Convert(obj.Label)
             obj.Data.Count=result.Count
             obj.Data.Unit=result.Unit
@@ -24,6 +22,7 @@
     class Object{
         constructor(label,id,raw){
             this.ID=id
+            this.IDLower=id.toLowerCase()
             this.Label=label
             this.#raw=raw
         }
@@ -40,6 +39,7 @@
         }
         Data=null
         ID=""
+        IDLower=""
         #raw=null
         Label=""
         Params={}
@@ -68,7 +68,7 @@
             id=id.toLowerCase()
             let result=new List()
             this.Items.forEach(item=>{
-                if (item.GetData().IDLower==id){
+                if (item.IDLower==id){
                     result.Append(item)
                 }
             })

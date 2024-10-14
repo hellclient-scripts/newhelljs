@@ -1,21 +1,23 @@
 (function (App) {
     let proposalsModule = App.RequireModule("helllibjs/proposals/proposals.js")
     App.Core.Prepare = {}
+    App.Core.Prepare.Data = {}
     App.Proposals = new proposalsModule.Proposals()
     App.Commands.RegisterExecutor("prepare", function (commands, running) {
         running.OnStart = function (arg) {
-            App.Prepare(running.Command.Data)
+            App.Prepare(running.Command.Data.ID, running.Command.Data.Data)
         }
     })
-    App.NewPrepareCommand = function (id) {
-        return App.Commands.NewCommand("prepare", id)
+    App.NewPrepareCommand = function (id, data) {
+        return App.Commands.NewCommand("prepare", { ID: id, Data: data })
     }
-    let eventBeforeCheck=new App.Event("core.beforecheck")
-    App.Prepare = function (id) {
+    let eventBeforeCheck = new App.Event("core.beforecheck")
+    App.Prepare = function (id, data) {
+        App.Core.Prepare.Data = data || {}
         App.RaiseEvent(eventBeforeCheck)
         let checks = App.Checker.Check()
         if (checks.length == 0) {
-            AfterCheck(id)
+            AfterCheck(id, data)
             return
         }
         App.PushCommands(
@@ -27,18 +29,18 @@
             }),
             App.NewSyncCommand(),
             App.Commands.NewFunctionCommand(function () {
-                AfterCheck(id)
+                AfterCheck(id, data)
             }),
         )
         App.Next()
     }
-    let AfterCheck = function (id) {
+    let AfterCheck = function (id, data) {
         id = id || ""
         let submit = App.Proposals.Submit(id)
         if (submit) {
             App.PushCommands(
                 App.Commands.NewFunctionCommand(submit),
-                App.NewPrepareCommand(id),
+                App.NewPrepareCommand(id, data),
             )
         }
         App.Next()
@@ -158,6 +160,7 @@
         "coin",
         "food",
         "drink",
+        "assets",
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)

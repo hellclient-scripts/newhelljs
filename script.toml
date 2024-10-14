@@ -662,3 +662,8 @@ Timers = []
   Name = "combat"
   Desc = "战斗指令"
   Intro = ""
+
+[[RequiredParams]]
+  Name = "sell"
+  Desc = "道具处理指令"
+  Intro = ""

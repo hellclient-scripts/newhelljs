@@ -28,6 +28,7 @@
             })
         }
         Submit(id,excluded){
+            id=id||""
             if (!excluded){
                 excluded={}
             }

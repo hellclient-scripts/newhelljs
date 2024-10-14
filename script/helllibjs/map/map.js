@@ -172,7 +172,7 @@
             }
 
         }
-        Resend(delay) {
+        Resend(delay,offset) {
             if (delay == null) {
                 delay = this.ResendDelay
             }
@@ -182,7 +182,7 @@
                 }
                 return
             }
-            this.Position.Wait(delay, () => {
+            this.Position.Wait(delay, offset,() => {
                 if (this.Move) {
                     this.Move.Resend(this)
                 }

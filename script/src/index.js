@@ -1,4 +1,4 @@
-(function(app){
+(function(App){
     print("加载脚本")
     App.Stopped=false
     App.Data={}

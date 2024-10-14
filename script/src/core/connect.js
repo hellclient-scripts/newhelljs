@@ -10,7 +10,7 @@
         App.Core.Connect.Login()
     }
     App.BindEvent("connected", function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             PlanOnConnected.Execute()
         })
     })

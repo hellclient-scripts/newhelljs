@@ -350,13 +350,13 @@
             this.Term.BindTask(task)
             return task
         }
-        Wait(delay, callback) {
+        Wait(delay, offset,callback) {
             let task = this.AddTask(result => {
                 if (result.Type == "timer") {
                     callback()
                 }
             })
-            task.AddTimer(delay)
+            task.AddTimer(delay).Reset(offset)
         }
         BindEvent(eventname, handler) {
             this.Term.EventBus.BindEvent(eventname, handler)

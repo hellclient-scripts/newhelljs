@@ -66,7 +66,7 @@
             checkerHP.Reset()
         })
     App.Core.OnHP = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.HP = {}
             PlanOnHP.Execute()
         })
@@ -92,7 +92,7 @@
         function (result) {
         })
     App.Core.OnSpecial = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.Special = {}
             PlanOnSpecial.Execute()
         })
@@ -106,7 +106,7 @@
     }
     App.BindEvent("core.title", App.Core.OnTitle)
     App.Core.OnScore = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.Score = {}
             App.Data.Player.Score["名字"] = LastName
             App.Data.Player.Score.ID = LastID
@@ -133,7 +133,7 @@
         })
     var LastType = ""
     App.Core.OnSkills = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.Skills = {}
             LastType = ""
             PlanOnSkills.Execute()
@@ -180,7 +180,7 @@
             checkerSkills.Reset()
         })
     App.Core.OnNoSkill = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.Skills = {}
             LastType = ""
         })
@@ -188,7 +188,7 @@
     App.BindEvent("core.noskill", App.Core.OnNoSkill)
 
     App.Core.OnHPM = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Player.HPM = {}
             PlanOnHPM.Execute()
         })

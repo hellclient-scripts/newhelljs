@@ -100,7 +100,7 @@
             this.Position.StartNewTerm()
             while(this.Remain.length) {
                 let r=this.Remain.shift()
-                if (!this.#registered[r.ID].InCooldown() && r.Checker()){
+                if (this.#registered[r.ID] && !this.#registered[r.ID].InCooldown() && r.Checker()){
                     this.Commands.PushCommands(
                         this.Commands.NewFunctionCommand(()=>{
                             let q=this.#registered[r.ID]

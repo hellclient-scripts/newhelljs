@@ -120,8 +120,8 @@
         NewDoCommand(cmd) {
             return this.NewCommand(this.CommandNameDo, cmd)
         }
-        NewWaitCommand(delay) {
-            return this.NewCommand(this.CommandNameWait, delay)
+        NewWaitCommand(delay, offset) {
+            return this.NewCommand(this.CommandNameWait, { Delay: delay, Offset: offset })
         }
         NewPlanCommand(plan) {
             return this.NewCommand(this.CommandNamePlan, plan)
@@ -273,11 +273,15 @@
     }
     module.ExecutorWait = function (commands, running) {
         running.OnStart = function (arg) {
-            let delay = running.Command.Data - 0
+            let delay = running.Command.Data.Delay - 0
             if (isNaN(delay)) {
                 delay = 0
             }
-            commands.PositionCommand.Wait(delay, result => {
+            let offset = running.Command.Data.Offset - 0
+            if (isNaN(offset)) {
+                offset = 0
+            }
+            commands.PositionCommand.Wait(delay, offset, result => {
                 commands.Next()
             })
         }

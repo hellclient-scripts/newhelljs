@@ -21,6 +21,7 @@
             good.Type = data[3] || ""
             good.From = data[4] || ""
             good.Command = data[5] || ""
+            good.Data = data[6] || ""
             this.RegisterGood(good)
         }
         NewGood() {

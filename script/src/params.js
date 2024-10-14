@@ -6,7 +6,7 @@
     Food:"gan liang",
     FoodCommand:"eat gan liang",
     FoodMin:5,
-    GoldKeep:1,
+    GoldKeep:2,
     GoldMax:20,
     SilverMax:2000,
     SilverKeep:0,

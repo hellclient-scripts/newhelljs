@@ -52,7 +52,7 @@
         }
     )
     App.BindEvent("core.roomentry", function (event) {
-        event.Context.ProposeLater("", function () {
+        event.Context.ProposeLater(function () {
             App.Map.OnWalking()
         })
     })

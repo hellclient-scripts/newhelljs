@@ -27,7 +27,7 @@
     App.BindEvent("core.roomname", App.Core.Room.OnName)
     reExit = /[a-z]+/g
     App.Core.Room.OnExit = function (event) {
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             let result = [...event.Data.Wildcards[1].matchAll(reExit)].map(data => data[0]).sort()
             // App.Data.Room.Exits = result
             App.Map.Room.WithExits(result)

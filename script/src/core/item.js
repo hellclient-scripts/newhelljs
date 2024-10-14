@@ -17,7 +17,7 @@
     App.BindEvent("core.noitem", App.Core.Item.NoItem)
     App.Core.Item.OnItem = function (event) {
         checkerI.Reset()
-        event.Context.Propose("", function () {
+        event.Context.Propose(function () {
             App.Data.Item = {}
             App.Data.Item.List = new objectModule.List()
             App.Data.Item.Weight = event.Data.Wildcards["0"] - 0
