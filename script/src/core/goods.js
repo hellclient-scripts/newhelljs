@@ -50,7 +50,7 @@
     App.Core.Goods.Load = function () {
         App.Core.Goods.Items = []
         let items = []
-        App.Core.Assets.GoodsRules = "#carry "
+        App.Core.Assets.GoodsRules =[]
         App.LoadVariable("items").forEach(data => {
             let item = actionModule.Parse(data).ParseNumber()
             if (item.Data) {

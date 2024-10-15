@@ -57,6 +57,25 @@ $.Module(function (App) {
             $.Next()
         },
     )
+    let relian=/^(炉顶青烟渐渐转淡，丹药气味渐浓，你|炉顶青烟渐渐转淡，蓦然一道金光闪过，你)/
+    let PlanLiandan = new App.Plan(App.Map.Position,
+        function (task) {
+            task.AddTrigger("炼丹之地，切勿滋扰。")
+            task.AddTrigger("别在这浪费时间了，快走吧。")
+            task.AddTrigger("原料都没有，炼什么啊？")
+            task.AddTrigger("炼制成功，快去复命吧。")
+            task.AddTrigger(relian)
+            task.AddTimer(30000)
+            App.Send("liandan")
+        },
+        function (result) {
+            if (result.Type == "cancel") {
+                return
+            }
+            $.Next()
+        },
+    )
+
     Liandan.KillDuShe = function () {
         $.PushCommands(
             $.CountAttack("du she", ["liandan", "liandan-dusha"]),
@@ -125,9 +144,7 @@ $.Module(function (App) {
             $.To("1387"),
             $.Do("give cao yao to xiao tong"),
             $.To("1389"),
-            $.Do("liandan"),
-            $.Nobusy(1000,10000),
-            $.Wait(2000),
+            $.Plan(PlanLiandan),
             $.To("1388"),
             $.Ask("yao chun", "炼丹"),
             $.Prepare("",preparedata),

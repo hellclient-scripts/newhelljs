@@ -67,7 +67,7 @@
         return null
     }))
     App.Proposals.Register("yangjingdan", App.Proposals.NewProposal(function (proposals, exclude) {
-        if (App.Data.Player.HP["气血百分比"] <= 34) {
+        if (App.Data.Player.HP["精气百分比"] <= 34) {
             return function () {
                 App.Commands.PushCommands(
                     App.Goods.NewBuyCommand("yangjing dan"),

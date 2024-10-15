@@ -17,7 +17,11 @@
             task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！")
             task.AddTrigger("已经有野兽跟着你了！")
             task.AddTrigger("你要让什么野兽跟随你？")
+            task.AddCatcher("disconnected").WithName("Disconnect")
         }, function (result) {
+            if (result.Name=="Disconnect"){
+                return
+            }
             App.Combat.Stop()
         })
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
