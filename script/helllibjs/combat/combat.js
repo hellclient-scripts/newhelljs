@@ -41,10 +41,11 @@
             if (!this.Combating) {
                 return
             }
-            this.OnStop(this)
+            let onstop=this.OnStop
             this.Position.StartNewTerm()
             this.Target = ""
             this.Combating = false
+            onstop(this)
         }
         Duration() {
             return (new Date()).getTime() - this.StartAt

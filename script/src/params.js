@@ -17,9 +17,12 @@
     LocBank:"23",
     HealBelow:75,
     InspireBleow:75,
-    NeiliMin:75,
+    NeiliMin:50,
     JingliMin:50,
     LocDazuo:"1927",
+    LocSleep:"179",
+    LocRepair:"66",
     NumDazuo:0,
     NumTuna:0,
+    WeaponDurationMin:40,
 }})()

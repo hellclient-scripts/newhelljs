@@ -33,16 +33,18 @@
         }
         OnEvent(event) {
             this.#pendingEvents.push(event)
-            if (this.#pendingEvents.length > 1){
+            if (this.#pendingEvents.length > 1) {
                 return
             }
             while (this.#pendingEvents.length > 0) {
-                let current=this.#pendingEvents[0]
-                this.EventBus.RaiseEvent(current)
-                this.#eventHandlers.forEach(handler => {
-                    handler.Handler(current)
+                this.TryRun(() => {
+                    let current = this.#pendingEvents[0]
+                    this.EventBus.RaiseEvent(current)
+                    this.#eventHandlers.forEach(handler => {
+                        handler.Handler(current)
+                    })
+                    current.Context.Execute()
                 })
-                current.Context.Execute()
                 this.#pendingEvents.shift()
             }
         }
@@ -52,11 +54,20 @@
                 Stack: (new Error()).Stack
             })
         }
+        TryRun(fn) {
+            try {
+                fn()
+            }
+            catch (e) {
+                PrintSystem(e.message + "\n" + e.stack)
+            }
+        }
         OnTime() {
             this.#timeHandlers.forEach(handler => {
-                handler.Handler()
+                this.TryRun(() => {
+                    handler.Handler()
+                })
             })
-
         }
         BindTimeHandler(handler) {
             this.#timeHandlers.push({
@@ -114,11 +125,11 @@
             App.BindEvent = function (eventname, callback) {
                 App.Engine.EventBus.BindEvent(eventname, callback)
             }
-            App.Send=function(cmd,group){
+            App.Send = function (cmd, group) {
                 Send(cmd)
             }
-            App.Userspace={}
-            App.Event=App.Engine.#eventmodule.Event
+            App.Userspace = {}
+            App.Event = App.Engine.#eventmodule.Event
             return App
         }
     }

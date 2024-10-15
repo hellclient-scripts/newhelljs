@@ -98,7 +98,6 @@
                             App.Commands.NewDoCommand("i"),
                             App.NewSyncCommand(),
                         )
-
                     }
                     break
                 default:

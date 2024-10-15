@@ -44,4 +44,10 @@ $.CountAttack = App.NewCounterAttackCommand
 
 $.Kill = App.NewKillCommand
 
+$.Append = App.Append
+
+$.Insert = App.Insert
+
+$.PrepareMoney=App.NewPrepareMoneyCommand
+
 $.Now = function () { return (new Date()).getTime() }

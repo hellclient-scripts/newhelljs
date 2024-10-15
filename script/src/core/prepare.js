@@ -11,6 +11,30 @@
     App.NewPrepareCommand = function (id, data) {
         return App.Commands.NewCommand("prepare", { ID: id, Data: data })
     }
+    App.PrepareMoney = function (num) {
+        if (!num) { num = 0 }
+        let money = App.Core.Item.GetMoney()
+        if (num > money) {
+            let cmd
+            let diff = num - money
+            if (diff >= 10) {
+                cmd = "qu " + Math.ceil(diff / 10) + " cash;i"
+            } else {
+                cmd = "qu " + cmd + " gold;i"
+            }
+            App.Commands.PushCommands(
+                App.Move.NewToCommand(App.Params.LocBank),
+                App.Commands.NewDoCommand(cmd),
+                App.NewSyncCommand(),
+                App.Commands.NewWaitCommand(1000),
+                App.NewPrepareMoneyCommand(num),
+            )
+        }
+        App.Next()
+    }
+    App.NewPrepareMoneyCommand=function(num){
+        return App.Commands.NewFunctionCommand(()=>{App.PrepareMoney(num)})
+    }
     let eventBeforeCheck = new App.Event("core.beforecheck")
     App.Prepare = function (id, data) {
         App.Core.Prepare.Data = data || {}
@@ -44,7 +68,6 @@
             )
         }
         App.Next()
-
     }
     App.Proposals.Register("cash", App.Proposals.NewProposal(function (proposals, exclude) {
         let cash = App.Data.Item.List.FindByName("一千两银票").First()
@@ -168,6 +191,7 @@
         "tuna",
         "assets",
         "item",
+        "repair",
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)

@@ -45,9 +45,8 @@
             msg += "总伤 " + dam + " 秒伤 " + (dam / duration).toFixed(2)
         }
         Note(msg)
-        App.Send("hp")
+        App.Send("yun recover;yun regenerate;hp;i")
         App.Commands.Execute(App.NewSyncCommand())
-        App.Next()
     }
     App.Core.Combat.Kill = function (id, tags) {
         App.Core.Combat.CounterAttack(id, tags)

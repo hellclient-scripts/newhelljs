@@ -6,6 +6,7 @@ $.Module(function (App) {
     let TimeToChange = 24000
     let Last = 0
     let preparedata = {}
+    let eatList=["longwang dan","qinglong dan","baihu dan","zhuque dan","xuanwu dan","haoyue dan","yinyang dan","wanshou dan"]
     preparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#sell name=火麒丹,血麒丹,归元丹,小还丹,大还丹,还魂丹,补精丹,大补丹,雪参丹,十全大还丹,大云丹,养精丹,锁泉丹,小金丹,小云丹,蓄精丹,碧泉丹"),
         App.Core.Assets.ParseRule("#pack name=龟苓丹,映月丹,修罗无常丹,回阳无极丹,龙涎丹,邀月丹,子午龙甲丹,幻灵丹,轩辕补心丹,罗刹无常丹"),
@@ -24,7 +25,6 @@ $.Module(function (App) {
             task.AddTrigger("东西到手，快去交了吧。").WithData("got")
             task.AddTrigger("别在这浪费时间了，快走吧。").WithData("got")
             task.AddTrigger("草丛中一阵晃动，突然钻出一条毒蛇。").WithData("dushe")
-            task.AddTrigger("慢慢找，先别急。").WithData("retry")
             task.AddTrigger("林子后面突然跳出一个凶神恶刹的男子，手提一把短刀向你扑来！").WithData("dulangzhong")
             task.AddTrigger(reFail)
             task.AddTimer(8000)
@@ -50,7 +50,7 @@ $.Module(function (App) {
                     return
             }
             $.PushCommands(
-                $.Prepare(),
+                $.Prepare(""),
                 $.Wait(1000 * ($.Random(2))),
                 $.Function(Liandan.Cai),
             )
@@ -72,6 +72,7 @@ $.Module(function (App) {
             if (result.Type == "cancel") {
                 return
             }
+            App.Send("i")
             $.Next()
         },
     )
@@ -79,7 +80,7 @@ $.Module(function (App) {
     Liandan.KillDuShe = function () {
         $.PushCommands(
             $.CountAttack("du she", ["liandan", "liandan-dusha"]),
-            $.Prepare(),
+            $.Prepare(""),
             $.Function(Liandan.Cai)
         )
         $.Next()
@@ -144,10 +145,30 @@ $.Module(function (App) {
             $.To("1387"),
             $.Do("give cao yao to xiao tong"),
             $.To("1389"),
+            $.Do("i"),
+            $.Sync(),
             $.Plan(PlanLiandan),
+            $.Sync(),
             $.To("1388"),
             $.Ask("yao chun", "炼丹"),
-            $.Prepare("",preparedata),
+            $.Function(()=>{
+                let toEat=[]
+                eatList.forEach(id=>{
+                    if (App.Data.Item.List.FindByIDLower(id).First()){
+                        toEat.push("eat "+id)
+                    }
+                })
+                if (toEat.length){
+                    $.Append(
+                        $.Do(toEat.join(";")),
+                        $.Do("i"),
+                        $.Sync(),
+                    )
+                }
+                $.Append($.Prepare("",preparedata))
+                $.Next()
+            })
+            
         )
         $.Next()
     }

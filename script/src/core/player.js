@@ -36,7 +36,7 @@
             })
             task.AddTrigger(matcherHPLine2, function (trigger, result, event) {
                 App.Data.Player.HP["当前气血"] = result[1] - 0
-                App.Data.Player.HP["精气气血"] = result[2] - 0
+                App.Data.Player.HP["气血上限"] = result[2] - 0
                 App.Data.Player.HP["气血百分比"] = result[3] - 0
                 App.Data.Player.HP["当前内力"] = result[4] - 0
                 App.Data.Player.HP["内力上限"] = result[5] - 0

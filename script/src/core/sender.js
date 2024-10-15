@@ -1,27 +1,42 @@
 (function (App) {
-    let senderModule=App.RequireModule("helllibjs/sender/sender.js")
-    App.Sender=new senderModule.Sender()
-    let re=/;/g
-    let re2=/[！·。]/g
-    let linkre=/、/g
-    App.Sender.Parser=function(cmd,Grouped){
-        let result=[]
-        if (Grouped){
+    let senderModule = App.RequireModule("helllibjs/sender/sender.js")
+    App.Sender = new senderModule.Sender()
+    let re = /;/g
+    let re2 = /[！·。]/g
+    let linkre = /、/g
+    App.Sender.Parser = function (cmd, Grouped) {
+        let result = []
+        if (Grouped) {
             result.push([])
         }
-        cmd=cmd.replaceAll(re2,"")
-        let data=cmd.split(re)
+        cmd = cmd.replaceAll(re2, "")
+        let data = cmd.split(re)
         data.forEach(c => {
-            let cmds=c.split(linkre)
-            if (Grouped){
-                result[0]=result[0].concat(cmds)
-            }else{
+            c = c.trim()
+            if (c.startsWith("#")) {
+                result.push([c])
+                return
+            }
+            let cmds = c.split(linkre)
+            if (Grouped) {
+                result[0] = result[0].concat(cmds)
+            } else {
                 result.push(cmds)
             }
         });
         return result
     }
-    App.Send=function(cmd,Grouped){
-        App.Sender.Send(cmd,Grouped)
+    App.Sender.TryAlias = function (sender, cmd) {
+        if (cmd.startsWith("#")) {
+            let data = SplitN(cmd, " ", 2)
+            if (sender.Aliases[data[0]]) {
+                sender.Aliases[data[0]](data[1] ? data[1] : "")
+                return true
+            }
+        }
+        return false
+    }
+    App.Send = function (cmd, Grouped) {
+        App.Sender.Send(cmd, Grouped)
     }
 })(App)

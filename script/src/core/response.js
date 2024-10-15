@@ -74,6 +74,7 @@
     }
     App.Engine.SetFilter("core.onecho", function (event) {
         let echoevent=new App.Event("core.echo."+event.Data.Wildcards[0],event.Data.Wildcards[1])
+        OmitOutput()
         App.RaiseEvent(echoevent)
     })
 

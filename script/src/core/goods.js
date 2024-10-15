@@ -26,7 +26,12 @@
     App.Goods.RegisterBuyer("buy", buyer)
     App.Commands.RegisterExecutor("buy", function (commands, running) {
         running.OnStart = function (arg) {
-            App.Goods.Buy(running.Command.Data)
+            let good = App.Goods.GetGood(running.Command.Data)
+            App.Commands.PushCommands(
+                App.NewPrepareMoneyCommand(good ? good.Key : 0),
+                App.Commands.NewFunctionCommand(() => { App.Goods.Buy(running.Command.Data) })
+            )
+            App.Next()
         }
     })
     App.Goods.NewBuyCommand = function (key) {
@@ -50,7 +55,7 @@
     App.Core.Goods.Load = function () {
         App.Core.Goods.Items = []
         let items = []
-        App.Core.Assets.GoodsRules =[]
+        App.Core.Assets.GoodsRules = []
         App.LoadVariable("items").forEach(data => {
             let item = actionModule.Parse(data).ParseNumber()
             if (item.Data) {
@@ -70,7 +75,7 @@
 
     App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, exclude) {
         for (item of App.Core.Goods.Items) {
-            let num = isNaN(item.Number) ? 1 : (item.Number-0)
+            let num = isNaN(item.Number) ? 1 : (item.Number - 0)
             let count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()
             if (count < num) {
                 return function () {

@@ -33,12 +33,16 @@
         GetRaw(){
             return this.#raw
         }
+        WithKey(key){
+            this.Key=key
+        }
         WithParam(name,data){
             this.Params[name]=data
             return this
         }
         Data=null
         ID=""
+        Key=""
         IDLower=""
         #raw=null
         Label=""
@@ -59,6 +63,15 @@
             let result=new List()
             this.Items.forEach(item=>{
                 if (item.ID==id){
+                    result.Append(item)
+                }
+            })
+            return result
+        }
+        FindByKey(id){
+            let result=new List()
+            this.Items.forEach(item=>{
+                if (item.Key==id){
                     result.Append(item)
                 }
             })
@@ -107,7 +120,7 @@
         Sum(){
             let result=0
             this.Items.forEach(item=>{
-                result=result+item.GetData().Number()
+                result=result+item.GetData().Count
             })
             return result
         }
