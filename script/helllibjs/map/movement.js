@@ -14,7 +14,7 @@
         }
         OnStepTimeout(move, map) {
             if (this.DFS != null) {
-                let level=this.DFS.Skip()
+                let level = this.DFS.Skip()
                 if (level == null) {
                     map.CancelMove()
                     return
@@ -81,7 +81,7 @@
         }
         Retry(move, map) {
             this.Path = null
-            this.Locate.DFS=null
+            this.Locate.DFS = null
         }
         Next(move, map) {
             if (this.Path != null) {
@@ -93,16 +93,11 @@
             }
             if (map.Room.ID) {
                 this.Locate.OnFound(move, map)
-                let result = move.GetPath(map,map.Room.ID,this.Target)
+                let result = move.GetPath(map, map.Room.ID, this.Target)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
-        }
-        OnStepTimeout(move, map){
-            if (this.Locate){
-                this.Locate.OnStepTimeout(move,map)
-            }
         }
         ApplyTo(move, map) {
             move.Retry = this.Retry.bind(this)
@@ -124,11 +119,11 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            this.Locate.DFS=null
+            this.Locate.DFS = null
         }
-        OnStepTimeout(move, map){
-            if (this.Locate){
-                this.Locate.OnStepTimeout(move,map)
+        OnStepTimeout(move, map) {
+            if (this.Locate) {
+                this.Locate.OnStepTimeout(move, map)
             }
         }
         Next(move, map) {
@@ -146,11 +141,17 @@
                 if (keys.length == 0) {
                     return null
                 }
-                let result = move.GetPath(map,map.Room.ID,keys[0])
+                keys.unshift(map.Room.ID)
+                let result = move.WalkAll(map, keys)
                 this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
+        }
+        OnStepFinsih(move, map, step) {
+            if (map.Room.ID) {
+                delete (this.Rooms[map.Room.ID])
+            }
         }
         ApplyTo(move, map) {
             this.Raw.forEach(roomid => {
@@ -159,6 +160,7 @@
             move.Retry = this.Retry.bind(this)
             move.Next = this.Next.bind(this)
             move.OnStepTimeout = this.OnStepTimeout.bind(this)
+            move.OnStepFinsih = this.OnStepFinsih.bind(this)
             move.Data.Movement = this
         }
     }
@@ -166,7 +168,7 @@
     module.To = To
     module.Rooms = Rooms
     module.MaxStep = 5
-    module.Locate=Locate
+    module.Locate = Locate
     let DefaultChecker = function (step, move, map) {
         return dfsModule.Backward[step.Command] != null
     }

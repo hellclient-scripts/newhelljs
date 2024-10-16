@@ -546,6 +546,68 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1fvnp5ao4q0ru72ocigh3"
+  Name = "core.dispelok"
+  Enabled = true
+  Match = "结果你没发现自己有任何异常。"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent('core.dispelok')"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = false
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1fvnph7bgrsb672ocigh6"
+  Name = "core.needdispel"
+  Enabled = true
+  Match = "^(忽然浑身一阵剧痛，你中的|忽然一股寒流夹着一阵灼热涌上心来，你中的生死符发作了！|忽然你觉得四肢百赅是似乎有无数小虫在游走|结果你一个不慎，被火星溅到了衣衫，哪知碧焰|结果只听扑的一声，你被他一掌拍中！一时间|你惊慌失措，连忙后退，然而没能避开|你只觉得伤口一阵灼伤，随即便跟着麻木起来|你只觉全身灼热无比，全身的燃起的碧焰直焚心髓|“喀喇”一声响，你大声惨叫，连退数步|你见滔天热浪扑面涌来，只觉眼前一片通红|你中的剧毒发作了|你只感内息顿滞，真气不畅，一张脸涨得通红|你只感内息顿滞，全身血液竟渐渐的开始凝固起来|你觉得肢体末端一阵僵直|你的脸蛋烧得通红|你嘶哑着嗓子咳了两声|你打了个冷战，头昏沉沉的|你觉得胸臆之间一阵翻腾|你感到胸口处传来阵阵刺痛，全身血液竟似要凝结住一般。|你只觉丹田处有如火焚，便似有千万钢针一齐扎入体内。|你只觉得一股寒意袭上心头，浑身说不出得难受。|你中的玄冥神掌之毒发作了|你只见眼前紫影晃动，突然间胸口一震，)"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent('core.needdispel')"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = false
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -573,7 +635,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare|kill|wpon|wpoff|unwield|buy)((\\s|\\|\\|).*)?$"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|killin|prepare|kill|wpon|wpoff|unwield|buy)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0
@@ -727,4 +789,9 @@ Timers = []
 [[RequiredParams]]
   Name = "sell"
   Desc = "道具处理指令"
+  Intro = ""
+
+[[RequiredParams]]
+  Name = "max_exp"
+  Desc = "最大经验值"
   Intro = ""

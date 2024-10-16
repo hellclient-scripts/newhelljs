@@ -86,16 +86,4 @@
         App.Commands.Execute(App.Move.NewRoomsCommand(rooms))
         App.Next()
     }
-    App.Move.Search = function (name) {
-        return function (move, map) {
-            move.Option.MutlipleStep = false
-            move.OnArrive = function (move, map) {
-                if (name && App.Map.Room.Data.Objects.FindByName(name).IsNotEmpty()) {
-                    map.FinishMove()
-                    return
-                } 
-                move.Walk(map)
-            }
-        }
-    }
 })(App)

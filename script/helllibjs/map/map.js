@@ -55,7 +55,7 @@
         CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
         Room = new Room()
-        #tagsIniter=[]
+        #tagsIniter = []
         Move = null
         #tags = {}
         Data = {}
@@ -64,7 +64,7 @@
         StepTimeout = 0
         ResendDelay = 0
         Mazes = {}
-        AppendTagsIniter(fn){
+        AppendTagsIniter(fn) {
             this.#tagsIniter.push(fn)
         }
         Trace(fr, cmd) {
@@ -127,12 +127,12 @@
             if (this.Move != null) {
                 this.Move.InitTags(this)
             }
-            this.#tagsIniter.forEach(fn=>{
+            this.#tagsIniter.forEach(fn => {
                 fn(this)
             })
             for (var key in this.#tags) {
                 if (this.#tags[key]) {
-                    Mapper.settag(key,true)
+                    Mapper.settag(key, true)
                 }
             }
         }
@@ -150,6 +150,18 @@
             })
             return path
         }
+        GetMapperWalkAll(rooms, fly, distance, options) {
+            let result = Mapper.WalkAll(rooms, fly, distance, options)
+            if (result == null) {
+                return null
+            }
+            let path = []
+            result.steps.forEach(step => {
+                path.push(new Step(step.command, step.to))
+            })
+            return path
+        }
+
         OnWalking() {
             if (this.Move != null) {
                 this.Move.OnWalking(this)
@@ -172,7 +184,7 @@
             }
 
         }
-        Resend(delay,offset) {
+        Resend(delay, offset) {
             if (delay == null) {
                 delay = this.ResendDelay
             }
@@ -182,7 +194,7 @@
                 }
                 return
             }
-            this.Position.Wait(delay, offset,() => {
+            this.Position.Wait(delay, offset, () => {
                 if (this.Move) {
                     this.Move.Resend(this)
                 }
@@ -297,11 +309,17 @@
             }
             this.TrySteps(map, steps)
         }
-        GetPath(map, from, to,skipinit) {
-            if (!skipinit){
+        GetPath(map, from, to, skipinit) {
+            if (!skipinit) {
                 map.InitTags()
             }
             return map.GetMapperPath(from, this.Option.Fly, to, this.Option.MapperOptions)
+        }
+        WalkAll(map, rooms, distance, skipinit) {
+            if (!skipinit) {
+                map.InitTags()
+            }
+            return map.GetMapperWalkAll(rooms, this.Option.Fly, distance, this.Option.MapperOptions)
         }
         StepTimeout(map) {
             this.OnStepTimeout(this, map)

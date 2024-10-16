@@ -58,6 +58,7 @@
             App.Echo("core.weapon.duration.end")
         },
         function (result) {
+            checkerDuration.Reset()
         }
     )
     App.Core.Weapon.CheckDuration = function () {
@@ -198,8 +199,8 @@
                             App.Move.NewToCommand(App.Params.LocRepair),
                             App.Commands.NewDoCommand("repair "+repair.ID),
                             App.Commands.NewDoCommand("repair "+repair.ID),
-                            App.NewSyncCommand(),
-                            App.Commands.NewWaitCommand(1000),
+                            App.Commands.NewFunctionCommand(()=>{checkerDuration.Force()}),
+                            App.NewNobusyCommand(),
                         )
                         App.Next()
         
@@ -207,7 +208,6 @@
                 }
             }
         }
-        checkerDuration.Reset()
         return null
     }))
 })(App)

@@ -6,7 +6,6 @@
     class Check {
         constructor(id) {
             this.#id = id
-            this.Last = (new Date()).getTime()
         }
         #id = ""
         Interval = 0
