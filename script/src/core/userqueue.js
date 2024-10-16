@@ -6,6 +6,7 @@
     }
     App.UserQueue.Exec=function(cmd){
         App.Init()
+        App.ReloadVariable()
         App.UserQueue.UserQueue.Exec(cmd)
     }
     

@@ -85,7 +85,13 @@
                     )
                     break
                 case "#pack":
-                    if (App.Data.Item.List.FindByID("budai").First()) {
+                    if (App.Data.Item.List.FindByID("qiankun bag").First()) {
+                        App.Commands.PushCommands(
+                            App.Commands.NewDoCommand("keep " + result.Asset.Item.IDLower),
+                            App.Commands.NewDoCommand("i"),
+                            App.NewSyncCommand()
+                        )
+                    } else if (App.Data.Item.List.FindByID("budai").First()) {
                         App.Commands.PushCommands(
                             App.Commands.NewDoCommand("put " + result.Asset.Item.IDLower + " in budai"),
                             App.Commands.NewDoCommand("i"),

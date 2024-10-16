@@ -36,6 +36,7 @@ Dump=function(data){
 var onTime=function(){
     App.Engine.OnTime()
 }
+Metronome.Discard(true)
 var App=eval(world.ReadFile("helllibjs/app.js"),"helllibjs/app.js").CreateAppliction()
 AddTimer("enginetimer",0,0,0.1,"",1+32+16384,"onTime")
 App.Include("src/index.js")

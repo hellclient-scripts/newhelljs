@@ -4,10 +4,22 @@
     App.Core.Quest = {}
 
     App.Core.Quest.OnAlias = function (n, l, w) {
-        App.Core.Quest.Exec(w[0])
+        let q = w[0].trim()
+        if (q) {
+            App.Core.Quest.Exec(w[0])
+            return
+        }
+        q=GetVariable("quest").trim()
+        if (q) {
+            App.Core.Quest.Exec(w[0])
+            return
+        }
+        PrintSystem("quest变量为空，未指定任务。")
     }
     App.Quest = {}
     App.Core.Quest.Exec = function (line) {
+        App.Init()
+        App.ReloadVariable()
         App.Quests.StartLine(line.trim())
     }
     App.Quests = new questsModule.Quests(App.Positions["Quest"], App.Commands, new conditionsModule.Conditions)

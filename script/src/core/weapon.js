@@ -72,9 +72,9 @@
     App.Core.Weapon.Print = function () {
         if (App.Core.Weapon.Wield.length) {
             Note("装备清单：")
-            Note("  #wpon :" + App.Core.Weapon.Wield[0].OnCommand() + "|  #wpoff :" + App.Core.Weapon.Wield[0].OffCommand())
+            Note("  #wpon :" + App.Core.Weapon.Wield[0].OnCommand() + " |  #wpoff :" + App.Core.Weapon.Wield[0].OffCommand())
             Object.keys(App.Core.Weapon.Named).sort().forEach(key => {
-                Note("  #wpon " + key + " :" + App.Core.Weapon.Named[key].OnCommand() + "| #wpoff " + key + " :" + App.Core.Weapon.Named[key].OffCommand())
+                Note("  #wpon " + key + " :" + App.Core.Weapon.Named[key].OnCommand() + " | #wpoff " + key + " :" + App.Core.Weapon.Named[key].OffCommand())
             })
         } else {
             Note("未设置装备。")
@@ -118,7 +118,7 @@
         })
         return result.join(";")
     }
-    App.Core.Weapon.LoadRules = function () {
+    App.Core.Weapon.Load = function () {
         App.Core.Weapon.Wield = []
         App.Core.Weapon.Named = {}
         let named = {}
@@ -153,7 +153,7 @@
         }
         App.Core.Weapon.Print()
     }
-    App.Core.Weapon.LoadRules()
+    App.Core.Weapon.Load()
 
     App.UserQueue.UserQueue.RegisterCommand("#wpon", function (uq, data) {
         uq.Commands.Append(

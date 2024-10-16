@@ -1,6 +1,6 @@
 Type = "jscript"
-Intro = ""
-Desc = ""
+Intro = "快速开始：\n#beiqi 备齐任务\n#liandan 炼丹任务"
+Desc = "新一代Hell机器人"
 OnOpen = "onOpen"
 OnClose = "onClose"
 OnConnect = "onConnected"
@@ -8,7 +8,7 @@ OnDisconnect = "onDisconnected"
 OnBroadcast = "onBroadcast"
 OnFocus = ""
 OnLoseFocus = ""
-OnKeyUp = "OnKeyUp"
+OnKeyUp = ""
 OnHUDClick = ""
 OnResponse = "onResponse"
 OnAssist = "onAssist"
@@ -573,7 +573,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare|kill|wpon|wpoff|unwield)((\\s|\\|\\|).*)?$"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|prepare|kill|wpon|wpoff|unwield|buy)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0
@@ -619,7 +619,7 @@ Timers = []
   ID = "d1fvd8m57s7g4i72l2d67r"
   Name = "App.Core.Quest.OnAlias"
   Enabled = true
-  Match = "#q(\\s*.+)$"
+  Match = "#start(\\s*.+)?$"
   Send = ""
   Script = "App.Core.Quest.OnAlias"
   SendTo = 0
@@ -628,6 +628,52 @@ Timers = []
   Temporary = false
   OneShot = false
   Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1fvmus00v3gj972ochkp5"
+  Name = ""
+  Enabled = true
+  Match = "#liandan"
+  Send = "#start liandan"
+  Script = ""
+  SendTo = 10
+  Sequence = 200
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1fvmusekl0sit72ochkpc"
+  Name = ""
+  Enabled = true
+  Match = "#beiqi"
+  Send = "#start beiqi"
+  Script = ""
+  SendTo = 10
+  Sequence = 200
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
   Group = ""
   IgnoreCase = false
   KeepEvaluating = false
@@ -659,14 +705,19 @@ Timers = []
   Intro = "比如ride bao-feiji。\n留空则不尝试rideto。\n如果不需要召唤坐骑，可以设为t"
 
 [[RequiredParams]]
-  Name = "combat"
-  Desc = "战斗指令"
-  Intro = ""
+  Name = "quest"
+  Desc = "任务列表"
+  Intro = "#start不带参数会执行这个列表里的任务，一行一个，越上面的越优先。"
 
 [[RequiredParams]]
-  Name = "sell"
-  Desc = "道具处理指令"
-  Intro = ""
+  Name = "combat"
+  Desc = "战斗指令"
+  Intro = "战斗指令,参考：\n\n#start #wpon\nyun recover\nperform sword.kuang $1"
+
+[[RequiredParams]]
+  Name = "weapon"
+  Desc = "武器"
+  Intro = "武器相关设置\n\n支持\n#wield 武器ID\n#wear 空手武器ID\n#wield.别名 武器ID\n的格式\n\n以及\n#repair 修理装备id\n#repair 修理装备id * 修理需要的黄金\n的格式"
 
 [[RequiredParams]]
   Name = "items"
@@ -674,6 +725,6 @@ Timers = []
   Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nlong word * 2"
 
 [[RequiredParams]]
-  Name = "weapon"
-  Desc = "武器"
-  Intro = "武器相关设置"
+  Name = "sell"
+  Desc = "道具处理指令"
+  Intro = ""

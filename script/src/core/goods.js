@@ -27,8 +27,10 @@
     App.Commands.RegisterExecutor("buy", function (commands, running) {
         running.OnStart = function (arg) {
             let good = App.Goods.GetGood(running.Command.Data)
+            let gold = good ? good.Data : 0
+            if (isNaN(gold)) { gold = 0 }
             App.Commands.PushCommands(
-                App.NewPrepareMoneyCommand(good ? good.Key : 0),
+                App.NewPrepareMoneyCommand(gold),
                 App.Commands.NewFunctionCommand(() => { App.Goods.Buy(running.Command.Data) })
             )
             App.Next()
@@ -90,4 +92,17 @@
         return null
     }))
 
+    App.UserQueue.UserQueue.RegisterCommand("#buy", function (uq, data) {
+        let item = data.trim()
+        if (!item || App.Goods.GetGood(item) == null) {
+            PrintSystem("物品 " + data + "无效")
+            uq.Next()
+            return
+        }
+        uq.Commands.Append(
+            App.Goods.NewBuyCommand(item),
+            uq.Commands.NewFunctionCommand(function () { uq.Next() }),
+        )
+        uq.Commands.Next()
+    })
 })(App)

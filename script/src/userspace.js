@@ -40,7 +40,7 @@ $.Rooms = App.Move.NewRoomsCommand
 
 $.Buy = App.Goods.NewBuyCommand
 
-$.CountAttack = App.NewCounterAttackCommand
+$.CounterAttack = App.NewCounterAttackCommand
 
 $.Kill = App.NewKillCommand
 
@@ -49,5 +49,7 @@ $.Append = App.Append
 $.Insert = App.Insert
 
 $.PrepareMoney=App.NewPrepareMoneyCommand
+
+$.NewCombat=App.NewCombat
 
 $.Now = function () { return (new Date()).getTime() }

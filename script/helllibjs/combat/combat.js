@@ -10,32 +10,27 @@
             this.Position = position
             this.Plan = plan
         }
+        Data=null
         Interval = module.DefaultInterval
         Position = null
         Combating = false
         Target = ""
         StartAt = 0
-        Tags = {}
         Plan = null
         Ticker = module.DefaultTicker
         OnStop = module.DefaultOnStop
-        Start(id) {
+        Start(id,data) {
             this.Position.StartNewTerm()
-            this.Tags = {}
+            this.Data=data
             this.Target = id ? id : ""
             this.StartAt = (new Date()).getTime()
             this.Position.AddTimer(this.Interval, () => {
                 this.Ticker(this)
             })
+            this.Ticker(this)
             this.Plan.Execute()
             this.Combating = true
             return this
-        }
-        WithTags(tags) {
-            tags = tags || []
-            tags.forEach(tag => {
-                this.Tags[tag] = true
-            })
         }
         Stop() {
             if (!this.Combating) {
@@ -43,9 +38,10 @@
             }
             let onstop=this.OnStop
             this.Position.StartNewTerm()
+            onstop(this)
             this.Target = ""
             this.Combating = false
-            onstop(this)
+            this.Data=null
         }
         Duration() {
             return (new Date()).getTime() - this.StartAt

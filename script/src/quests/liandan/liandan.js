@@ -76,10 +76,10 @@ $.Module(function (App) {
             $.Next()
         },
     )
-
+    
     Liandan.KillDuShe = function () {
         $.PushCommands(
-            $.CountAttack("du she", ["liandan", "liandan-dusha"]),
+            $.CounterAttack("du she", $.NewCombat("liandan").WithTags("liandan-dusha")),
             $.Prepare(""),
             $.Function(Liandan.Cai)
         )
@@ -87,7 +87,7 @@ $.Module(function (App) {
     }
     Liandan.KillDuLangzhong = function () {
         $.PushCommands(
-            $.CountAttack("du langzhong", ["liandan", "liandan-dusha"]),
+            $.CounterAttack("du langzhong",$.NewCombat("liandan").WithTags("liandan-langzhong")),
             $.Prepare(),
             $.Function(Liandan.Cai)
         )
@@ -155,6 +155,7 @@ $.Module(function (App) {
                 let toEat=[]
                 eatList.forEach(id=>{
                     if (App.Data.Item.List.FindByIDLower(id).First()){
+                        toEat.push("keep "+id)
                         toEat.push("eat "+id)
                     }
                 })
