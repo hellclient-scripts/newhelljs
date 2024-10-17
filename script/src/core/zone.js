@@ -1,10 +1,74 @@
 (function (App) {
     App.Zone = {}
     App.Zone.Maps = {}
+    App.Zone.Info = {}
     let convertPath = function (fr, cmds) {
         return App.Map.TraceRooms(fr, ...cmds.split(";"))
     }
-    App.Zone.Maps["扬州"] = convertPath("54", "w;w;w;n;w;s;e;e;e;e;e;e;e;e;n;s;se;nw;w;w;w;w;s;s;s;s;su;nd;w;e;e;w;n;n;se;s;n;e;ne;e;w;sw;w;nw;n;n;n;e;w;w;e;n;w;u;d;e;n;e;s;n;e;s;n;e;n;e;n;w;n;s;s;s;s;s;w;e;se;nw;n;n;n;n;e;e;ne;n;n;s;s;sw;se;s;e;w;s;n;w;e;n;nw;w;w;w;w;w;w;n;s;s;n;w;n;n;n;s;s;s;w;w;w;w;s;s;n;n;w;n;s;w;e;e;e;e;e;e;e;e;n;w;e;n;e;u;d;w;n;n;n;n;n;s;s;s;s;w;w;w;n;n;s;w;s;e;e;e;e;s;s;w;e;s;w;n;s;s;n;w;e;e;e;e;w;s;n;w;s;w;e;s;s;n;n;n;w;s;n;n;s;e;s;s;s")
+    App.LoadLines("data/zones.txt", "|").forEach((data) => {
+        switch (data[1]) {
+            case "path":
+                App.Zone.Maps[data[0]] = convertPath(data[2], data[3])
+                break
+            default:
+                PrintSystem("无效的路径类型" + data[1])
+        }
+    })
+    App.LoadLines("data/info.txt", "|").forEach((data) => {
+        App.Zone.Info[data[0]] = {
+            ID: data[0],
+            Name: data[1],
+            NPC: data[2],
+            Area: data[3],
+            Loc: data[4],
+        }
+    })
+    let DefaultChecker = function (wanted) {
+        return map.Room.Data.Objects.FindByName(wanted.Target).First() || map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
+    }
+    class Wanted {
+        constructor(target, zone) {
+            this.Target = target
+            this.Zone = zone
+        }
+        Target = ""
+        Name = ""
+        Zone = ""
+        ID = ""
+        Loc = null
+        OnFound = null
+        SingleStep = false
+        Ordered = true
+        WithID(id) {
+            this.ID = id
+            return this
+        }
+        WithLoc(loc) {
+            this.Loc = loc
+            return this
+        }
+        WithOnFound(found) {
+            this.OnFound = found
+            return this
+        }
+        WithSingleStep(s) {
+            this.SingleStep = s
+            return this
+        }
+        WithChecker(c) {
+            this.Checker = c
+            return this
+        }
+        WithOrdered(o) {
+            this.Ordered = o
+            return this
+        }
+        Checker = DefaultChecker
+    }
+    App.NewWanted = function (target, zone) {
+        return new Wanted(target, zone)
+    }
+    App.Zone.Wanted = null
     App.UserQueue.UserQueue.RegisterCommand("#search", function (uq, data) {
         let result = SplitN(data, " ", 2)
         if (result.length != 2) {
@@ -16,50 +80,70 @@
         if (!npc) {
             npc = ""
         }
+        let zone = result[0]
+        let wanted = App.NewWanted(npc, zone)
         uq.Commands.Append(
-            uq.Commands.NewFunctionCommand(function () { App.Zone.Search(npc, result[0]) }),
+            uq.Commands.NewFunctionCommand(function () { App.Zone.Search(wanted) }),
             uq.Commands.NewFunctionCommand(function () { uq.Next() }),
         )
         uq.Commands.Next()
     })
+    App.Zone.Finder = function (move, map) {
+        wanted = App.Zone.Wanted
+        move.Option.MutlipleStep = wanted.SingleStep != true
+        move.OnRoom = function (move, map, step) {
+            let item = map.Room.Data.Objects.FindByName(wanted.Target).First()
+            if (item) {
+                wanted.Name = item.GetData().Name
+                wanted.ID = item.IDLower
+                if (map.Room.ID) {
+                    wanted.Loc = map.Room.ID
+                    Note(wanted.Target + " @ " + wanted.Loc)
+                }
+            }
+        }
+        move.OnArrive = function (move, map) {
+            if (wanted.Loc) {
+                App.Map.FinishMove()
+                return
+            }
+            move.Walk(map)
+        }
+    }
 
-    App.Zone.Search = function (target, zone, singlestep, foundcommands) {
-        let rooms = App.Zone.Maps[zone]
+    App.Zone.Search = function (wanted) {
+        let rooms = App.Zone.Maps[wanted.Zone]
         if (!rooms) {
-            PrintSystem("#search 地图未招到")
+            PrintSystem("#search 地图未找到")
             App.Fail()
             return
         }
-        target = target || ""
-        let loc = null
-        finder = function (move, map) {
-            move.Option.MutlipleStep = singlestep != true
-            move.OnRoom = function (move, map, step) {
-                if (map.Room.ID) {
-                    if (map.Room.Data.Objects.FindByName(target).IsNotEmpty()) {
-                        loc = map.Room.ID
-                        Note(target + " @ " + loc)
-                    }
-                }
-            }
-            move.OnArrive = function (move, map) {
-                if (loc) {
-                    App.Map.FinishMove()
-                    return
-                }
-                move.Walk(map)
-            }
-        }
+        App.Zone.Wanted = wanted
+        wanted.Loc = null
+        let move = wanted.Ordered ? App.Move.NewOrderedCommand(rooms, App.Zone.Finder) : App.Move.NewRoomsCommand(rooms, App.Zone.Finder)
         App.Commands.PushCommands(
-            App.Move.NewRoomsCommand(rooms, finder),
+            move,
             App.Commands.NewFunctionCommand(() => {
-                if (loc && loc != App.Map.Room.ID) {
+                if (App.Zone.Wanted.Loc && App.Zone.Wanted.Loc != App.Map.Room.ID) {
                     App.Commands.Insert(
-                        App.Move.NewToCommand(loc)
+                        App.Move.NewToCommand(App.Zone.Wanted.Loc)
                     )
-                    if (foundcommands && foundcommands.length) {
-                        App.Commands.Insert(...foundcommands)
-                    }
+                    if (App.Zone.Wanted.OnFound) { App.Zone.Wanted.OnFound() }
+                }
+                App.Next()
+            }),
+            App.Commands.NewFunctionCommand(() => {
+                if (App.Zone.Wanted.Loc && !App.Zone.Wanted.ID) {
+                    App.Send("id here")
+                    App.Commands.Insert(
+                        App.NewSyncCommand(),
+                        App.Commands.NewFunctionCommand(() => {
+                            if (App.Map.Room.Data.IDHere && App.Map.Room.Data.IDHere[wanted.Name]) {
+                                wanted.ID = App.Map.Room.Data.IDHere[wanted.Name].toLowerCase()
+                                Note(wanted.ID)
+                            }
+                        })
+                    )
                 }
                 App.Next()
             })
@@ -77,15 +161,16 @@
         if (!npc) {
             npc = ""
         }
+        let zone = result[0]
+        let wanted = App.NewWanted(npc, zone)
         uq.Commands.Append(
             App.NewPrepareCommand(""),
-            uq.Commands.NewFunctionCommand(function () { App.Zone.Search(npc, result[0]) }),
+            uq.Commands.NewFunctionCommand(function () { App.Zone.Search(wanted) }),
             uq.Commands.NewFunctionCommand(function () {
                 if (npc) {
-                    let obj = App.Map.Room.Data.Objects.FindByName(npc).First()
-                    if (obj && obj.IDLower) {
+                    if (App.Zone.Wanted.Loc && App.Zone.Wanted.ID) {
                         App.Commands.Insert(
-                            App.NewKillCommand(obj.IDLower, App.NewCombat("userqueue"))
+                            App.NewKillCommand(App.Zone.Wanted.ID, App.NewCombat("userqueue"))
                         )
                     }
                 }

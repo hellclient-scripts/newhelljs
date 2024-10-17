@@ -134,5 +134,40 @@
         }
         return null
     }))
-
+    App.Core.Heal.NewRestCommand = function () {
+        return App.Commands.NewCommand("rest")
+    }
+    App.Commands.RegisterExecutor("rest", function (commands, running) {
+        running.OnStart = function (arg) {
+            if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
+                let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"])
+                if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
+                if (num < 10) { num = 10 }
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand("dazuo " + num),
+                    App.NewNobusyCommand(),
+                    App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
+                    App.NewSyncCommand(),
+                    App.Core.Heal.NewRestCommand(),
+                )
+            } else if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow) {
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand("yun heal"),
+                    App.NewNobusyCommand(),
+                    App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
+                    App.NewSyncCommand(),
+                    App.Core.Heal.NewRestCommand(),
+                )
+            } else if (App.Core.Dispel.Need) {
+                return function () {
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand("yun dispel;hp"),
+                        App.NewNobusyCommand(),
+                        App.Core.Heal.NewRestCommand(),
+                    )
+                }
+            }
+            App.Next()
+        }
+    })
 })(App)

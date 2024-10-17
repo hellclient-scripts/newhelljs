@@ -73,5 +73,27 @@
                 App.RaiseEvent(new App.Event("core.roomentry"))
             }
         })
-
+        let matcherIDHere = /^(\S+)\s*=\s*([^、]+)/
+        var PlanOnIDHere = new App.Plan(App.Positions.Connect,
+            function (task) {
+                task.AddTrigger(matcherIDHere, function (trigger, result, event) {
+                    App.Map.Room.Data.IDHere[result[1]]=result[2]
+                    event.Context.Set("core.room.onidhere", true)
+                    return true
+                })
+                task.AddCatcher("line", function (catcher, event) {
+                    return event.Context.Get("core.room.onidhere")
+                })
+                task.AddTimer(5000)
+            },
+            function (result) {
+            })
+        App.Core.Room.OnIDHere = function (event) {
+            event.Context.Propose(function () {
+                App.Map.Room.Data.IDHere={}
+                PlanOnIDHere.Execute()
+            })
+        }
+        App.BindEvent("core.idhere", App.Core.Room.OnIDHere)
+    
 })(App)

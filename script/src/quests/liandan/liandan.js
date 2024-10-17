@@ -6,7 +6,7 @@ $.Module(function (App) {
     let TimeToChange = 24000
     let Last = 0
     let preparedata = {}
-    let eatList=["longwang dan","qinglong dan","baihu dan","zhuque dan","xuanwu dan","haoyue dan","yinyang dan","wanshou dan"]
+    let eatList=["longwang dan","qinglong dan","baihu dan","zhuque dan","xuanwu dan","haoyue dan","yinyang dan","wanshou dan","change dan"]
     preparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#sell name=火麒丹,血麒丹,归元丹,小还丹,大还丹,还魂丹,补精丹,大补丹,雪参丹,十全大还丹,大云丹,养精丹,锁泉丹,小金丹,小云丹,蓄精丹,碧泉丹"),
         App.Core.Assets.ParseRule("#pack name=龟苓丹,映月丹,修罗无常丹,回阳无极丹,龙涎丹,邀月丹,子午龙甲丹,幻灵丹,轩辕补心丹,罗刹无常丹"),

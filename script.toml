@@ -608,6 +608,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1fvp1h2ir151r7115lsdj"
+  Name = "core.idhere"
+  Enabled = true
+  Match = "在这个房间中, 生物及物品的(英文)名称如下："
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent('core.idhere')"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -789,9 +820,4 @@ Timers = []
 [[RequiredParams]]
   Name = "sell"
   Desc = "道具处理指令"
-  Intro = ""
-
-[[RequiredParams]]
-  Name = "max_exp"
-  Desc = "最大经验值"
   Intro = ""

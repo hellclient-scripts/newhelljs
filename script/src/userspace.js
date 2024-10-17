@@ -34,9 +34,13 @@ $.Prepare = App.NewPrepareCommand
 
 $.Ask = App.NewAskCommand
 
+$.Path = App.Move.NewPathCommand
+
 $.To = App.Move.NewToCommand
 
 $.Rooms = App.Move.NewRoomsCommand
+
+$.Ordered = App.Move.NewOrderedCommand
 
 $.Buy = App.Goods.NewBuyCommand
 
@@ -48,8 +52,9 @@ $.Append = App.Append
 
 $.Insert = App.Insert
 
-$.PrepareMoney=App.NewPrepareMoneyCommand
+$.PrepareMoney = App.NewPrepareMoneyCommand
 
-$.NewCombat=App.NewCombat
+$.NewCombat = App.NewCombat
 
+$.NewWanted=App.NewWanted
 $.Now = function () { return (new Date()).getTime() }

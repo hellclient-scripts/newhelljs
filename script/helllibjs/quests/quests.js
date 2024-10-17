@@ -35,7 +35,7 @@
         InCooldown() {
             return (new Date()).getTime() < this.CooldownTo
         }
-        Cooldown(interval){
+        Cooldown(interval) {
             this.CooldownTo = (new Date()).getTime() + (interval ? interval : 0)
         }
         CooldownTo = 0
@@ -64,7 +64,7 @@
                 this.Next()
             })
         }
-        #nextcommand
+        #nextcommand = null
         Position = null
         Commands = null
         Conditions = null
@@ -93,19 +93,19 @@
             this.Commands.Next()
         }
         Next() {
-            if (this.Stopped){
+            if (this.Stopped) {
                 this.Commands.Next()
                 return
             }
             this.Position.StartNewTerm()
-            while(this.Remain.length) {
-                let r=this.Remain.shift()
-                if (this.#registered[r.ID] && !this.#registered[r.ID].InCooldown() && r.Checker()){
+            while (this.Remain.length) {
+                let r = this.Remain.shift()
+                if (this.#registered[r.ID] && !this.#registered[r.ID].InCooldown() && r.Checker()) {
                     this.Commands.PushCommands(
-                        this.Commands.NewFunctionCommand(()=>{
-                            let q=this.#registered[r.ID]
-                            if (q==null){
-                                throw new Error("Quest "+r.ID+" not found")
+                        this.Commands.NewFunctionCommand(() => {
+                            let q = this.#registered[r.ID]
+                            if (q == null) {
+                                throw new Error("Quest " + r.ID + " not found")
                             }
                             q.Start(r.Data)
                         })
@@ -116,8 +116,8 @@
             }
             this.Loop()
         }
-        Loop(){
-            this.Remain=[...this.Queue]
+        Loop() {
+            this.Remain = [...this.Queue]
             this.Commands.PushCommands(
                 this.Commands.NewWaitCommand(this.Delay),
                 this.#nextcommand,
@@ -125,7 +125,7 @@
             App.Next()
         }
         StartLine(line) {
-            this.StartRunningQuests(this.Parser(this,line))
+            this.StartRunningQuests(this.Parser(this, line))
         }
         NewQuest(id) {
             return new Quest(id)
@@ -134,6 +134,6 @@
     }
     module.RunningQuest = RunningQuest
     module.Quest = Quest
-    module.Quests=Quests
+    module.Quests = Quests
     return module
 })

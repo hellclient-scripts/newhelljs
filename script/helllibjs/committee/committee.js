@@ -330,6 +330,7 @@
         constructor(name) {
             this.Name = name
             this.Term = new Term()
+            this.OnTermStart(this)
         }
         StartNewTerm() {
             this.Term.End()
@@ -350,7 +351,7 @@
             this.Term.BindTask(task)
             return task
         }
-        Wait(delay, offset,callback) {
+        Wait(delay, offset, callback) {
             let task = this.AddTask(result => {
                 if (result.Type == "timer") {
                     callback()
@@ -361,14 +362,17 @@
         BindEvent(eventname, handler) {
             this.Term.EventBus.BindEvent(eventname, handler)
         }
-
+        OnTermStart = DefaultOnTermStart
         Term = null
         Name = ""
+    }
+    let DefaultOnTermStart = function (position) {
     }
     class Committee {
         constructor() {
             this.EventBus = new eventModule.Bus()
         }
+        OnTermStart = DefaultOnTermStart
         RegisterPosition(name) {
             var s = this.Positions.find(function (value) {
                 return value.Name == name
@@ -377,6 +381,7 @@
                 return s
             }
             s = new Position(name)
+            Position.OnTermStart = this.OnTermStart
             this.Positions.push(s)
             return s
         }

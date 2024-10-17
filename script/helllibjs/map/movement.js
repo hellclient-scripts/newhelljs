@@ -143,7 +143,7 @@
                 }
                 keys.unshift(map.Room.ID)
                 let result = move.WalkAll(map, keys)
-                this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
+                this.Path = result == null ? [[]] : module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
@@ -164,9 +164,67 @@
             move.Data.Movement = this
         }
     }
+    class Ordered {
+        constructor(rooms) {
+            if (typeof (rooms) != 'object') {
+                rooms = [rooms + ""]
+            }
+            this.Rooms = [...rooms]
+        }
+        Rooms = []
+        Locate = new Locate()
+        Path = null
+        Retry(move, map) {
+            this.Path = null
+            this.Locate.DFS = null
+        }
+        OnStepTimeout(move, map) {
+            if (this.Locate) {
+                this.Locate.OnStepTimeout(move, map)
+            }
+        }
+        Next(move, map) {
+            if (this.Path != null && this.Path.length) {
+                return this.Path.shift()
+            }
+            if (map.Room.ID) {
+                this.Locate.OnFound(move, map)
+                if (move.StartCommand) {
+                    move.StartCommand = ""
+                    return [move.StartCommand]
+                }
+                if (this.Rooms.length == 0) {
+                    return null
+                }
+                let result = move.GetWalkOrdered(map, map.Room.ID, this.Rooms)
+                if (result == null) {
+                    return null
+                }
+                this.Path = module.MutlipleStepConverter.Convert(result, move, map)
+                return this.Next(move, map)
+            }
+            return this.Locate.Next(move, map)
+        }
+        OnStepFinsih(move, map, step) {
+            if (map.Room.ID && this.Rooms.length) {
+                if (map.Room.ID == this.Rooms[0]) {
+                    this.Rooms.shift()
+                }
+            }
+        }
+        ApplyTo(move, map) {
+            move.Retry = this.Retry.bind(this)
+            move.Next = this.Next.bind(this)
+            move.OnStepTimeout = this.OnStepTimeout.bind(this)
+            move.OnStepFinsih = this.OnStepFinsih.bind(this)
+            move.Data.Movement = this
+        }
+    }
+
     module.Path = Path
     module.To = To
     module.Rooms = Rooms
+    module.Ordered = Ordered
     module.MaxStep = 5
     module.Locate = Locate
     let DefaultChecker = function (step, move, map) {

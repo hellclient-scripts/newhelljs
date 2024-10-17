@@ -45,6 +45,17 @@
         }
         return null
     }
+    let DefaultTrace = function (map, fr, cmd) {
+        if (fr != "") {
+            let exits = Mapper.getexits(fr + "")
+            for (var i = 0; i < exits.length; i++) {
+                if (exits[i].command == cmd) {
+                    return exits[i].to
+                }
+            }
+        }
+        return ""
+    }
     class Map {
         constructor(position) {
             this.Position = position
@@ -64,19 +75,9 @@
         StepTimeout = 0
         ResendDelay = 0
         Mazes = {}
+        Trace = DefaultTrace
         AppendTagsIniter(fn) {
             this.#tagsIniter.push(fn)
-        }
-        Trace(fr, cmd) {
-            if (fr != "") {
-                let exits = Mapper.getexits(fr + "")
-                for (var i = 0; i < exits.length; i++) {
-                    if (exits[i].command == cmd) {
-                        return exits[i].to
-                    }
-                }
-            }
-            return ""
         }
         TracePath(fr, ...commands) {
             let result = []
@@ -85,8 +86,9 @@
             }
             let current = fr
             for (let cmd of commands) {
-                let to = this.Trace(current, cmd)
+                let to = this.Trace(this, current, cmd)
                 if (!to) {
+                    PrintSystem("路径解析错误")
                     return null
                 }
                 result.push(new Step(cmd, to))
@@ -98,8 +100,9 @@
             let result = [fr]
             let current = fr
             for (let cmd of commands) {
-                let to = this.Trace(current, cmd)
+                let to = this.Trace(this,current, cmd)
                 if (!to) {
+                    PrintSystem("路径解析错误")
                     return null
                 }
                 result.push(to)
@@ -159,6 +162,20 @@
             result.steps.forEach(step => {
                 path.push(new Step(step.command, step.to))
             })
+            return path
+        }
+        GetMapperWalkOrdered(from, rooms, fly, options) {
+            let path = []
+            let current = from
+            for (var i in rooms) {
+                let result = Mapper.GetPath(current, fly, [rooms[i]], options)
+                if (result != null) {
+                    result.forEach(step => {
+                        path.push(new Step(step.command, step.to))
+                    })
+                    current = rooms[i]
+                }
+            }
             return path
         }
 
@@ -321,6 +338,13 @@
             }
             return map.GetMapperWalkAll(rooms, this.Option.Fly, distance, this.Option.MapperOptions)
         }
+        GetWalkOrdered(map, from, rooms, skipinit) {
+            if (!skipinit) {
+                map.InitTags()
+            }
+            return map.GetMapperWalkOrdered(from, rooms, this.Option.Fly, this.Option.MapperOptions)
+        }
+
         StepTimeout(map) {
             this.OnStepTimeout(this, map)
         }

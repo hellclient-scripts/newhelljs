@@ -10,6 +10,7 @@
         Quest = ""
         Tags = {}
         Command = ""
+        Plan = null
         WithTags(...tags) {
             tags.forEach(tag => {
                 this.Tags[tag] = true
@@ -18,6 +19,10 @@
         }
         WithCommand(cmd) {
             this.Command = cmd
+        }
+        WithPlan(plan) {
+            this.Plan = plan
+            return this
         }
     }
     App.Core.Combat.Actions = []
@@ -38,10 +43,13 @@
                 App.Combat.Position.Term.Set("core.combat.damage", App.Combat.Position.Term.Get("core.combat.damage") + dam)
                 return true
             })
-            task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！")
-            task.AddTrigger("已经有野兽跟着你了！")
-            task.AddTrigger("你要让什么野兽跟随你？")
+            task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！", () => { OmitOutput() })
+            task.AddTrigger("已经有野兽跟着你了！", () => { OmitOutput() })
+            task.AddTrigger("你要让什么野兽跟随你？", () => { OmitOutput() })
             task.AddCatcher("disconnected").WithName("Disconnect")
+            if (App.Combat.Data.Plan) {
+                App.Combat.Data.Plan.Execute()
+            }
         }, function (result) {
             if (result.Name == "Disconnect") {
                 return
@@ -51,14 +59,14 @@
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
     let checkCombatCmd = "come"
     App.Core.Combat.Perform = function () {
-        App.Core.Combat.FilterActions("#send","#wpon","wpoff").forEach(action=>{
-            switch(action.Command){
+        App.Core.Combat.FilterActions("#send", "#wpon", "wpoff").forEach(action => {
+            switch (action.Command) {
                 case "#send":
-                    App.Send(action.Data.replaceAll("$1",App.Combat.Target))
+                    App.Send(action.Data.replaceAll("$1", App.Combat.Target))
                     return
                 case "#wpoff":
                 case "#wpon":
-                    App.Send(action.Command+action.Data?(" "+action.Data):"")
+                    App.Send(action.Command + action.Data ? (" " + action.Data) : "")
                     return
             }
         })
@@ -84,22 +92,22 @@
         App.Commands.Execute(App.NewSyncCommand())
     }
     App.Core.Combat.Kill = function (id, data) {
-        data = (data || App.NewCombat()).WithTags("kill")
+        data = (data || App.NewCombat("")).WithTags("kill")
         App.Core.Combat.DoCombat(id, data)
     }
     App.Core.Combat.CounterAttack = function (id, data) {
-        data = (data || App.NewCombat()).WithTags("counterattack")
+        data = (data || App.NewCombat("")).WithTags("counterattack")
         App.Core.Combat.DoCombat(id, data)
 
     }
     App.Core.Combat.DoCombat = function (id, data) {
         if (data.Command) {
             App.Send(data.Command)
-        }else if (id) {
+        } else if (id) {
             App.Send("kill " + id)
         }
-        App.Core.Combat.FilterActions("#start").forEach(action=>{
-            App.Send(action.Data.replaceAll("$1",App.Combat.Target))
+        App.Core.Combat.FilterActions("#start").forEach(action => {
+            App.Send(action.Data.replaceAll("$1", App.Combat.Target))
         })
         App.Send(checkCombatCmd)
         App.Combat.Start(id, data)
@@ -127,12 +135,12 @@
             App.Core.Combat.CounterAttack(running.Command.Data.ID, running.Command.Data.Data)
         }
     })
-    App.Core.Combat.FilterActions=function(...commands){
-        let filter={}
-        commands.forEach(c=>{filter[c]=true})
-        let result=[]
-        App.Core.Combat.Actions.forEach(action=>{
-            if (filter[action.Command]){
+    App.Core.Combat.FilterActions = function (...commands) {
+        let filter = {}
+        commands.forEach(c => { filter[c] = true })
+        let result = []
+        App.Core.Combat.Actions.forEach(action => {
+            if (filter[action.Command]) {
                 result.push(action)
             }
         })
