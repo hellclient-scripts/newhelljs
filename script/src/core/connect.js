@@ -14,7 +14,13 @@
             PlanOnConnected.Execute()
         })
     })
-    
+    App.BindEvent("disconnected", function (event) {
+        Metronome.Discard(true)
+        App.Committee.Positions.forEach(position => {
+            position.StartNewTerm()
+        });
+        Note("断线了")
+    })
     let matcherEnter = /^你连线进入.+。$/
     let matcherReenter = /^重新连线完毕。/
     let matcherTooFast=/^你距上一次退出时间只有.+秒钟，请稍候再登录。$/

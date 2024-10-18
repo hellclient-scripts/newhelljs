@@ -9,7 +9,7 @@
             App.Core.Quest.Exec(w[0])
             return
         }
-        q=GetVariable("quest").trim()
+        q = GetVariable("quest").trim()
         if (q) {
             App.Core.Quest.Exec(w[0])
             return
@@ -18,9 +18,11 @@
     }
     App.Quest = {}
     App.Core.Quest.Exec = function (line) {
-        App.Init()
-        App.ReloadVariable()
-        App.Quests.StartLine(line.trim())
+        App.Commands.PushCommands(
+            App.Commands.NewFunctionCommand(App.Init),
+            App.Commands.NewFunctionCommand(() => { App.Quests.StartLine(line.trim()) }),
+        )
+        App.Next()
     }
     App.Quests = new questsModule.Quests(App.Positions["Quest"], App.Commands, new conditionsModule.Conditions)
     App.BindEvent("core.stop", function () {
