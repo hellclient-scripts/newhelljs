@@ -2,22 +2,22 @@
     let mapModule = App.RequireModule("helllibjs/map/map.js")
 
     App.Move = {}
-    let refilter= /[。·！]/g;
-    App.Move.Filterdir=function(dir){
+    let refilter = /[。·！]/g;
+    App.Move.Filterdir = function (dir) {
         dir = dir.replace(refilter, "");
         if (dir.indexOf("、") != -1) {
             dir = dir.split("、");
             dir = dir[dir.length - 1];
         }
-        return dir    
+        return dir
     }
-    App.Map.Trace=function(map,rid,dir){
-        var flylist=Mapper.flylist()
-        var exits=Mapper.getexits(rid)
-        var result=""
-        flylist.concat(exits).forEach(function(path){
-            if (App.Move.Filterdir(path.command)==App.Move.Filterdir(dir)){
-                result=path.to+""
+    App.Map.Trace = function (map, rid, dir) {
+        var flylist = Mapper.flylist()
+        var exits = Mapper.getexits(rid)
+        var result = ""
+        flylist.concat(exits).forEach(function (path) {
+            if (App.Move.Filterdir(path.command) == App.Move.Filterdir(dir)) {
+                result = path.to + ""
             }
         })
         return result
@@ -34,12 +34,12 @@
     App.Move.NewOrdered = function (rooms, ...initers) {
         return App.Map.NewRoute(new App.Map.Movement.Ordered(rooms), ...initers)
     }
-    App.Move.LongtimeStepDelay=60*1000
+    App.Move.LongtimeStepDelay = 60 * 1000
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
-            let tt=task.AddTimer(App.Map.StepTimeout).WithName("timeout")
-            task.AddCatcher("core.longtimestep",function(){
+            let tt = task.AddTimer(App.Map.StepTimeout).WithName("timeout")
+            task.AddCatcher("core.longtimestep", function () {
                 tt.Reset(App.Move.LongtimeStepDelay)
                 return true
             })
@@ -58,7 +58,7 @@
                             App.Map.OnStepTimeout()
                             break
                         case "wrongway":
-                            App.Map.Room.ID=""
+                            App.Map.Room.ID = ""
                             App.Map.Retry()
                             break
                         case "walkbusy":
@@ -93,7 +93,7 @@
             App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })
-    
+
     App.Move.NewRoomsCommand = function (target, ...initers) {
         return App.Commands.NewCommand("rooms", { Rooms: target, Initers: initers })
     }
@@ -116,11 +116,11 @@
         App.Commands.Execute(App.Move.NewToCommand(target))
         App.Next()
     }
-    App.Move.Rooms=function(rooms){
+    App.Move.Rooms = function (rooms) {
         App.Commands.Execute(App.Move.NewRoomsCommand(rooms))
         App.Next()
     }
-    App.Move.Ordered=function(rooms){
+    App.Move.Ordered = function (rooms) {
         App.Commands.Execute(App.Move.NewOrderedCommand(rooms))
         App.Next()
     }

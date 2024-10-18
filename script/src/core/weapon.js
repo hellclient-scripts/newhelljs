@@ -199,7 +199,10 @@
                             App.Move.NewToCommand(App.Params.LocRepair),
                             App.Commands.NewDoCommand("repair "+repair.ID),
                             App.Commands.NewDoCommand("repair "+repair.ID),
-                            App.Commands.NewFunctionCommand(()=>{checkerDuration.Force()}),
+                            App.Commands.NewFunctionCommand(()=>{
+                                checkerDuration.Force()
+                                App.Next()
+                            }),
                             App.NewNobusyCommand(),
                         )
                         App.Next()

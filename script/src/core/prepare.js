@@ -20,7 +20,7 @@
             if (diff >= 10) {
                 cmd = "qu " + Math.ceil(diff / 10) + " cash;i"
             } else {
-                cmd = "qu " + cmd + " gold;i"
+                cmd = "qu " + diff + " gold;i"
             }
             App.Commands.PushCommands(
                 App.Move.NewToCommand(App.Params.LocBank),

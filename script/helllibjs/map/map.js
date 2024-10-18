@@ -69,6 +69,7 @@
         #tagsIniter = []
         Move = null
         #tags = {}
+        #blocked = []
         Data = {}
         Movement = null
         StepPlan = null
@@ -100,7 +101,7 @@
             let result = [fr]
             let current = fr
             for (let cmd of commands) {
-                let to = this.Trace(this,current, cmd)
+                let to = this.Trace(this, current, cmd)
                 if (!to) {
                     PrintSystem("路径解析错误")
                     return null
@@ -118,6 +119,10 @@
         FlashTags() {
             this.#tags = {}
             Mapper.flashtags()
+            this.#blocked=[]
+        }
+        BlockPath(from, to) {
+            this.#blocked.push([from, to])
         }
         SetTag(name, value, force) {
             let old = this.#tags[name]
@@ -138,6 +143,14 @@
                     Mapper.settag(key, true)
                 }
             }
+        }
+        UpdateMapperOption(option) {
+            if (option.blockedpath == null) {
+                option.blockedpath = []
+            }
+            this.#blocked.forEach(val => {
+                option.blockedpath.push(val)
+            })
         }
         GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
@@ -280,6 +293,9 @@
     }
     let DefaultOnStepTimeout = function (move, map) {
     }
+    let DefaultMapperOptionCreator = function (move, map) {
+        return null
+    }
     class Move {
         StartCommand = ""
         Data = {}
@@ -293,6 +309,7 @@
         OnInitTags = DefaultOnInitTags
         OnStepTimeout = DefaultOnStepTimeout
         OnStepFinsih = DefaultMoveOnStepFinish
+        MapperOptionCreator = DefaultMapperOptionCreator
         Option = new Option()
         #walking = []
         Pending = null
@@ -330,21 +347,28 @@
             if (!skipinit) {
                 map.InitTags()
             }
-            return map.GetMapperPath(from, this.Option.Fly, to, this.Option.MapperOptions)
+            return map.GetMapperPath(from, this.Option.Fly, to, this.GetMapperOptions(map))
         }
         WalkAll(map, rooms, distance, skipinit) {
             if (!skipinit) {
                 map.InitTags()
             }
-            return map.GetMapperWalkAll(rooms, this.Option.Fly, distance, this.Option.MapperOptions)
+            return map.GetMapperWalkAll(rooms, this.Option.Fly, distance, this.GetMapperOptions(map))
         }
         GetWalkOrdered(map, from, rooms, skipinit) {
             if (!skipinit) {
                 map.InitTags()
             }
-            return map.GetMapperWalkOrdered(from, rooms, this.Option.Fly, this.Option.MapperOptions)
+            return map.GetMapperWalkOrdered(from, rooms, this.Option.Fly, this.GetMapperOptions(map))
         }
-
+        GetMapperOptions(map) {
+            let opt = this.MapperOptionCreator(this, map)
+            if (opt == null) {
+                opt = {}
+            }
+            map.UpdateMapperOption(opt)
+            return opt
+        }
         StepTimeout(map) {
             this.OnStepTimeout(this, map)
         }
@@ -419,7 +443,6 @@
         MutlipleStep = false
         Fly = false
         Tags = {}
-        MapperOptions = null
         ApplyTo(move, map) {
             move.Option = this
         }
