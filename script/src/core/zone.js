@@ -140,7 +140,6 @@
                         App.Commands.NewFunctionCommand(() => {
                             if (App.Map.Room.Data.IDHere && App.Map.Room.Data.IDHere[wanted.Target]) {
                                 wanted.ID = App.Map.Room.Data.IDHere[wanted.Target].toLowerCase()
-                                Note(wanted.ID)
                             }
                             App.Next()
                         })

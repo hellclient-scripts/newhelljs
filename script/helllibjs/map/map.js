@@ -56,9 +56,14 @@
         }
         return ""
     }
+    class Snap{
+        Move=null
+        Term=null
+    }
     class Map {
-        constructor(position) {
+        constructor(position,moveposition) {
             this.Position = position
+            this.MovePosition=moveposition
             this.Movement = movementModule
             this.StepTimeout = module.DefaultStepTimeout
             this.ResendDelay = module.DefaultResendDelay
@@ -191,7 +196,6 @@
             }
             return path
         }
-
         OnWalking() {
             if (this.Move != null) {
                 this.Move.OnWalking(this)
@@ -235,6 +239,7 @@
                 let move = this.Move
                 this.Move = null
                 move.OnFinish(this.Move, this)
+                this.MovePosition.StartNewTerm()
             }
         }
         CancelMove() {
@@ -242,10 +247,26 @@
                 let move = this.Move
                 this.Move = null
                 move.OnCancel(this.Move, this)
+                this.MovePosition.StartNewTerm()
             }
+        }
+        Snap(){
+            if (this.Move != null) {
+                let snap=new Snap()
+                snap.Move=this.Move
+                this.Move=null
+                snap.Term=this.MovePosition.Snap()
+                return snap
+            }
+            return null
+        }
+        Rollback(snap){
+            this.Move=snap.Move
+            this.MovePosition.Rollback(snap.Term)
         }
         StartMove(move) {
             this.Move = move
+            this.MovePosition.StartNewTerm()
             move.Walk(this)
         }
         NewRoute(...initers) {
@@ -408,6 +429,12 @@
                     map.StepPlan.Execute()
                 }
             }
+        }
+        GetLastStep(){
+            if (this.#walking && this.#walking.length){
+                return this.#walking[0]
+            }
+            return null
         }
         InitTags(map) {
             if (this.Option != null) {

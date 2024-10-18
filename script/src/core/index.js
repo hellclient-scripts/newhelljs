@@ -33,6 +33,7 @@
     App.Include("src/core/goods.js")
     App.Include("src/core/heal.js")
     App.Include("src/core/dispel.js")
+    App.Include("src/core/blocker.js")
     App.Include("src/core/quests.js")
     App.Include("src/core/variable.js")
     App.Include("src/core/helpfind.js")

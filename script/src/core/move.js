@@ -47,6 +47,9 @@
             task.AddCatcher("core.walkbusy").WithName("walkbusy")
             task.AddCatcher("core.walkresend").WithName("walkresend")
             task.AddCatcher("core.walkretry").WithName("walkretry")
+            task.AddCatcher("core.blocked", (catcher, event) => {
+                catcher.WithData(event.Data)
+            }).WithName("blocked")
         },
         function (result) {
             switch (result.Type) {
@@ -70,10 +73,16 @@
                         case "walkretry":
                             App.Map.Retry()
                             break
+                        case "blocked":
+                            App.Move.OnBlocker(result.Data)
+                            break
                     }
             }
         }
     )
+    App.Move.OnBlocker = function (name) {
+        App.Core.Blocker.KillBlocker(name)
+    }
     App.BindEvent("core.roomentry", function (event) {
         event.Context.ProposeLater(function () {
             App.Map.OnWalking()

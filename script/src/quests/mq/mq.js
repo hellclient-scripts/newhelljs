@@ -61,11 +61,26 @@ $.Module(function (App) {
             Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务")
         }
     }
+    MQ.Verify = () => {
+        if (App.Data.Player.HP["经验"] > 740000) {
+            $.PushCommands(
+                $.To(App.Params.LocDazuo),
+                $.Do("fangqi exp;hp"),
+                $.Nobusy(),
+                $.Function(MQ.Prepare),
+            )
+        } else {
+            $.PushCommands(
+                $.To(MasterLoc),
+                $.Function(MQ.AskQuest),
+            )
+        }
+        $.Next()
+    }
     MQ.Prepare = () => {
         $.PushCommands(
             $.Prepare(),
-            $.To(MasterLoc),
-            $.Function(MQ.AskQuest),
+            $.Function(MQ.Verify),
         )
         $.Next()
     }
@@ -152,10 +167,10 @@ $.Module(function (App) {
                 return obj
             }
         }
-        if (App.Map.Room.ID){
-            map.Room.Data.Objects.Items.forEach((item)=>{
-                if (item.ID.indexOf(" ")>0 && item.Label.length<5){
-                    App.Core.HelpFind.OnNPC(item.Label,item.ID,App.Map.Room.ID)
+        if (App.Map.Room.ID) {
+            map.Room.Data.Objects.Items.forEach((item) => {
+                if (item.ID.indexOf(" ") > 0 && item.Label.length < 5) {
+                    App.Core.HelpFind.OnNPC(item.Label, item.ID, App.Map.Room.ID)
                 }
             })
         }
@@ -333,8 +348,8 @@ $.Module(function (App) {
             if (!MQ.Data.NPC.Loc) {
                 MQ.Data.NPC.Loc = loc
             }
-            if (App.Zone.Wanted&&App.Zone.Wanted.Target==name){
-                App.Zone.Wanted.Loc=loc
+            if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {
+                App.Zone.Wanted.Loc = loc
             }
             Note("接到线报:" + name + "|" + id + "|" + loc)
             MQ.Data.NPC.Farlist = null

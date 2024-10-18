@@ -7,7 +7,7 @@
     App.Data.Room.Name = ""
     App.Data.Room.Objects = new objectModule.List()
     App.Data.Room.Exits = []
-    App.Map = new mapModule.Map(App.Positions["Room"])
+    App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
     }
@@ -22,7 +22,7 @@
         App.Map.EnterNewRoom().
             WithName(App.History.Current).
             WithNameRaw(App.History.CurrentOutput)
-            initRoom()
+        initRoom()
     }
     App.BindEvent("core.roomname", App.Core.Room.OnName)
     reExit = /[a-z]+/g
@@ -64,36 +64,36 @@
             })
         }, function (result) {
             if (result.Type != "cancel") {
-                if (App.Map.Room.Name && !App.Map.Room.ID){
-                    let idlist=App.Map.Data.RoomsByName[App.Map.Room.Name]
-                    if (idlist&&idlist.length==1){
-                        App.Map.Room.ID=idlist[0]
+                if (App.Map.Room.Name && !App.Map.Room.ID) {
+                    let idlist = App.Map.Data.RoomsByName[App.Map.Room.Name]
+                    if (idlist && idlist.length == 1) {
+                        App.Map.Room.ID = idlist[0]
                     }
                 }
                 App.RaiseEvent(new App.Event("core.roomentry"))
             }
         })
-        let matcherIDHere = /^(\S+)\s*=\s*([^、]+)/
-        var PlanOnIDHere = new App.Plan(App.Positions.Connect,
-            function (task) {
-                task.AddTrigger(matcherIDHere, function (trigger, result, event) {
-                    App.Map.Room.Data.IDHere[result[1]]=result[2]
-                    event.Context.Set("core.room.onidhere", true)
-                    return true
-                })
-                task.AddCatcher("line", function (catcher, event) {
-                    return event.Context.Get("core.room.onidhere")
-                })
-                task.AddTimer(5000)
-            },
-            function (result) {
+    let matcherIDHere = /^(\S+)\s*=\s*([^、]+)/
+    var PlanOnIDHere = new App.Plan(App.Positions.Connect,
+        function (task) {
+            task.AddTrigger(matcherIDHere, function (trigger, result, event) {
+                App.Map.Room.Data.IDHere[result[1]] = result[2]
+                event.Context.Set("core.room.onidhere", true)
+                return true
             })
-        App.Core.Room.OnIDHere = function (event) {
-            event.Context.Propose(function () {
-                App.Map.Room.Data.IDHere={}
-                PlanOnIDHere.Execute()
+            task.AddCatcher("line", function (catcher, event) {
+                return event.Context.Get("core.room.onidhere")
             })
-        }
-        App.BindEvent("core.idhere", App.Core.Room.OnIDHere)
-    
+            task.AddTimer(5000)
+        },
+        function (result) {
+        })
+    App.Core.Room.OnIDHere = function (event) {
+        event.Context.Propose(function () {
+            App.Map.Room.Data.IDHere = {}
+            PlanOnIDHere.Execute()
+        })
+    }
+    App.BindEvent("core.idhere", App.Core.Room.OnIDHere)
+
 })(App)

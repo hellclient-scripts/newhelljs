@@ -332,6 +332,19 @@
             this.Term = new Term()
             this.OnTermStart(this)
         }
+        Snap(){
+            let term=this.Term
+            this.Term=new Term()
+            return term
+        }
+        Rollback(snap){
+            if (snap==null){
+                return
+            }
+            let term=this.Term
+            this.Term=snap
+            return term
+        }
         StartNewTerm() {
             this.Term.End()
             this.Term = new Term()
