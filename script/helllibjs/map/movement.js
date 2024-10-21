@@ -227,7 +227,7 @@
     module.Ordered = Ordered
     module.MaxStep = 5
     module.Locate = Locate
-    let DefaultChecker = function (step, move, map) {
+    let DefaultChecker = function (step, index, move, map) {
         return dfsModule.Backward[step.Command] != null
     }
     class MutlipleStepConverter {
@@ -236,12 +236,12 @@
         Convert(path, move, map) {
             let result = []
             let current = []
-            path.forEach(step => {
+            path.forEach((step, index) => {
                 if (!move.Option.MutlipleStep) {
                     result.push([step])
                     return
                 }
-                if (this.Checker(step, move, map)) {
+                if (this.Checker(step, index, move, map)) {
                     current.push(step)
                     if (current.length >= module.MaxStep) {
                         result.push(current)

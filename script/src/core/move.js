@@ -1,6 +1,9 @@
 (function (App) {
     let mapModule = App.RequireModule("helllibjs/map/map.js")
-
+    let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
+    App.Map.Movement.MutlipleStepConverter.Checker = function (step, index, move, map) {
+        return index != 0 && dfsModule.Backward[step.Command] != null
+    }
     App.Move = {}
     let refilter = /[。·！]/g;
     App.Move.Filterdir = function (dir) {

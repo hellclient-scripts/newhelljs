@@ -56,14 +56,14 @@
         }
         return ""
     }
-    class Snap{
-        Move=null
-        Term=null
+    class Snap {
+        Move = null
+        Term = null
     }
     class Map {
-        constructor(position,moveposition) {
+        constructor(position, moveposition) {
             this.Position = position
-            this.MovePosition=moveposition
+            this.MovePosition = moveposition
             this.Movement = movementModule
             this.StepTimeout = module.DefaultStepTimeout
             this.ResendDelay = module.DefaultResendDelay
@@ -75,6 +75,7 @@
         Move = null
         #tags = {}
         #blocked = []
+        #temporaryPaths = []
         Data = {}
         Movement = null
         StepPlan = null
@@ -124,7 +125,12 @@
         FlashTags() {
             this.#tags = {}
             Mapper.flashtags()
-            this.#blocked=[]
+            Mapper.ResetTemporary()
+            this.#blocked = []
+            this.#temporaryPaths=[]
+        }
+        AddTemporaryPath(from, path) {
+            this.#temporaryPaths.push({ From: from, Path: path })
         }
         BlockPath(from, to) {
             this.#blocked.push([from, to])
@@ -148,6 +154,9 @@
                     Mapper.settag(key, true)
                 }
             }
+            this.#temporaryPaths.forEach(tp => {
+                Mapper.AddTemporaryPath(tp.from, tp.path)
+            })
         }
         UpdateMapperOption(option) {
             if (option.blockedpath == null) {
@@ -250,18 +259,18 @@
                 this.MovePosition.StartNewTerm()
             }
         }
-        Snap(){
+        Snap() {
             if (this.Move != null) {
-                let snap=new Snap()
-                snap.Move=this.Move
-                this.Move=null
-                snap.Term=this.MovePosition.Snap()
+                let snap = new Snap()
+                snap.Move = this.Move
+                this.Move = null
+                snap.Term = this.MovePosition.Snap()
                 return snap
             }
             return null
         }
-        Rollback(snap){
-            this.Move=snap.Move
+        Rollback(snap) {
+            this.Move = snap.Move
             this.MovePosition.Rollback(snap.Term)
         }
         StartMove(move) {
@@ -430,8 +439,8 @@
                 }
             }
         }
-        GetLastStep(){
-            if (this.#walking && this.#walking.length){
+        GetLastStep() {
+            if (this.#walking && this.#walking.length) {
                 return this.#walking[0]
             }
             return null
