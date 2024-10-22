@@ -1,5 +1,6 @@
 (function (App) {
     App.Data.Player = {
+        NoForce: true,
         HP: {},
         HPM: {},
         Special: {},
@@ -73,9 +74,9 @@
     }
     App.BindEvent("core.hp", App.Core.OnHP)
 
-// 你现在会以下这些特技：
-// 杀气(hatred)
-// 小周天运转(self)
+    // 你现在会以下这些特技：
+    // 杀气(hatred)
+    // 小周天运转(self)
     matcherSpecial = /^\S+\(([a-z]+)\)$/
     var PlanOnSpecial = new App.Plan(App.Positions.Connect,
         function (task) {
@@ -131,6 +132,7 @@
         function (result) {
             checkerScore.Reset()
         })
+
     var LastType = ""
     App.Core.OnSkills = function (event) {
         event.Context.Propose(function () {
@@ -139,6 +141,7 @@
             PlanOnSkills.Execute()
         })
     }
+
     let checkerSkills = App.Checker.Register("skills", "skills", 300000)
     App.BindEvent("core.skills", App.Core.OnSkills)
     // ┌─────────────┬─────────────┬──────┬──────┐
@@ -186,6 +189,26 @@
         })
     }
     App.BindEvent("core.noskill", App.Core.OnNoSkill)
+
+
+    App.Core.OnChaForce = function (event) {
+        event.Context.Propose(function () {
+            App.Data.Player.NoForce = true
+            PlanOnChaForce.Execute()
+        })
+    }
+    var PlanOnChaForce = new App.Plan(App.Positions.Connect,
+        function (task) {
+            task.AddTrigger(matcherSkills, function (trigger, result, event) {
+                if (result[2] != "基本内功") {
+                    App.Data.Player.NoForce = false
+                }
+                return true
+            })
+            task.AddTimer(5000)
+            task.AddTrigger(matcherSkillsEnd)
+        })
+    App.BindEvent("core.chaforce", App.Core.OnChaForce)
 
     App.Core.OnHPM = function (event) {
         event.Context.Propose(function () {

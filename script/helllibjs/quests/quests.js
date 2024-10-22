@@ -92,6 +92,11 @@
             }
             this.Commands.Next()
         }
+        Restart() {
+            this.Remain = [...this.Queue]
+            this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
+            this.Commands.Next()
+        }
         Next() {
             if (this.Stopped) {
                 this.Commands.Next()

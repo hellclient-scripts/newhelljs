@@ -349,6 +349,9 @@
             this.Term.End()
             this.Term = new Term()
         }
+        Discard(){
+            this.Term = new Term()
+        }
         AddTimer(duration, callback, disabled, norepeat) {
             let timer = new Timer(duration, callback, !disabled, norepeat)
             this.Term.BindTimer(timer)

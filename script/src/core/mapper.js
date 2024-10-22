@@ -41,7 +41,7 @@
         App.Send("yun recover")
         App.RaiseEvent(event)
     })
-    App.Engine.SetFilter("core.unwield.walkrest", function (event) {
+    App.Engine.SetFilter("core.unwield", function (event) {
         App.Send("#unwield")
         App.RaiseEvent(event)
     })

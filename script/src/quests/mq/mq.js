@@ -61,19 +61,36 @@ $.Module(function (App) {
             Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务")
         }
     }
+    MQ.CheckYou = () => {
+        $.PushCommands(
+            $.Function(() => {
+                App.Core.NPC.CheckYouxun(MQ.Data.NPC.Name, MQ.Data.NPC.ID)
+            }),
+            $.Function(() => {
+                if (App.Core.NPC.AskYouxunData.Live) {
+                    MQ.Far()
+                } else {
+                    MQ.GiveHead()
+                }
+            })
+        )
+        $.Next()
+    }
     MQ.Verify = () => {
-        if (App.Data.Player.HP["经验"] > 740000) {
-            $.PushCommands(
-                $.To(App.Params.LocDazuo),
-                $.Do("fangqi exp;hp"),
-                $.Nobusy(),
-                $.Function(MQ.Prepare),
-            )
-        } else {
-            $.PushCommands(
-                $.To(MasterLoc),
-                $.Function(MQ.AskQuest),
-            )
+        if (!App.Quests.Stopped) {
+            if (App.Data.Player.HP["经验"] > 740000) {
+                $.PushCommands(
+                    $.To(App.Params.LocDazuo),
+                    $.Do("fangqi exp;hp"),
+                    $.Nobusy(),
+                    $.Function(MQ.Prepare),
+                )
+            } else {
+                $.PushCommands(
+                    $.To(MasterLoc),
+                    $.Function(MQ.AskQuest),
+                )
+            }
         }
         $.Next()
     }
@@ -89,10 +106,14 @@ $.Module(function (App) {
     let reStart = /^据说此人前不久曾经在(.*)出没。/
     let reFlee = /(.{2,5})在(.*)失踪了！现在不知道去了哪里！/
     let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前杀了/
+    let reNoMaster = "这里没有这个人，你怎么领任务？"
+    let reNoQuest = "你现在没有领任何任务！"
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             let fled = false
+            MQ.Data.NoMaster = false
+            MQ.Data.NPC = null
             task.AddTrigger(reQuest, (tri, result) => {
                 MQ.Data.NPC = new NPC(result[2])
                 return true
@@ -119,6 +140,11 @@ $.Module(function (App) {
             task.AddTrigger(reFail, () => {
                 App.Send("quest cancel")
             })
+            task.AddTrigger(reNoMaster, () => {
+                MQ.Data.NoMaster = true
+                return true
+            })
+            task.AddTrigger(reNoQuest)
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
             App.Send("give head to " + MasterID + ";drop head")
@@ -144,7 +170,10 @@ $.Module(function (App) {
         $.PushCommands(
             $.Plan(PlanQuest),
             $.Function(() => {
-                if (MQ.Data.NPC) {
+                if (MQ.Data.NoMaster) {
+                    Quest.Cooldown(3000000)
+                    Note("师傅没了，任务冷却5分钟")
+                } else if (MQ.Data.NPC) {
                     $.Insert($.Function(MQ.Ready))
                 } else {
                     $.Insert(
@@ -243,7 +272,7 @@ $.Module(function (App) {
     MQ.GoKill = () => {
         if (MQ.Data.NPC.Times > 3) {
             Note("找不到")
-            MQ.Far()
+            MQ.CheckYou()
             return
         }
         App.Core.HelpFind.HelpFind(MQ.Data.NPC.Name)
@@ -330,7 +359,7 @@ $.Module(function (App) {
             MQ.AskInfo()
         }
         Note("没人知道")
-        MQ.Far()
+        MQ.CheckYou()
     }
 
 
@@ -457,9 +486,11 @@ $.Module(function (App) {
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Start = function (data) {
+        MQ.Prepare()
     }
     App.Quests.Register(Quest)
     App.MQ = () => {
+        MQ.Data.NPC = null
         MQ.Prepare()
     }
 })

@@ -794,6 +794,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g05l89bgspfu73htif0i"
+  Name = "core.chaforce"
+  Enabled = true
+  Match = "你目前所学到的基本内功及相关技能"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.chaforce\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"

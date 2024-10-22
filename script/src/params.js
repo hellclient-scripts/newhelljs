@@ -25,4 +25,5 @@
     NumDazuo:0,
     NumTuna:0,
     WeaponDurationMin:40,
+    ReloginDelay:120000,
 }})()

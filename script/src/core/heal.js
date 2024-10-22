@@ -64,10 +64,12 @@
         if (App.Data.Player.HP["气血百分比"] <= 20) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Goods.NewBuyCommand("jin chuangyao"),
                     App.Commands.NewDoCommand("eat jinchuang yao;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
+                if (!App.Data.Item.List.FindByIDLower("jinchuang yao").First()) {
+                    App.Commands.Insert(App.Goods.NewBuyCommand("jin chuangyao"),)
+                }
                 App.Next()
             }
         }
@@ -110,10 +112,12 @@
         if (App.Data.Player.HP["精气百分比"] <= 34) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Goods.NewBuyCommand("yangjing dan"),
                     App.Commands.NewDoCommand("eat yangjing dan;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
+                if (!App.Data.Item.List.FindByIDLower("yangjing dan").First()) {
+                    App.Commands.Insert(App.Goods.NewBuyCommand("yangjing dan"))
+                }
                 App.Next()
             }
         }

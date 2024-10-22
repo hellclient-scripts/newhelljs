@@ -162,6 +162,9 @@
             this.Queues.push(queue)
             this.#enter()
         }
+        Discard(){
+            this.Queues=[]
+        }
         Next() {
             let queue = this.CurrentQueue()
             if (queue) {
