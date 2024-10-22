@@ -34,7 +34,7 @@
                 return true
             }
             if ((new Date()).getTime()-LastTry>5*1000){
-                Mode.mode = 0
+                Mode = 0
                 return true
             }
         }

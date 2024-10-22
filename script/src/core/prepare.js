@@ -32,8 +32,8 @@
         }
         App.Next()
     }
-    App.NewPrepareMoneyCommand=function(num){
-        return App.Commands.NewFunctionCommand(()=>{App.PrepareMoney(num)})
+    App.NewPrepareMoneyCommand = function (num) {
+        return App.Commands.NewFunctionCommand(() => { App.PrepareMoney(num) })
     }
     let eventBeforeCheck = new App.Event("core.beforecheck")
     App.Prepare = function (id, data) {
@@ -175,6 +175,27 @@
         }
         return null
     }))
+    App.Proposals.Register("exp", App.Proposals.NewProposal(function (proposals, exclude) {
+        if (App.Params.ExpMax > 0 && App.Data.Player.HP["经验"] > App.Params.ExpMax) {
+            let skill = App.Core.GetMaxSkillLevel()
+            let safelevel = skill["等级"] - 3
+            if ((safelevel * safelevel * safelevel / 10) > App.Params.ExpMax) {
+                return function () {
+                    PrintSystem("最大经验设置有误,技能 " + skill["名称"] + " 超限")
+                }
+            }
+            return function () {
+                $.PushCommands(
+                    $.To(App.Params.LocDazuo),
+                    $.Do("fangqi exp;hp"),
+                    $.Nobusy(),
+                )
+                App.Next()
+            }
+        }
+        return null
+    }))
+
     let common = App.Proposals.NewProposalGroup(
         "cash",
         "gold",
@@ -195,7 +216,7 @@
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)
-
+    App.Proposals.Register("commonWithExp", App.Proposals.NewProposalGroup("common", "exp"))
     App.UserQueue.UserQueue.RegisterCommand("#prepare", function (uq, data) {
         uq.Commands.Append(
             App.NewPrepareCommand(data),

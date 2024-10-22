@@ -974,11 +974,6 @@ Timers = []
   Intro = "用户密码，登陆用"
 
 [[RequiredParams]]
-  Name = "num_cmds"
-  Desc = "每心跳指令数"
-  Intro = "应该是2的倍数，留空默认"
-
-[[RequiredParams]]
   Name = "cmd_ride"
   Desc = "骑坐骑的指令"
   Intro = "比如ride bao-feiji。\n留空则不尝试rideto。\n如果不需要召唤坐骑，可以设为t"
@@ -1004,6 +999,36 @@ Timers = []
   Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nlong word * 2"
 
 [[RequiredParams]]
+  Name = "house"
+  Desc = "房屋信息"
+  Intro = "设置后会将1933-1949设置为对应的房屋信息\n格式为'包子铺 bzp 1558'"
+
+[[RequiredParams]]
+  Name = "max_exp"
+  Desc = "最大经验，部分任务中超过这个会放弃。"
+  Intro = "留空或小于等于0不放弃"
+
+[[RequiredParams]]
+  Name = "max_pot"
+  Desc = "潜能上限"
+  Intro = ""
+
+[[RequiredParams]]
+  Name = "num_cmds"
+  Desc = "每心跳指令数(选填)"
+  Intro = "应该是2的倍数，留空默认"
+
+[[RequiredParams]]
   Name = "sell"
-  Desc = "道具处理指令"
+  Desc = "道具处理指令(选填)"
+  Intro = ""
+
+[[RequiredParams]]
+  Name = "id_pass"
+  Desc = "门派缩写（选填）"
+  Intro = "留空从门派自动判断"
+
+[[RequiredParams]]
+  Name = "min_pot"
+  Desc = "潜能下限(选填)"
   Intro = ""

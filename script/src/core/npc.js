@@ -52,6 +52,7 @@
                     if (App.Data.Ask.Answers.length && App.Data.Ask.Answers[0].Line == "游讯嘿嘿奸笑两声，对你小声道：“没有问题，不过得要50两黄金，不二价！”") {
                         App.Core.NPC.AskYouxunData.Live = true
                     }
+                    App.Next()
                 })
             ).WithFailCommand(
                 App.Commands.NewFunctionCommand(() => {
@@ -61,4 +62,36 @@
         }
         App.Next()
     }
+    App.Core.NPC.Family = {}
+    App.LoadLines("data/family.txt", "|").forEach((data) => {
+        App.Core.NPC.Family[data[0]] = {
+            Name: data[0],
+            LocMaster: data[1],
+            MasterID: data[2],
+            LocSleep: data[3],
+            LocDazuo: data[4],
+            IDPass: data[5],
+        }
+    })
+    App.Core.NPC.Load = function () {
+        let fam = App.Core.NPC.Family[App.Data.Player.Score["门派"]]
+        if (fam) {
+            Note("引入门派设置")
+            App.Params.LocSleep = fam.LocSleep
+            App.Params.MasterID = fam.MasterID
+            App.Params.LocMaster = fam.LocMaster
+            App.Params.LocDazuo = fam.LocDazuo
+            App.Params.IDPass = fam.IDPass
+        }
+        let idpass = GetVariable("id_pass").trim()
+        if (idpass) {
+            App.Params.IDPass = idpass
+        }
+        if (App.Params.IDPass) {
+            Note("门派标签为 " + App.Params.IDPass)
+        }
+    }
+    App.Map.AppendTagsIniter((map) => {
+        map.SetTag(App.Params.IDPass, true)
+    })
 })(App)

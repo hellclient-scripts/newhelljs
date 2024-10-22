@@ -49,8 +49,6 @@ $.Module(function (App) {
         start: null,
         eff: 0,
     }
-    let MasterLoc = "2226"
-    let MasterID = "feng buping"
     MQ.OnNpcDie = function () {
         if (MQ.Data.kills == 0) {
             MQ.Data.start = $.Now()
@@ -78,25 +76,16 @@ $.Module(function (App) {
     }
     MQ.Verify = () => {
         if (!App.Quests.Stopped) {
-            if (App.Data.Player.HP["经验"] > 740000) {
-                $.PushCommands(
-                    $.To(App.Params.LocDazuo),
-                    $.Do("fangqi exp;hp"),
-                    $.Nobusy(),
-                    $.Function(MQ.Prepare),
-                )
-            } else {
-                $.PushCommands(
-                    $.To(MasterLoc),
-                    $.Function(MQ.AskQuest),
-                )
-            }
+            $.PushCommands(
+                $.To(App.Params.LocMaster),
+                $.Function(MQ.AskQuest),
+            )
         }
         $.Next()
     }
     MQ.Prepare = () => {
         $.PushCommands(
-            $.Prepare(),
+            $.Prepare("commonWithExp"),
             $.Function(MQ.Verify),
         )
         $.Next()
@@ -147,8 +136,8 @@ $.Module(function (App) {
             task.AddTrigger(reNoQuest)
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
-            App.Send("give head to " + MasterID + ";drop head")
-            App.Send("quest " + MasterID)
+            App.Send("give head to " + App.Params.MasterID + ";drop head")
+            App.Send("quest " + App.Params.MasterID)
             App.Send("quest")
         },
         (result) => {
@@ -159,8 +148,8 @@ $.Module(function (App) {
     )
     MQ.GiveHead = () => {
         $.PushCommands(
-            $.To(MasterLoc),
-            $.Do("give head to " + MasterID + ";drop head"),
+            $.To(App.Params.LocMaster),
+            $.Do("give head to " + App.Params.MasterID + ";drop head"),
             $.Function(MQ.Prepare),
         )
         $.Next()
@@ -252,7 +241,7 @@ $.Module(function (App) {
         if (App.Map.Room.ID && !MQ.Data.NPC.Fled && !MQ.Data.NPC.Died) {
             MQ.Data.NPC.Loc = null
             let rooms = App.Mapper.ExpandRooms(App.Map.Room.ID, 2)
-            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, zone).WithChecker(Checker).WithSingleStep(true).WithID(MQ.Data.NPC.ID)
+            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, MQ.Data.NPC.Name.Zone).WithChecker(Checker).WithSingleStep(true).WithID(MQ.Data.NPC.ID)
             $.PushCommands(
                 $.Rooms(rooms, App.Zone.Finder),
                 $.Function(MQ.KillLoc),
@@ -265,7 +254,9 @@ $.Module(function (App) {
             MQ.Data.NPC.ID = App.Zone.Wanted.ID
         }
         if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name)) {
-            $.Insert($.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat)))
+            $.Insert(
+                $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat)),
+            )
         }
         $.Next()
     }
@@ -293,9 +284,17 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    MQ.Connect = () => {
+        $.PushCommands(
+            $.Function(App.Core.Emergency.CheckDeath),
+            $.Function(MQ.KillLoc)
+        )
+        $.Next()
+    }
     let matcherDie = /^(.+)扑在地上挣扎了几下，腿一伸，口中喷出几口鲜血，死了！$/
     let matcherFlee2 = /^你连连进击，眼看便要得手，接连数招，让(.+)已是避/
     let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了|只有招架之功)(.*)/
+    let matcherHelper = /^看起来(.+)想杀死你！$/
     let PlanCombat = new App.Plan(
         App.Positions["Combat"],
         (task) => {
@@ -321,9 +320,17 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddTrigger(matcherHelper, function (tri, result) {
+                if (MQ.Data.NPC && result[1] != MQ.Data.NPC.Name) {
+                    return
+                }
+                return true
+            }).WithName("helper")
         },
         (result) => {
-
+            if (result.Name == "helper") {
+                App.Reconnect(0, MQ.Connect)
+            }
         })
     let reCity = /^.*说道：.*(好像听人说过是在|他不是在|据说是躲到|好像去了|已经躲到|好像是去了|但是也有人说他在|有人说在|不过听人说在|听说是在|不过听说他好像在|现在应该是去了)(.*)/
     MQ.AskInfo = function () {
@@ -486,11 +493,16 @@ $.Module(function (App) {
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Start = function (data) {
-        MQ.Prepare()
-    }
-    App.Quests.Register(Quest)
-    App.MQ = () => {
+        if (!App.Params.MasterID) {
+            PrintSystem("掌门ID " + App.Params.MasterID + " 无效")
+            return
+        }
+        if (!App.Params.LocMaster) {
+            PrintSystem("掌门位置 " + App.Params.LocMaster + " 无效")
+            return
+        }
         MQ.Data.NPC = null
         MQ.Prepare()
     }
+    App.Quests.Register(Quest)
 })

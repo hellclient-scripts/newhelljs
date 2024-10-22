@@ -141,7 +141,20 @@
             PlanOnSkills.Execute()
         })
     }
-
+    App.Core.GetMaxSkillLevel = function () {
+        let max = 0
+        let maxskill = null
+        for (var key in App.Data.Player.Skills) {
+            let skill = App.Data.Player.Skills[key]
+            if (skill["类型"] == "基本功夫") {
+                if (skill["等级"] > max) {
+                    max = skill["等级"]
+                    maxskill = skill
+                }
+            }
+        }
+        return maxskill
+    }
     let checkerSkills = App.Checker.Register("skills", "skills", 300000)
     App.BindEvent("core.skills", App.Core.OnSkills)
     // ┌─────────────┬─────────────┬──────┬──────┐
