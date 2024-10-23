@@ -38,4 +38,5 @@
     App.Include("src/core/variable.js")
     App.Include("src/core/helpfind.js")
     App.Include("src/core/npc.js")
+    App.Include("src/core/study.js")
 })(App)

@@ -395,7 +395,7 @@ Timers = []
   ID = "d1fv5jkjvdotit726vp8pf"
   Name = "core.walkbusy"
   Enabled = true
-  Match = "^(你现在正忙着呢。|你突然发现眼前的景象有些迷乱。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
+  Match = "^(你的内力不够，还是休息一下再说吧。|你现在正忙着呢。|你突然发现眼前的景象有些迷乱。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
   Send = ""
   ColourChangeType = 0
   Colour = 0
@@ -825,6 +825,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g07madisgo9g73hu933d"
+  Name = "core.ride.later"
+  Enabled = true
+  Match = "你现在正在和人家动手， 哪能骑马走人呀。"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.FilterLineEvent(\"core.ride.later\",\"core.walkretry\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -852,7 +883,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop|nobusy|sync|search|killin|prepare|kill|wpon|wpoff|unwield|buy)((\\s|\\|\\|).*)?$"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|killin|prepare|kill|wpon|wpoff|unwield|buy|study)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0
@@ -1005,13 +1036,18 @@ Timers = []
 
 [[RequiredParams]]
   Name = "max_exp"
-  Desc = "最大经验，部分任务中超过这个会放弃。"
-  Intro = "留空或小于等于0不放弃"
+  Desc = "最大经验(实时更新)"
+  Intro = "部分任务中超过这个会放弃。\n留空或小于等于0不放弃"
 
 [[RequiredParams]]
   Name = "max_pot"
-  Desc = "潜能上限"
+  Desc = "潜能上限(实时更新)"
   Intro = ""
+
+[[RequiredParams]]
+  Name = "study"
+  Desc = "学习指令，一行一个学习内容"
+  Intro = "格式为\n\n技能ID|学习限制|类型|目标|位置|开始指令|结束指令\n除了技能ID都能省略，类型默认为yanjiu\n技能ID以!开头代表强制优先学习\n参考:\n\nsword|180|xue|feng buping|2226|wield sword\nhuashan-xinfa\n!zuoyou-hubo|360|xue|zhou botong|779"
 
 [[RequiredParams]]
   Name = "num_cmds"
@@ -1030,5 +1066,10 @@ Timers = []
 
 [[RequiredParams]]
   Name = "min_pot"
-  Desc = "潜能下限(选填)"
+  Desc = "潜能下限(实时更新,选填)"
   Intro = ""
+
+[[RequiredParams]]
+  Name = "jiqu"
+  Desc = "汲取武道设置(选填)"
+  Intro = "设置数字则为最大体会，数字小于等于0不汲取，不设自动设置。\n\n#cmd可以指定多条汲取指令。不设则自动。参考\n\n400\n#cmd jiqu\n#cmd #unwield;#wpon;jiqu sword-cognize"

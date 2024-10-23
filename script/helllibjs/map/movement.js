@@ -17,12 +17,14 @@
                 let level = this.DFS.Skip()
                 if (level == null) {
                     map.CancelMove()
-                    return
+                    return false
                 }
                 this.DFS = level.Next()
                 move.Pending = [map.NewStep(this.DFS.Command)]
                 move.Walk(map)
+                return false
             }
+            return true
         }
         Next(move, map) {
             if (this.DFS == null) {
@@ -77,7 +79,7 @@
         Locate = new Locate()
         Path = null
         OnStepTimeout(move, map) {
-            this.Locate.OnStepTimeout(move, map)
+            return this.Locate.OnStepTimeout(move, map)
         }
         Retry(move, map) {
             this.Path = null
@@ -123,8 +125,9 @@
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {
-                this.Locate.OnStepTimeout(move, map)
+                return this.Locate.OnStepTimeout(move, map)
             }
+            return true
         }
         Next(move, map) {
             if (this.Path != null && this.Path.length) {
@@ -180,8 +183,9 @@
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {
-                this.Locate.OnStepTimeout(move, map)
+                return this.Locate.OnStepTimeout(move, map)
             }
+            return true
         }
         Next(move, map) {
             if (this.Path != null && this.Path.length) {

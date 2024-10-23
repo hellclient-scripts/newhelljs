@@ -11,7 +11,7 @@
         }
         q = GetVariable("quest").trim()
         if (q) {
-            App.Core.Quest.Exec(w[0])
+            App.Core.Quest.Exec(q)
             return
         }
         PrintSystem("quest变量为空，未指定任务。")

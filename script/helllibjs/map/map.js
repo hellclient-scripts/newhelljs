@@ -127,7 +127,7 @@
             Mapper.flashtags()
             Mapper.ResetTemporary()
             this.#blocked = []
-            this.#temporaryPaths=[]
+            this.#temporaryPaths = []
         }
         AddTemporaryPath(from, path) {
             this.#temporaryPaths.push({ From: from, Path: path })
@@ -223,9 +223,9 @@
         }
         OnStepTimeout() {
             if (this.Move != null) {
-                this.Move.StepTimeout(this)
+                return this.Move.StepTimeout(this)
             }
-
+            return true
         }
         Resend(delay, offset) {
             if (delay == null) {
@@ -322,6 +322,7 @@
 
     }
     let DefaultOnStepTimeout = function (move, map) {
+        return true
     }
     let DefaultMapperOptionCreator = function (move, map) {
         return null
@@ -400,7 +401,7 @@
             return opt
         }
         StepTimeout(map) {
-            this.OnStepTimeout(this, map)
+            return this.OnStepTimeout(this, map)
         }
         OnWalking(map) {
             if (this.#walking.length == 0) {

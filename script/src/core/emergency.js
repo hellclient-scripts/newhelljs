@@ -42,7 +42,7 @@
     )
     App.Core.Emergency.CheckDeath = function () {
         App.Commands.PushCommands(
-            App.Commands.NewDoCommand("cha force"),
+            App.Commands.NewDoCommand("hp;i;cha force"),
             App.Commands.NewPlanCommand(PlanCheckDeath),
         )
         App.Next()

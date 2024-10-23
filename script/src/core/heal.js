@@ -44,7 +44,7 @@
                 }
             } else {
                 return function () {
-                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"])
+                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo :  ((App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"]) * 0.8).toFixed()
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                     if (num < 10) { num = 10 }
                     App.Commands.PushCommands(

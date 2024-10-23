@@ -20,7 +20,6 @@
 虚明|xu ming|50000
 劳德诺|lao denuo|2500000
 李力世|li lishi|1000000
-江百胜|jiang baisheng|1000000
 官兵|guan bing|50000
 衙役|ya yi|50000
 御前侍卫|shi wei|1000000

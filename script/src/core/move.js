@@ -41,7 +41,9 @@
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
-            let tt = task.AddTimer(App.Map.StepTimeout).WithName("timeout")
+            let tt = task.AddTimer(App.Map.StepTimeout,function(timer){
+                return App.Map.OnStepTimeout()
+            }).WithName("timeout")
             task.AddCatcher("core.longtimestep", function () {
                 tt.Reset(App.Move.LongtimeStepDelay)
                 return true
@@ -61,7 +63,6 @@
                 default:
                     switch (result.Name) {
                         case "timeout":
-                            App.Map.OnStepTimeout()
                             break
                         case "wrongway":
                             App.Map.Room.ID = ""

@@ -9,5 +9,6 @@
             App.Params.ExpMax = expmax - 0
         }
         App.Core.NPC.Load()
+        App.Core.Study.Load()
     }
 })(App)

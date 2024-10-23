@@ -272,5 +272,9 @@
 
     let checkerHPM = App.Checker.Register("hpm", "hp -m", 300000)
     App.BindEvent("core.hpm", App.Core.OnHPM)
+    App.BindEvent("core.skillimproved",function(){
+        checkerHPM.Force()
+        checkerSkills.Force()
+    })
 
 })(App)

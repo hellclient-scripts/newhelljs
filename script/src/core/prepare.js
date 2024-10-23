@@ -213,10 +213,12 @@
         "assets",
         "item",
         "repair",
+        "jiqu",
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)
-    App.Proposals.Register("commonWithExp", App.Proposals.NewProposalGroup("common", "exp"))
+    App.Proposals.Register("commonWithStudy", App.Proposals.NewProposalGroup("common", "study"))
+    App.Proposals.Register("commonWithExp", App.Proposals.NewProposalGroup("commonWithStudy", "exp"))
     App.UserQueue.UserQueue.RegisterCommand("#prepare", function (uq, data) {
         uq.Commands.Append(
             App.NewPrepareCommand(data),
