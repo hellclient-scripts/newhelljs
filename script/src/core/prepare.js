@@ -76,7 +76,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("cun " + (num - App.Params.CashKeep) + " cash;i"),
+                    App.Commands.NewDoCommand("cun " + (num - App.Params.CashKeep) + " cash;i;score"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )
@@ -92,7 +92,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("cun " + Math.floor((num - (App.Params.GoldMax - App.Params.GoldKeep) / 2)) + " gold;i"),
+                    App.Commands.NewDoCommand("cun " + Math.floor((num - (App.Params.GoldMax - App.Params.GoldKeep) / 2)) + " gold;i;score"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )
@@ -108,7 +108,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("qu " + Math.floor(((App.Params.GoldMax - App.Params.GoldKeep) / 2 - num)) + " gold;i"),
+                    App.Commands.NewDoCommand("qu " + Math.floor(((App.Params.GoldMax - App.Params.GoldKeep) / 2 - num)) + " gold;i;score"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )
@@ -209,6 +209,7 @@
         "inspire",
         "dazuo",
         "heal",
+        "dispel",
         "tuna",
         "assets",
         "item",

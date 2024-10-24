@@ -28,4 +28,10 @@
     App.BindEvent("core.stop", function () {
         App.Quests.Stop()
     })
-})(App)
+    App.Quests.OnStart=()=>{
+        App.RaiseEvent(new App.Event("core.queststart"))
+    }
+    App.Quests.OnStop=()=>{
+        App.RaiseEvent(new App.Event("core.queststop"))
+    }
+})(App)            

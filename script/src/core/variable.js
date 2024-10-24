@@ -10,5 +10,6 @@
         }
         App.Core.NPC.Load()
         App.Core.Study.Load()
+        App.Core.Stage.Load()
     }
 })(App)

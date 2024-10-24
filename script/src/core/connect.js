@@ -28,7 +28,7 @@
             App.Commands.NewFunctionCommand(App.Core.Emergency.CheckDeath),
             App.NewPrepareCommand(""),
             App.Commands.NewFunctionCommand(() => {
-                if (!App.Quests.Stopped) {
+                if (!App.Quests.IsStopped()) {
                     Note("重新执行任务队列")
                     App.Quests.Restart()
                 }

@@ -1,10 +1,59 @@
 (function (App) {
     let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
+    App.Mapper = {}
     roomshModule.CostToken = "%"
     App.RoomsH = new roomshModule.File()
     let mapfile = "data/rooms.h"
     Note("加载地图文件" + mapfile)
     App.RoomsH.Load(ReadLines(mapfile))
+    let houseexit = null
+    App.Mapper.HouseID = null
+    App.Mapper.HouseLoc = null
+    App.Mapper.Addhouse = function (line) {
+        if (line) {
+            var data = line.split(" ")
+            if (data.length != 3) {
+                world.Note("解析房屋信息失败，格式应该为 '包子铺 bzp 1558' ")
+                return
+            }
+            var hosuename = data[0]
+            var houesid = data[1]
+            var houseloc = data[2]
+            let houserooms = []
+            houserooms.push("1933=" + hosuename + "大院|n:1934,out:" + houseloc + ",")
+            houserooms.push("1934=" + hosuename + "前庭|e:1936,push、n。:1937,s:1933,w:1935,")
+            houserooms.push("1935=右卫舍|e:1934,")
+            houserooms.push("1936=左卫舍|w:1934,")
+            houserooms.push("1937=走道|n:1938,push、s。:1934,")
+            houserooms.push("1938=" + hosuename + "迎客厅|n:1939,s:1937,open door、e:2533,")
+            houserooms.push("1939=议事厅|e:1941,n:1942,s:1938,w:1940,")
+            houserooms.push("1940=" + hosuename + "武厅|e:1939,")
+            houserooms.push("1941=" + hosuename + "武厅|w:1939,")
+            houserooms.push("1942=" + hosuename + "中庭|open west、w:1943,n:1944,s:1939,")
+            houserooms.push("1943=左厢房|e:1942,")
+            houserooms.push("1944=后院|e:-1,n:1947,s:1942,w:1945,")
+            houserooms.push("1945=厨房|e:1944,")
+            houserooms.push("1946=备用|e。:1949,")
+            houserooms.push("1947=后花园|e:1948,s:1944,open door、w、close door:2681,")
+            houserooms.push("1948=竹林|e:1949,w:1947,")
+            houserooms.push("1949=听涛阁|w:1948,")
+            App.RoomsH.Load(houserooms)
+            world.Note("在位置 " + houseloc + " 添加房屋" + hosuename + "入口[" + houesid + "]")
+            App.Mapper.HouseID = houesid
+            App.Mapper.HouseLoc = houseloc
+        } else {
+            world.Note("变量 house 未设置")
+        }
+    }
+    App.Mapper.Addhouse(GetVariable("house"))
+    App.Mapper.AddPath = (fr, exitcmd) => {
+        let exit = App.RoomsH.ParsePath(fr, exitcmd)
+        if (exit.Ready()) {
+            exit.Command = exit.Command.replaceAll(_re, "")
+            exit.AddToMapper()
+        }
+
+    }
     App.Map.Data.RoomsByName = {}
     _re = /·/g
     App.RoomsH.Data.forEach(line => {
@@ -22,13 +71,15 @@
             })
         }
     });
+
     App.LoadLines("data/exits.h", "|").forEach((data) => {
-        let exit = App.RoomsH.ParsePath(data[0], data[1])
-        if (exit.Ready()) {
-            exit.Command = exit.Command.replaceAll(_re, "")
-            exit.AddToMapper()
-        }
+        App.Mapper.AddPath(data[0], data[1])
     })
+    if (App.Mapper.HouseID && App.Mapper.HouseLoc) {
+        App.Mapper.AddPath(App.Mapper.HouseLoc, App.Mapper.HouseID + ":1933")
+    }
+
+
     App.Engine.SetFilter("core.wintercross", function (event) {
         App.Mapper.Data.Winter = (new Date()).getTime()
         App.RaiseEvent(event)
@@ -45,8 +96,7 @@
         App.Send("#unwield")
         App.RaiseEvent(event)
     })
-    
-    App.Mapper = {}
+
     App.Mapper.ExcludeRooms = {}
     App.Mapper.ExpandRooms = (rooms, expand) => {
         if (rooms == null || rooms.length == 0) {
@@ -105,4 +155,5 @@
         }
     }
     App.Map.AppendTagsIniter(App.Mapper.InitTag)
+
 })(App)

@@ -27,6 +27,9 @@ var onResponse = function (type, id, data) {
 var onkeyup = function (key) {
 
 }
+var onFocus=function(){
+    App.RaiseEvent(new App.Event("onfocus").WithType("system"))
+}
 NoteJSON = function (data) {
     print(JSON.stringify(data, null, 2))
 }

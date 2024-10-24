@@ -13,11 +13,15 @@
             App.Send("yun --")
             App.Sync(function () { task.Cancel("sync") })
             task.AddTrigger("( 你上一个动作还没有完成，不能施用内功。)", function () {
-                checkdeathmode = 1
+                if (checkdeathmode == 0) {
+                    checkdeathmode = 1
+                }
                 return true
             })
-            task.AddTrigger("( 你请先用 enable 指令选择你要使用的内功。)", function () {
-                checkdeathmode = 2
+            task.AddTrigger("你请先用 enable 指令选择你要使用的内功。", function () {
+                if (checkdeathmode == 0) {
+                    checkdeathmode = 2
+                }
                 return true
             })
         },

@@ -152,6 +152,18 @@ $.Module(function (App) {
     Quest.Desc = "做备齐任务，积累阅历"
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.OnHUD = () => {
+        return [
+            new App.HUD.UI.Word("阅历:"),
+            new App.HUD.UI.Word(App.Data.Player.Score["阅历"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["阅历"]) : "-", 5),
+        ]
+    }
+    Quest.OnSummary = () => {
+        return [
+            new App.HUD.UI.Word("阅:"),
+            new App.HUD.UI.Word(App.Data.Player.Score["阅历"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["阅历"]) : "-", 5),
+        ]
+    }
     Quest.Start = function (data) {
         $.Push().
             WithReadyCommand(readyCommand).

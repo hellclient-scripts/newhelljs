@@ -3,7 +3,7 @@
     const ModeNormal = 0
     const ModeComment = 1
     const ModeError = 2
-    module.CostToken="$"
+    module.CostToken = "$"
     class Line {
         constructor(data) {
             this.Raw = data
@@ -41,7 +41,7 @@
             path.tags = this.Tags
             path.excludetags = this.ExcludeTags
             path.command = this.Command
-            Mapper.addpath(this.From,path)
+            Mapper.addpath(this.From, path)
             return path
         }
     }
@@ -79,7 +79,7 @@
                 }
                 let exitlist = SplitN(roomdata[1], ",", -1)
                 exitlist.forEach(exitdata => {
-                    if (exitdata==""){
+                    if (exitdata == "") {
                         return
                     }
                     let exit = this.ParsePath(line.ID, exitdata)
@@ -94,13 +94,13 @@
                 })
                 result.push(line)
             });
-            this.Data = result
+            this.Data = this.Data.concat(result)
         }
         Data = []
         Raw = []
         BlockedID = {}
         BlockedPath = {}
-        ParsePath=parsepath
+        ParsePath = parsepath
     }
     parsepath = function (fr, str) {
         let exit = new Exit(str)
@@ -156,6 +156,6 @@
         return s
     }
     module.File = File
-    module.Parsepath=parsepath
+    module.Parsepath = parsepath
     return module
 })

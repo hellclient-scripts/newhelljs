@@ -119,13 +119,32 @@
 
     App.BindEvent("core.score", App.Core.OnScore)
     var matcherScoreEnd = /^└─+┴─+.+─+┘$/
-    var matcherScoreFamily = /│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│/
+    var matcherScoreFamily = /^│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│$/
+    var matcherScoreBank = /^│钱庄：(\d+)\.\d+\.\d+\s*│帮派：.*│$/
+    var matcherScoreBond = /^│债券：(\S+)\s*│威望：(\d)+\s*│$/
+    var matcherScoreYueli=/^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
                 App.Data.Player.Score["门派"] = result[3]
                 return true
             })
+            task.AddTrigger(matcherScoreBank, (tri, result) => {
+                App.Data.Player.Score["存款"] = result[1] - 0
+                return true
+            })
+            task.AddTrigger(matcherScoreBond, (tri, result) => {
+                App.Data.Player.Score["债券"] = isNaN(result[1]) ? 0 : result[1] - 0
+                App.Data.Player.Score["威望"] = result[2] - 0
+                return true
+            })
+            task.AddTrigger(matcherScoreYueli, (tri, result) => {
+                App.Data.Player.Score["灵慧"] = result[1] - 0
+                App.Data.Player.Score["正气"] = result[2] - 0
+                App.Data.Player.Score["阅历"] = result[3] - 0
+                return true
+            })
+            
             task.AddTimer(5000)
             task.AddTrigger(matcherScoreEnd)
         },
@@ -272,7 +291,7 @@
 
     let checkerHPM = App.Checker.Register("hpm", "hp -m", 300000)
     App.BindEvent("core.hpm", App.Core.OnHPM)
-    App.BindEvent("core.skillimproved",function(){
+    App.BindEvent("core.skillimproved", function () {
         checkerHPM.Force()
         checkerSkills.Force()
     })

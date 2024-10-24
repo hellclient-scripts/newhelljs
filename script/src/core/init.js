@@ -11,11 +11,11 @@
         if (App.InitCommad) {
             App.Send(App.InitCommad)
             App.InitCommad = ""
-            App.Commands.PushCommands(
-                App.NewSyncCommand(),
-                App.Commands.NewFunctionCommand(() => { App.ReloadVariable(); App.Next() })
-            )
         }
+        App.Commands.PushCommands(
+            App.NewSyncCommand(),
+            App.Commands.NewFunctionCommand(() => { App.ReloadVariable(); App.Next() })
+        )
         App.Next()
     }
 })(App)

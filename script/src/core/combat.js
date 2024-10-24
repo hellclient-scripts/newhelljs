@@ -101,6 +101,10 @@
 
     }
     App.Core.Combat.DoCombat = function (id, data) {
+        App.Core.Combat.FilterActions("#before").forEach(action => {
+            App.Send(action.Data.replaceAll("$1", App.Combat.Target))
+        })
+
         if (data.Command) {
             App.Send(data.Command)
         } else if (id) {

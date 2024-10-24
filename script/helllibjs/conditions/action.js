@@ -45,8 +45,8 @@
             sep = sep || "*"
             let data = SplitN(this.Data, sep, 2)
             if (data.length == 2) {
-                this.Data = data[0]
-                this.Number = data[1] ? data[1] : ""
+                this.Data = data[0].trim()
+                this.Number = data[1] ? data[1].trim() : ""
             }
             return this
         }

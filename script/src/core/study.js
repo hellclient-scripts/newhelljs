@@ -63,7 +63,7 @@
                 case "yanjiu":
                     var loc = this.Loc
                     if (!loc) {
-                        loc = App.Params.LocDazuo
+                        loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
                     }
                     var times = App.Core.Study.YanjiuMax
                     if (times > App.Data.Player.HP["潜能"]) {

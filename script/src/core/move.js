@@ -41,7 +41,7 @@
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
-            let tt = task.AddTimer(App.Map.StepTimeout,function(timer){
+            let tt = task.AddTimer(App.Map.StepTimeout, function (timer) {
                 return App.Map.OnStepTimeout()
             }).WithName("timeout")
             task.AddCatcher("core.longtimestep", function () {
@@ -55,6 +55,7 @@
             task.AddCatcher("core.blocked", (catcher, event) => {
                 catcher.WithData(event.Data)
             }).WithName("blocked")
+            task.AddCatcher("core.needrest").WithName("needrest")
         },
         function (result) {
             switch (result.Type) {
@@ -80,10 +81,27 @@
                         case "blocked":
                             App.Move.OnBlocker(result.Data)
                             break
+                        case "needrest":
+                            App.Move.NeedReset()
+                            break
                     }
             }
         }
     )
+    App.Move.NeedReset = function () {
+        let snap = App.Map.Snap()
+        App.Commands.Insert(
+            App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
+            App.NewSyncCommand(),
+            App.Core.Heal.NewRestCommand(),
+            App.Commands.NewFunctionCommand(() => {
+                App.Map.Rollback(snap)
+                App.Map.Resend(0)
+            })
+        )
+        App.Next()
+
+    }
     App.Move.OnBlocker = function (name) {
         App.Core.Blocker.KillBlocker(name)
     }

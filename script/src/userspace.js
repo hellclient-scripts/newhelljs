@@ -57,4 +57,6 @@ $.PrepareMoney = App.NewPrepareMoneyCommand
 $.NewCombat = App.NewCombat
 
 $.NewWanted=App.NewWanted
+
+$.RaiseStage=App.Core.Stage.Raise
 $.Now = function () { return (new Date()).getTime() }

@@ -28,6 +28,18 @@
         });
         return result
     }
+    let DefaultOnHUD = () => {
+        return null
+    }
+    let DefaultOnSummary = () => {
+        return null
+    }
+    let DefaultOnStart = (quests) => {
+
+    }
+    let DefaultOnStop = (quests) => {
+
+    }
     class Quest {
         constructor(id) {
             this.ID = id
@@ -45,6 +57,8 @@
         Intro = ""
         Help = ""
         Start = null
+        OnHUD = DefaultOnHUD
+        OnSummary = DefaultOnSummary
     }
     let DefaultChecker = function () {
         return true
@@ -64,6 +78,8 @@
                 this.Next()
             })
         }
+        OnStart = DefaultOnStart
+        OnStop = DefaultOnStop
         #nextcommand = null
         Position = null
         Commands = null
@@ -76,12 +92,18 @@
         Register = function (quest) {
             this.#registered[quest.ID] = quest
         }
+        GetQuest(id) {
+            return this.#registered[id]
+        }
         Cooldown(id, interval) {
             let q = this.#registered[id]
             q.Cooldown(interval)
         }
         Stop() {
             this.Stopped = true
+        }
+        IsStopped() {
+            return this.Queue == null || this.Queue.length == 0
         }
         StartRunningQuests(quests) {
             if (quests.length) {
@@ -90,6 +112,7 @@
                 this.Remain = [...this.Queue]
                 this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             }
+            this.OnStart(this)
             this.Commands.Next()
         }
         Restart() {
@@ -99,6 +122,7 @@
         }
         Next() {
             if (this.Stopped) {
+                this.OnStop(this)
                 this.Commands.Next()
                 return
             }

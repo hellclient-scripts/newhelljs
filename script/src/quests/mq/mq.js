@@ -50,6 +50,7 @@ $.Module(function (App) {
         eff: 0,
     }
     MQ.OnNpcDie = function () {
+        $.RaiseStage("npcdie")
         if (MQ.Data.kills == 0) {
             MQ.Data.start = $.Now()
         }
@@ -58,6 +59,9 @@ $.Module(function (App) {
             MQ.Data.eff = MQ.Data.kills * 3600 * 1000 / ($.Now() - MQ.Data.start)
             Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务")
         }
+    }
+    MQ.OnNpcFaint = function () {
+        $.RaiseStage("fait")
     }
     MQ.CheckYou = () => {
         $.PushCommands(
@@ -137,6 +141,7 @@ $.Module(function (App) {
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
             App.Send("give head to " + App.Params.MasterID + ";drop head")
+            $.RaiseStage("mqbefore")
             App.Send("quest " + App.Params.MasterID)
             App.Send("quest")
         },
@@ -241,7 +246,7 @@ $.Module(function (App) {
         if (App.Map.Room.ID && !MQ.Data.NPC.Fled && !MQ.Data.NPC.Died) {
             MQ.Data.NPC.Loc = null
             let rooms = App.Mapper.ExpandRooms(App.Map.Room.ID, 2)
-            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, MQ.Data.NPC.Name.Zone).WithChecker(Checker).WithSingleStep(true).WithID(MQ.Data.NPC.ID)
+            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, MQ.Data.NPC.Name.Zone).WithChecker(Checker).WithID(MQ.Data.NPC.ID)
             $.PushCommands(
                 $.Rooms(rooms, App.Zone.Finder),
                 $.Function(MQ.KillLoc),
@@ -256,6 +261,12 @@ $.Module(function (App) {
         if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name).First()) {
             $.Insert(
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat)),
+                $.Function(() => {
+                    if (!(MQ.Data.NPC.Died || MQ.Data.NPC.Fled)) {
+                        $.Append($.Function(MQ.KillNear))
+                    }
+                    App.Next()
+                })
             )
         }
         $.Next()
@@ -272,12 +283,15 @@ $.Module(function (App) {
         let wanted = $.NewWanted(MQ.Data.NPC.Name, zone).
             WithChecker(Checker).WithOrdered(true).WithID(MQ.Data.NPC.ID)
         App.Send("yun recover;yun regenerage")
+        $.RaiseStage("prepare")
         $.PushCommands(
+            $.Prepare(),
             $.To(Cities.Loc),
             $.Function(() => { App.Zone.Search(wanted) }),
             $.Function(MQ.KillLoc),
             $.Function(() => {
                 MQ.Data.NPC.Times++
+                Note("第" + MQ.Data.NPC.Times + "次搜索完毕")
                 MQ.Ready()
             }),
 
@@ -292,6 +306,7 @@ $.Module(function (App) {
         $.Next()
     }
     let matcherDie = /^(.+)扑在地上挣扎了几下，腿一伸，口中喷出几口鲜血，死了！$/
+    let matcherFaint = /^(.+)下一个不稳，跌在地上一动也不动了。$/
     let matcherFlee2 = /^你连连进击，眼看便要得手，接连数招，让(.+)已是避/
     let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了|只有招架之功)(.*)/
     let matcherHelper = /^看起来(.+)想杀死你！$/
@@ -306,6 +321,14 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddTrigger(matcherFaint, (tri, result) => {
+                if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
+                    MQ.Data.NPC.Died = true
+                    MQ.OnNpcFaint()
+                }
+                return true
+            })
+
             task.AddTrigger(matcherFlee, (tri, result) => {
                 if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
                     MQ.Data.NPC.Flee()
@@ -332,7 +355,7 @@ $.Module(function (App) {
                 App.Reconnect(0, MQ.Connect)
             }
         })
-    MQ.AskInfo=function(){
+    MQ.AskInfo = function () {
         $.PushCommands(
             $.Prepare("common"),
             $.Function(MQ.GoAskInfo),
@@ -499,6 +522,18 @@ $.Module(function (App) {
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.OnHUD = () => {
+        return [
+            new App.HUD.UI.Word("任务效率:"),
+            new App.HUD.UI.Word(MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) : "-", 5, true),
+        ]
+    }
+    Quest.OnSummary = () => {
+        return [
+            new App.HUD.UI.Word("效:"),
+            new App.HUD.UI.Word(MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) : "-", 5, true),
+        ]
+    }
     Quest.Start = function (data) {
         if (!App.Params.MasterID) {
             PrintSystem("掌门ID " + App.Params.MasterID + " 无效")
