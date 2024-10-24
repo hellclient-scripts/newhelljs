@@ -253,7 +253,7 @@ $.Module(function (App) {
         if (App.Zone.Wanted.ID) {
             MQ.Data.NPC.ID = App.Zone.Wanted.ID
         }
-        if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name)) {
+        if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name).First()) {
             $.Insert(
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat)),
             )
@@ -332,8 +332,15 @@ $.Module(function (App) {
                 App.Reconnect(0, MQ.Connect)
             }
         })
+    MQ.AskInfo=function(){
+        $.PushCommands(
+            $.Prepare("common"),
+            $.Function(MQ.GoAskInfo),
+        )
+        App.Next()
+    }
     let reCity = /^.*说道：.*(好像听人说过是在|他不是在|据说是躲到|好像去了|已经躲到|好像是去了|但是也有人说他在|有人说在|不过听人说在|听说是在|不过听说他好像在|现在应该是去了)(.*)/
-    MQ.AskInfo = function () {
+    MQ.GoAskInfo = function () {
         if (MQ.Data.NPC.Info.length) {
             let infoid = MQ.Data.NPC.Info.shift()
             let info = App.Zone.Info[infoid]

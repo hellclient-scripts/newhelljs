@@ -8,11 +8,15 @@
         App.Core.Study.Jiqu.Commands = []
         App.Core.Study.Learn = []
         App.Core.Study.LearnMode = 0
+        App.Core.Study.TeacherID = ""
+        App.Core.Study.TeacherLoc = ""
     }
     App.Core.Study.LearnMode = 0
     App.Core.Study.LearnMax = 100
     App.Core.Study.YanjiuMax = 100
     App.Core.Study.Learn = []
+    App.Core.Study.TeacherID = ""
+    App.Core.Study.TeacherLoc = ""
     class Learn {
         constructor(line) {
             line = line.trim()
@@ -57,7 +61,7 @@
         Execute() {
             switch (this.Type) {
                 case "yanjiu":
-                    let loc = this.Loc
+                    var loc = this.Loc
                     if (!loc) {
                         loc = App.Params.LocDazuo
                     }
@@ -75,12 +79,14 @@
                     $.Next()
                     break
                 case "xue":
-                    if (!this.Loc) {
-                        PrintSystem("未知的学习位置 " + this.Loc)
+                    var loc = this.Loc || App.Core.Study.TeacherLoc
+                    if (!loc) {
+                        PrintSystem("未知的学习位置 " + loc)
                         return
                     }
-                    if (!this.From) {
-                        PrintSystem("未知的学习目标 " + this.From)
+                    var from = this.From || App.Core.Study.TeacherID
+                    if (!from) {
+                        PrintSystem("未知的学习目标 " + from)
                         return
                     }
                     var times = App.Core.Study.LearnMax
@@ -88,8 +94,8 @@
                         times = App.Data.Player.HP["潜能"]
                     }
                     $.PushCommands(
-                        $.To(this.Loc),
-                        $.Do("learn " + this.From + " about " + this.SkillID + " " + times),
+                        $.To(loc),
+                        $.Do("learn " + from + " about " + this.SkillID + " " + times),
                         $.Do("hp"),
                         $.Wait(1000),
                         $.Sync(),
@@ -126,7 +132,7 @@
         Check() {
             let skill = App.Data.Player.Skills[this.SkillID]
             if (skill) {
-                if (skill["类型"] = "基本功夫" && skill["等级"] >= App.Data.Player.HPM["当前等级"]) {
+                if (skill["类型"] == "基本功夫" && skill["等级"] >= App.Data.Player.HPM["当前等级"]) {
                     return false
                 }
             }
@@ -298,6 +304,11 @@
                 case "#lowest":
                     App.Core.Study.LearnMode = 0
                     break
+                case "#teacher":
+                    data = SplitN(action.Data.trim(), "@", 2)
+                    App.Core.Study.TeacherID = data[0]
+                    App.Core.Study.TeacherLoc = data[1] || ""
+                    break
                 case "":
                     App.Core.Study.Learn.push(new Learn(action.Data))
                     break
@@ -318,12 +329,15 @@
                 default:
                     Note("顺序学习模式")
             }
+            if (App.Core.Study.TeacherID && App.Core.Study.TeacherLoc) {
+                Note("老师信息:" + App.Core.Study.TeacherID + "@" + App.Core.Study.TeacherLoc)
+            }
         }
 
     }
     App.Core.Study.Load()
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, exclude) {
-        if (App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max) {
+        if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),

@@ -1047,7 +1047,7 @@ Timers = []
 [[RequiredParams]]
   Name = "study"
   Desc = "学习指令，一行一个学习内容"
-  Intro = "格式为\n\n技能ID|学习限制|类型|目标|位置|开始指令|结束指令\n除了技能ID都能省略，类型默认为yanjiu\n技能ID以!开头代表强制优先学习\n参考:\n\nsword|180|xue|feng buping|2226|wield sword\nhuashan-xinfa\n!zuoyou-hubo|360|xue|zhou botong|779"
+  Intro = "格式为\n\n技能ID|学习限制|类型|目标|位置|开始指令|结束指令\n除了技能ID都能省略，类型默认为yanjiu\n技能ID以!开头代表强制优先学习\n可以 #teacher ID@位置的方式设置老师信息\n参考:\n\nsword|180|xue|feng buping|2226|wield sword\nforce|180|xue\nhuashan-xinfa\n!zuoyou-hubo|360|xue|zhou botong|779\n#teacher feng buping@2226"
 
 [[RequiredParams]]
   Name = "num_cmds"
