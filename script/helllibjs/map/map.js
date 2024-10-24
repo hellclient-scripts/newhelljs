@@ -170,6 +170,9 @@
             if (typeof (to) != "object") {
                 to = [to]
             }
+            if (to.length == 0) {
+                return []
+            }
             let result = Mapper.GetPath(from, fly, to, options)
             if (result == null) {
                 return null
@@ -358,6 +361,10 @@
                 return
             } else {
                 steps = this.Next(this, map)
+            }
+            if (typeof steps == "function") {
+                steps(map)
+                return
             }
             if (steps == null || steps.length == 0) {
                 map.FinishMove()

@@ -1,6 +1,13 @@
 (function (App) {
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
     App.Core.Stage = {}
+    App.Core.Stage.Stance = ""
+    App.Core.Stage.ChangeStance = function (s) {
+        if (App.Core.Stage.Stance != s) {
+            App.Core.Stage.Stance = s
+            App.Core.Stage.Raise("stance-" + s)
+        }
+    }
     App.Core.Stage.Commands = []
     App.Core.Stage.Raise = (name) => {
         name = "#" + name

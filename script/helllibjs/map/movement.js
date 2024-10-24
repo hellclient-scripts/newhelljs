@@ -1,4 +1,5 @@
 (function (App) {
+    let cancelMove = (map) => { map.CancelMove() }
     let module = {}
     module.CheckRoomCmd = "l"
     let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
@@ -46,12 +47,15 @@
         Raw = null
         Path = null
         Retry(move, map) {
-            this.Path = []
+            this.Path = null
         }
         Next(move, map) {
             if (move.StartCommand) {
                 move.StartCommand = ""
                 return [move.StartCommand]
+            }
+            if (this.Path==null){
+                return cancelMove
             }
             if (this.Path.length) {
                 return this.Path.shift()
@@ -96,7 +100,10 @@
             if (map.Room.ID) {
                 this.Locate.OnFound(move, map)
                 let result = move.GetPath(map, map.Room.ID, this.Target)
-                this.Path = result == null ? [] : module.MutlipleStepConverter.Convert(result, move, map)
+                if (result == null) {
+                    return cancelMove
+                }
+                this.Path = module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)

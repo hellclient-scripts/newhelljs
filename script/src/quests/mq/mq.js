@@ -280,13 +280,14 @@ $.Module(function (App) {
         App.Core.HelpFind.HelpFind(MQ.Data.NPC.Name)
         let zone = MQ.Data.NPC.First ? Cities[MQ.Data.NPC.Zone].Path1 : Cities[MQ.Data.NPC.Zone].Path;
         MQ.Data.NPC.First = false
+        App.Core.Stage.ChangeStance("mq")
         let wanted = $.NewWanted(MQ.Data.NPC.Name, zone).
             WithChecker(Checker).WithOrdered(true).WithID(MQ.Data.NPC.ID)
         App.Send("yun recover;yun regenerage")
         $.RaiseStage("prepare")
         $.PushCommands(
             $.Prepare(),
-            $.To(Cities.Loc),
+            $.To(Cities[MQ.Data.NPC.Zone].Loc),
             $.Function(() => { App.Zone.Search(wanted) }),
             $.Function(MQ.KillLoc),
             $.Function(() => {
