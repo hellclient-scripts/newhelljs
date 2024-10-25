@@ -12,7 +12,7 @@
         }
     }
     App.Core.Connect.Running = function () {
-        return App.Quests.Stopped == false
+        return App.Quests.IsStopped() == false
     }
     App.Core.Connect.NoLogin = false
     App.Core.Connect.Login = function () {

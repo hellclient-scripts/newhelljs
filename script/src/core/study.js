@@ -364,7 +364,7 @@
                 App.Core.Study.LastPot = 0
                 App.Core.Study.LearndTimes = 0
                 let data = Object.create(context)
-                data.NeiliMin = 10
+                data.NeiliMin = 25
                 return () => {
                     $.PushCommands(
                         $.Function(() => { App.Core.Study.DoLearn(data) })

@@ -80,7 +80,12 @@
         App.Core.Combat.Perform()
         App.Send(checkCombatCmd)
     }
-    App.Combat.OnStop = function (combat) {
+    App.Combat.OnStop = function (combat, reason) {
+        if (reason == "fail") {
+            App.Send("yun recover;yun regenerate;hp;i")
+            App.Fail()
+            return
+        }
         let duration = Math.floor(combat.Duration() / 1000)
         let msg = "战斗结束 共" + duration + "秒。"
         let dam = App.Combat.Position.Term.Get("core.combat.damage")

@@ -34,6 +34,9 @@
     })
     App.Proposals.Register("dazuo", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let neimin = context.NeiliMin || App.Params.NeiliMin
+        if (neimin > App.Params.NeiliMin) {
+            neimin = App.Params.NeiliMin
+        }
         if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= neimin) {
             if ((new Date()).getTime() - App.Core.Heal.LastSleep > App.Core.Heal.SleepInterval) {
                 return function () {
@@ -65,7 +68,7 @@
         if (App.Data.Player.HP["气血百分比"] <= 20) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Commands.NewDoCommand("eat jinchuang yao;yun recover;yun regenerate;hp;i"),
+                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun dispel;" : "" + "eat jinchuang yao;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
                 if (!App.Data.Item.List.FindByIDLower("jinchuang yao").First()) {
@@ -110,10 +113,10 @@
         return null
     }))
     App.Proposals.Register("yangjingdan", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Data.Player.HP["精气百分比"] <= 34) {
+        if (App.Data.Player.HP["精气百分比"] <= 50) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Commands.NewDoCommand("eat yangjing dan;yun recover;yun regenerate;hp;i"),
+                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun dispel;" : "" + "eat yangjing dan;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
                 if (!App.Data.Item.List.FindByIDLower("yangjing dan").First()) {

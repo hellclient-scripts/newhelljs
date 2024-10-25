@@ -3,14 +3,14 @@
     module.DefaultInterval = 1000
     module.DefaultTicker = function (combat) {
     }
-    module.DefaultOnStop = function (combat) {
+    module.DefaultOnStop = function (combat, reason) {
     }
     class Combat {
         constructor(position, plan) {
             this.Position = position
             this.Plan = plan
         }
-        Data=null
+        Data = null
         Interval = module.DefaultInterval
         Position = null
         Combating = false
@@ -19,9 +19,9 @@
         Plan = null
         Ticker = module.DefaultTicker
         OnStop = module.DefaultOnStop
-        Start(id,data) {
+        Start(id, data) {
             this.Position.StartNewTerm()
-            this.Data=data
+            this.Data = data
             this.Target = id ? id : ""
             this.StartAt = (new Date()).getTime()
             this.Position.AddTimer(this.Interval, () => {
@@ -32,16 +32,16 @@
             this.Combating = true
             return this
         }
-        Stop() {
+        Stop(reason) {
             if (!this.Combating) {
                 return
             }
-            let onstop=this.OnStop
+            let onstop = this.OnStop
             this.Position.StartNewTerm()
-            onstop(this)
+            onstop(this, reason)
             this.Target = ""
             this.Combating = false
-            this.Data=null
+            this.Data = null
         }
         Duration() {
             return (new Date()).getTime() - this.StartAt
