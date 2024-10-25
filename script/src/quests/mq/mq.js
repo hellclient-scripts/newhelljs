@@ -46,6 +46,7 @@ $.Module(function (App) {
     })
     MQ.Data = {
         kills: 0,
+        helpded: 0,
         start: null,
         eff: 0,
     }
@@ -57,7 +58,7 @@ $.Module(function (App) {
         MQ.Data.kills++
         if (MQ.Data.kills > 3) {
             MQ.Data.eff = MQ.Data.kills * 3600 * 1000 / ($.Now() - MQ.Data.start)
-            Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务")
+            Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务," + "线报率 " + (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(2) + "%")
         }
     }
     MQ.OnNpcFaint = function () {
@@ -413,6 +414,7 @@ $.Module(function (App) {
                 MQ.Data.NPC.ID = id.toLowerCase()
             }
             if (!MQ.Data.NPC.Loc) {
+                MQ.Data.helpded++
                 MQ.Data.NPC.Loc = loc
             }
             if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {

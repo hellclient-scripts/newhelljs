@@ -113,7 +113,7 @@
     mapModule.DefaultOnFinish = function (move, map) {
         App.Next()
     }
-    mapModule.DefaultOnCamce = function (move, map) {
+    mapModule.DefaultOnCancel= function (move, map) {
         App.Fail()
     }
     App.Move.NewToCommand = function (target, ...initers) {

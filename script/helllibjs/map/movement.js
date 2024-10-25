@@ -54,7 +54,7 @@
                 move.StartCommand = ""
                 return [move.StartCommand]
             }
-            if (this.Path==null){
+            if (this.Path == null) {
                 return cancelMove
             }
             if (this.Path.length) {
@@ -211,6 +211,13 @@
                 if (result == null) {
                     return null
                 }
+                let rooms = []
+                result.forEach(step => {
+                    if (step.Target) {
+                        rooms.push(step.Target)
+                    }
+                })
+                this.Rooms = rooms
                 this.Path = module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }

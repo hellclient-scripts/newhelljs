@@ -6,6 +6,7 @@
         Special: {},
         Score: {},
         Skills: {},
+        Jifa: {},
     }
     let checkerHP = App.Checker.Register("hp", "yun recover;yun regenerate;hp", 5000)
     // ┌───个人状态────────────┬───────────────────┐
@@ -122,7 +123,7 @@
     var matcherScoreFamily = /^│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│$/
     var matcherScoreBank = /^│钱庄：(\d+)\.\d+\.\d+\s*│帮派：.*│$/
     var matcherScoreBond = /^│债券：(\S+)\s*│威望：(\d)+\s*│$/
-    var matcherScoreYueli=/^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
+    var matcherScoreYueli = /^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
@@ -144,7 +145,7 @@
                 App.Data.Player.Score["阅历"] = result[3] - 0
                 return true
             })
-            
+
             task.AddTimer(5000)
             task.AddTrigger(matcherScoreEnd)
         },
@@ -290,10 +291,54 @@
         })
 
     let checkerHPM = App.Checker.Register("hpm", "hp -m", 300000)
+
+    let checkerJifa = App.Checker.Register("jifa", "jifa", 30 * 60 * 1000)
+    App.Core.OnJifa = function (event) {
+        event.Context.Propose(function () {
+            App.Data.Player.Jifa = {}
+            PlanOnJifa.Execute()
+        })
+    }
+    App.BindEvent("core.jifa", App.Core.OnJifa)
+
+    // ┌───基本功夫────┬───────────┬───────────┐
+    // │内功 (force)          │叫花内功              │有效等级：    106     │
+    // │轻功 (dodge)          │飞檐走壁              │有效等级：    22      │
+    // │招架 (parry)          │无                    │有效等级：    1       │
+    // ├───其他功夫────┼───────────┼───────────┤
+    // └───────────┴───────────┴───────────┘
+    let matcherJifa = /^│(\S+) \((.+)\)\s*│(\S+)\s*│有效等级：\s*(\d+)\s*│$/
+    var PlanOnJifa = new App.Plan(App.Positions.Connect,
+        function (task) {
+            task.AddTrigger(matcherJifa, function (trigger, result, event) {
+                let jifa={
+                    Label:result[1],
+                    ID:result[2],
+                    Skill:result[3],
+                    Level:result[4]-0,
+                }
+                App.Data.Player.Jifa[jifa.ID]=jifa
+                return true
+            })
+            task.AddTimer(5000)
+            task.AddTrigger("└───────────┴───────────┴───────────┘")
+        },
+        function (result) {
+            checkerJifa.Reset()
+        })
+        App.Core.OnNoJifa = function (event) {
+            event.Context.Propose(function () {
+                App.Data.Player.Jifa = {}
+                LastType = ""
+            })
+        }
+        App.BindEvent("core.nojifa", App.Core.OnNoJifa)
+    
     App.BindEvent("core.hpm", App.Core.OnHPM)
     App.BindEvent("core.skillimproved", function () {
         checkerHPM.Force()
         checkerSkills.Force()
+        checkerJifa.Force()
     })
 
 })(App)
