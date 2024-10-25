@@ -188,7 +188,7 @@
         App.Send(App.Core.Weapon.UnwieldAllCommand(data))
     })
 
-    App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context,exclude) {
         for(var index in App.Core.Weapon.Duration){
             if (App.Core.Weapon.Duration[index]<App.Params.WeaponDurationMin){
                 let repair=App.Core.Weapon.Repair[index-0]

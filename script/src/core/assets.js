@@ -113,9 +113,9 @@
         App.Next()
     }
     App.Core.Assets.PrepareDataKey = "assetsrules"
-    App.Proposals.Register("assets", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("assets", App.Proposals.NewProposal(function (proposals, context,exclude) {
         for (item of App.Data.Item.List.Items) {
-            let result = App.Core.Assets.Maintain(item, App.Core.Prepare.Data[App.Core.Assets.PrepareDataKey] || [])
+            let result = App.Core.Assets.Maintain(item, context[App.Core.Assets.PrepareDataKey] || [])
             if (result && result.Command != "" && result.Command != "#carry") {
                 return function () {
                     App.Core.Assets.GoMaintain(result)

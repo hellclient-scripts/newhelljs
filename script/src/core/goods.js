@@ -75,7 +75,7 @@
     }
     App.Core.Goods.Load()
 
-    App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, context,exclude) {
         for (item of App.Core.Goods.Items) {
             let num = isNaN(item.Number) ? 1 : (item.Number - 0)
             let count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()

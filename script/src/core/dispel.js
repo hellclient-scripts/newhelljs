@@ -7,7 +7,7 @@
     App.BindEvent("core.needdispel", function () {
         App.Core.Dispel.Need = true
     })
-    App.Proposals.Register("dispel", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("dispel", App.Proposals.NewProposal(function (proposals, context,exclude) {
         if (App.Core.Dispel.Need) {
             return function () {
                 App.Commands.PushCommands(

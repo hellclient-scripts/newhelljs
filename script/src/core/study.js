@@ -232,7 +232,7 @@
         let minpot = GetVariable("min_pot")
         return (!isNaN(minpot) && App.Data.Player.HP["潜能"] < (minpot - 0)) || App.Data.Player.HP["潜能"] <= 10
     }
-    App.Core.Study.DoLearn = () => {
+    App.Core.Study.DoLearn = (context) => {
         if (!App.Core.Study.HitMinPot()) {
 
             if (App.Data.Player.HP["潜能"] >= App.Core.Study.LastPot) {
@@ -245,8 +245,8 @@
                 if (App.Core.Study.CurrentSkill.Check()) {
                     $.PushCommands(
                         $.Function(() => { App.Core.Study.CurrentSkill.Execute() }),
-                        $.Prepare("common"),
-                        $.Function(App.Core.Study.DoLearn),
+                        $.Prepare("common", context),
+                        $.Function(()=>{App.Core.Study.DoLearn(context)}),
                     )
                 }
             } else {
@@ -336,7 +336,7 @@
 
     }
     App.Core.Study.Load()
-    App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context,exclude) {
         if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max) {
             return function () {
                 App.Commands.PushCommands(
@@ -352,7 +352,7 @@
         }
         return null
     }))
-    App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, exclude) {
+    App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context,exclude) {
         if (App.Core.Study.HitMinPot()) {
             return null
         }
@@ -363,9 +363,11 @@
                 App.Core.Study.CurrentSkill = skill
                 App.Core.Study.LastPot = 0
                 App.Core.Study.LearndTimes = 0
+                let data = Object.create(context)
+                data.NeiliMin = 10
                 return () => {
                     $.PushCommands(
-                        $.Function(App.Core.Study.DoLearn)
+                        $.Function(() => { App.Core.Study.DoLearn(data) })
                     )
                     $.Next()
                 }

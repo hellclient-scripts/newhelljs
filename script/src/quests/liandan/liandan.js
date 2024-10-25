@@ -128,7 +128,7 @@ $.Module(function (App) {
     Liandan.GoAsk = function () {
         Room = FixedRoom ? FixedRoom : App.Random(locations)
         $.PushCommands(
-            $.Prepare("",preparedata),
+            $.Prepare("commonWithStudy",preparedata),
             $.To("1388"),
             $.Ask("yao chun", "炼丹"),
             $.To("1387"),
