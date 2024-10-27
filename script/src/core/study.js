@@ -367,7 +367,7 @@
     }
     App.Core.Study.Load()
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max) {
+        if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),
