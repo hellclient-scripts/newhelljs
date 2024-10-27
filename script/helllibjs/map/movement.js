@@ -2,6 +2,26 @@
     let cancelMove = (map) => { map.CancelMove() }
     let module = {}
     module.CheckRoomCmd = "l"
+    module.Filter = (steps, filter) => {
+        let result = []
+        let dup = {}
+        filter.forEach(e => { dup[e] = true })
+        steps.forEach(step => {
+            if (step.Target && dup[step.Target]) {
+                result.push(step.Target)
+            }
+        })
+        return result
+    }
+    module.FilterRooms = (steps, filter) => {
+        let result = {}
+        steps.forEach(step => {
+            if (step.Target && filter[step.Target]) {
+                result[step.Target] = true
+            }
+        })
+        return result
+    }
     let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
     class Locate {
         DFS = null
@@ -153,7 +173,14 @@
                 }
                 keys.unshift(map.Room.ID)
                 let result = move.WalkAll(map, keys)
+                let rooms = []
+                result.forEach(step => {
+                    if (step.Target) {
+                        rooms.push(step.Target)
+                    }
+                })
                 this.Path = result == null ? [[]] : module.MutlipleStepConverter.Convert(result, move, map)
+                this.Rooms = module.FilterRooms(result, this.Rooms)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
@@ -179,8 +206,10 @@
             if (typeof (rooms) != 'object') {
                 rooms = [rooms + ""]
             }
+            this.Raw = rooms
             this.Rooms = [...rooms]
         }
+        Raw = []
         Rooms = []
         Locate = new Locate()
         Path = null
@@ -211,13 +240,7 @@
                 if (result == null) {
                     return null
                 }
-                let rooms = []
-                result.forEach(step => {
-                    if (step.Target) {
-                        rooms.push(step.Target)
-                    }
-                })
-                this.Rooms = rooms
+                this.Rooms = module.Filter(result, this.Rooms)
                 this.Path = module.MutlipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }

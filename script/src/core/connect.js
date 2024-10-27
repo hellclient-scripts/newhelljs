@@ -1,8 +1,11 @@
 (function (App) {
     App.Core.Connect = {}
     App.Core.Connect.Next = null
+    App.Core.Connect.CanLogin = function () {
+        return !App.Core.Emergency.NoLogin && App.Core.Connect.Running()
+    }
     App.Core.Connect.OnTime = function () {
-        if (!App.Core.Connect.NoLogin && App.Core.Connect.Running() && App.Core.Connect.Next != null && App.Core.Connect.Next <= (new Date()).getTime()) {
+        if (App.Core.Connect.CanLogin() && App.Core.Connect.Next != null && App.Core.Connect.Next <= (new Date()).getTime()) {
             if (!IsConnected()) {
                 Connect()
             } else {
@@ -14,7 +17,6 @@
     App.Core.Connect.Running = function () {
         return App.Quests.IsStopped() == false
     }
-    App.Core.Connect.NoLogin = false
     App.Core.Connect.Login = function () {
         Send(GetVariable("id"))
         SendNoEcho(GetVariable("passw"))
@@ -53,20 +55,20 @@
     })
     App.BindEvent("disconnected", function (event) {
         Metronome.Discard(true)
-        for (var key in App.Positions){
+        for (var key in App.Positions) {
             App.Positions[key].Discard()
         }
-        if (!App.Core.Connect.NoLogin && App.Core.Connect.Running()) {
+        if (App.Core.Connect.CanLogin()) {
             if (App.Core.Connect.Next == null) {
-                Note(""+(App.Params.ReloginDelay/1000).toFixed()+"秒后尝试重连")
+                Note("" + (App.Params.ReloginDelay / 1000).toFixed() + "秒后尝试重连")
                 App.Reconnect(App.Params.ReloginDelay)
             }
         }
     })
     let matcherEnter = /^你连线进入.+。$/
     let matcherReenter = /重新连线完毕。/
-    let matcherTooFast = /^你距上一次退出时间只有.+秒钟，请稍候再登录。$/
-    let matcherTooFast2 = /^你不能在.+秒钟之内连续重新连线。$/
+    let matcherTooFast = /你距上一次退出时间只有.+秒钟，请稍候再登录。$/
+    let matcherTooFast2 = /你不能在.+秒钟之内连续重新连线。$/
     var PlanOnConnected = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherEnter).WithName("enter")

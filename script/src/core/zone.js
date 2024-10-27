@@ -92,7 +92,7 @@
         wanted = App.Zone.Wanted
         move.Option.MutlipleStep = wanted.SingleStep != true
         move.OnRoom = function (move, map, step) {
-            let item = map.Room.Data.Objects.FindByName(wanted.Target).First()
+            let item = wanted.Checker(wanted)
             if (item) {
                 wanted.Name = item.GetData().Name
                 wanted.ID = item.IDLower

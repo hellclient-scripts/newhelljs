@@ -1,4 +1,24 @@
 (function (App) {
+    let martial = {
+        "force": true,
+        "dodge": true,
+        "parry": true,
+        "unarmed": true,
+        "cuff": true,
+        "strike": true,
+        "finger": true,
+        "hand": true,
+        "claw": true,
+        "sword": true,
+        "blade": true,
+        "staff": true,
+        "hammer": true,
+        "club": true,
+        "whip": true,
+        "dagger": true,
+        "throwing": true,
+        "poison": true,
+    }
     App.Data.Player = {
         NoForce: true,
         HP: {},
@@ -154,10 +174,12 @@
         })
 
     var LastType = ""
+    var LastBasic = ""
     App.Core.OnSkills = function (event) {
         event.Context.Propose(function () {
             App.Data.Player.Skills = {}
             LastType = ""
+            LastBasic = ""
             PlanOnSkills.Execute()
         })
     }
@@ -166,7 +188,7 @@
         let maxskill = null
         for (var key in App.Data.Player.Skills) {
             let skill = App.Data.Player.Skills[key]
-            if (skill["类型"] == "基本功夫") {
+            if (skill["受限经验"]) {
                 if (skill["等级"] > max) {
                     max = skill["等级"]
                     maxskill = skill
@@ -206,6 +228,18 @@
                 skill["类型"] = LastType
                 skill["等级"] = result[4] - 0
                 skill["进度"] = result[5] - 0
+                if (skill["类型"] == "基本功夫") {
+                    let isBasic = App.History.CurrentOutput.Words[1].Color == "Cyan"
+                    if (isBasic) {
+                        skill["基本"] = skill.ID
+                        LastBasic = skill.ID
+                    } else {
+                        skill["基本"] = LastBasic
+                    }
+                } else {
+                    skill["基本"] = ""
+                }
+                skill["受限经验"] = martial[skill["基本"]] == true
                 App.Data.Player.Skills[skill.ID] = skill
                 return true
             })
@@ -219,6 +253,7 @@
         event.Context.Propose(function () {
             App.Data.Player.Skills = {}
             LastType = ""
+            LastBasic = ""
         })
     }
     App.BindEvent("core.noskill", App.Core.OnNoSkill)
@@ -311,13 +346,13 @@
     var PlanOnJifa = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherJifa, function (trigger, result, event) {
-                let jifa={
-                    Label:result[1],
-                    ID:result[2],
-                    Skill:result[3],
-                    Level:result[4]-0,
+                let jifa = {
+                    Label: result[1],
+                    ID: result[2],
+                    Skill: result[3],
+                    Level: result[4] - 0,
                 }
-                App.Data.Player.Jifa[jifa.ID]=jifa
+                App.Data.Player.Jifa[jifa.ID] = jifa
                 return true
             })
             task.AddTimer(5000)
@@ -326,14 +361,13 @@
         function (result) {
             checkerJifa.Reset()
         })
-        App.Core.OnNoJifa = function (event) {
-            event.Context.Propose(function () {
-                App.Data.Player.Jifa = {}
-                LastType = ""
-            })
-        }
-        App.BindEvent("core.nojifa", App.Core.OnNoJifa)
-    
+    App.Core.OnNoJifa = function (event) {
+        event.Context.Propose(function () {
+            App.Data.Player.Jifa = {}
+        })
+    }
+    App.BindEvent("core.nojifa", App.Core.OnNoJifa)
+
     App.BindEvent("core.hpm", App.Core.OnHPM)
     App.BindEvent("core.skillimproved", function () {
         checkerHPM.Force()

@@ -182,7 +182,7 @@ $.Module(function (App) {
         $.Next()
     }
     let Checker = function (wanted) {
-        let result = map.Room.Data.Objects.FindByName(wanted.Target)
+        let result = App.Map.Room.Data.Objects.FindByName(wanted.Target).Items
         for (var obj of result) {
             if (obj.ID.indexOf(" ") > 0) {
                 if (MQ.Data.NPC && MQ.Data.NPC.Zone) {
@@ -192,7 +192,7 @@ $.Module(function (App) {
             }
         }
         if (App.Map.Room.ID) {
-            map.Room.Data.Objects.Items.forEach((item) => {
+            App.Map.Room.Data.Objects.Items.forEach((item) => {
                 if (item.ID.indexOf(" ") > 0 && item.Label.length < 5) {
                     App.Core.HelpFind.OnNPC(item.Label, item.ID, App.Map.Room.ID)
                 }

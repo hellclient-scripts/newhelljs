@@ -17,6 +17,24 @@
     App.Core.Study.Learn = []
     App.Core.Study.TeacherID = ""
     App.Core.Study.TeacherLoc = ""
+
+    let matcherGiveMoney = /^(戚长发|朱熹|厨娘|李博渊)(笑着说道：您见笑了|说道：您太客气了|像是受宠若惊一样)/
+    let idmapGivemoney = {
+        "戚长发": "qi changfa",
+        "朱熹": "zhu xi",
+        "厨娘": "chu niang",
+        "李博渊": "li boyuan",
+    }
+    let PlanStudy = new App.Plan(App.Positions["Response"],
+        (task) => {
+            task.AddTrigger(matcherGiveMoney, function (tri, result) {
+                App.Send("give 1 gold to " + idmapGivemoney[result[1]])
+                return true
+            })
+        }
+        , (result) => {
+        }
+    )
     class Learn {
         constructor(line) {
             line = line.trim()
@@ -69,9 +87,13 @@
                     if (times > App.Data.Player.HP["潜能"]) {
                         times = App.Data.Player.HP["潜能"]
                     }
+                    var cmds = ["yanjiu " + this.SkillID + " " + times]
+                    if (this.Before) { cmds.unshift(this.Before) }
+                    if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(loc),
-                        $.Do("yanjiu " + this.SkillID + " " + times),
+                        $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do(cmds.join(";")),
                         $.Do("hp"),
                         $.Wait(1000),
                         $.Sync(),
@@ -93,9 +115,13 @@
                     if (times > App.Data.Player.HP["潜能"]) {
                         times = App.Data.Player.HP["潜能"]
                     }
+                    var cmds = ["learn " + from + " about " + this.SkillID + " " + times]
+                    if (this.Before) { cmds.unshift(this.Before) }
+                    if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(loc),
-                        $.Do("learn " + from + " about " + this.SkillID + " " + times),
+                        $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do(cmds.join(";")),
                         $.Do("hp"),
                         $.Wait(1000),
                         $.Sync(),
@@ -112,9 +138,13 @@
                         PrintSystem("未知的学习目标 " + this.From)
                         return
                     }
+                    var cmds = [this.From]
+                    if (this.Before) { cmds.unshift(this.Before) }
+                    if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(this.Loc),
-                        $.Do(this.From),
+                        $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do(cmds.join(";")),
                         $.Nobusy(),
                         $.Do("hp"),
                         $.Sync(),
@@ -132,7 +162,7 @@
         Check() {
             let skill = App.Data.Player.Skills[this.SkillID]
             if (skill) {
-                if (skill["类型"] == "基本功夫" && skill["等级"] >= App.Data.Player.HPM["当前等级"]) {
+                if (skill["受限经验"] && skill["等级"] >= App.Data.Player.HPM["当前等级"]) {
                     return false
                 }
             }
@@ -246,7 +276,7 @@
                     $.PushCommands(
                         $.Function(() => { App.Core.Study.CurrentSkill.Execute() }),
                         $.Prepare("common", context),
-                        $.Function(()=>{App.Core.Study.DoLearn(context)}),
+                        $.Function(() => { App.Core.Study.DoLearn(context) }),
                     )
                 }
             } else {
@@ -336,7 +366,7 @@
 
     }
     App.Core.Study.Load()
-    App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max) {
             return function () {
                 App.Commands.PushCommands(
@@ -352,7 +382,7 @@
         }
         return null
     }))
-    App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Core.Study.HitMinPot()) {
             return null
         }

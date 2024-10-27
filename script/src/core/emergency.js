@@ -6,6 +6,12 @@
         App.Reconnect(App.Params.ReloginDelay)
     }
     App.BindEvent("core.faint", App.Core.Emergency.OnFaint)
+    App.Core.Emergency.OnHealCombat = function () {
+        Note("治疗被人打了")
+        App.Reconnect()
+    }
+    App.BindEvent("core.healcombat", App.Core.Emergency.OnHealCombat)
+
     let checkdeathmode = 0
     let PlanCheckDeath = new App.Plan(App.Positions.Connect,
         function (task) {
@@ -34,7 +40,7 @@
             } else {
                 if (checkdeathmode == 2 && !App.Data.Player.NoForce) {
                     Note("意外死亡")
-                    App.Core.Connect.NoLogin = true
+                    App.Core.Emergency.NoLogin = true
                     App.Commands.Discard()
                     Disconnect()
                     return
@@ -44,6 +50,7 @@
             App.Next()
         }
     )
+    App.Core.Emergency.NoLogin=false
     App.Core.Emergency.CheckDeath = function () {
         App.Commands.PushCommands(
             App.Commands.NewDoCommand("hp;i;cha force"),

@@ -12,6 +12,7 @@
   App.Positions["Room"] = App.Committee.RegisterPosition("Room")
   App.Positions["Combat"] = App.Committee.RegisterPosition("Combat")
   App.Positions["Move"] = App.Committee.RegisterPosition("Move")
+  App.Positions["Response"] = App.Committee.RegisterPosition("Response")
   App.Committee.EventBus.BindEvent("core.newmove", function () { App.Positions["Move"].StartNewTerm() })
   App.Positions["Command"] = App.Committee.RegisterPosition("Command")
   App.Positions["CommandQueue"] = App.Committee.RegisterPosition("CommandQueue")
