@@ -17,7 +17,7 @@ feihuang shi|feihuang shi|飞蝗石|buy|682|buy 飞蝗石 from tang huai|
 mu dao|mu dao|木刀|buy|161|buy 木刀 from mu jiang|
 mu jian|mu jian|木剑|buy|161|buy 木剑 from mu jiang|
 mu gun|mu gun|木棍|buy|161|buy 木棍 from mu jiang|
-diao gan|diao gan|木棍|buy|2717|buy 钓竿 from huo ji|
+diao gan|diao gan|钓竿|buy|2717|buy 钓竿 from huo ji|
 baoguo|baoguo|包裹|buy|62|buy 包裹 from yang yongfu|
 budai|budai|麻布袋|buy|62|buy 麻布袋 from yang yongfu|
 jinsi jia|jinsi jia|金丝甲|buy|62|buy 金丝甲 from yang yongfu|3
@@ -26,3 +26,5 @@ yanbo|yanbo|研钵|buy|65|buy 研钵 from ping yizhi|
 jin chuangyao|jin chuangyao|金创药|buy|65|buy 金创药 from yaopu huoji|
 yangjing dan|yangjing dan|养精丹|buy|65|buy 养精丹 from yaopu huoji|
 chan|chan|朱睛冰蟾|buy|2879|buy chan from wang dagui|1000
+diao gan 2|diao gan|钓竿|buy|269|buy 钓竿 from liu laoshi
+yu er|yu er|鱼饵|buy|269|buy 100 鱼饵 from liu laoshi

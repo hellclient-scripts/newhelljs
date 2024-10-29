@@ -68,6 +68,7 @@
         Path = null
         Retry(move, map) {
             this.Path = null
+            move.Walk(map)
         }
         Next(move, map) {
             if (move.StartCommand) {
@@ -107,7 +108,11 @@
         }
         Retry(move, map) {
             this.Path = null
-            this.Locate.DFS = null
+            if (this.Locate.DFS == null) {
+                move.Walk(map)
+            } else {
+                this.Locate.OnStepTimeout(move, map)
+            }
         }
         Next(move, map) {
             if (this.Path != null) {
@@ -148,7 +153,11 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            this.Locate.DFS = null
+            if (this.Locate.DFS == null) {
+                move.Walk(map)
+            } else {
+                this.Locate.OnStepTimeout(move, map)
+            }
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {
@@ -215,7 +224,11 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            this.Locate.DFS = null
+            if (this.Locate.DFS == null) {
+                move.Walk(map)
+            } else {
+                this.Locate.OnStepTimeout(move, map)
+            }
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {

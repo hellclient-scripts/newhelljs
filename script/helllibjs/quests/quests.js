@@ -122,6 +122,7 @@
         }
         Next() {
             if (this.Stopped) {
+                this.Queue = []
                 this.OnStop(this)
                 this.Commands.Next()
                 return
@@ -137,6 +138,9 @@
                                 throw new Error("Quest " + r.ID + " not found")
                             }
                             q.Start(r.Data)
+                        }),
+                        this.Commands.NewFunctionCommand(() => {
+                            this.Loop()
                         })
                     )
                     App.Next()

@@ -65,7 +65,7 @@
             Mapper.setroomname(line.ID, line.Name)
             line.Exits.forEach(exit => {
                 if (exit.Ready()) {
-                    exit.Command = exit.Command.replaceAll(_re, "")
+                    exit.Command = exit.Command.replaceAll(_re, "。")
                     exit.AddToMapper()
                 }
             })

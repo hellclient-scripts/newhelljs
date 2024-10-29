@@ -95,7 +95,7 @@
             for (let cmd of commands) {
                 let to = this.Trace(this, current, cmd)
                 if (!to) {
-                    PrintSystem("路径解析错误")
+                    PrintSystem("路径解析错误:" + current + "," + cmd)
                     return null
                 }
                 result.push(new Step(cmd, to))
@@ -109,7 +109,7 @@
             for (let cmd of commands) {
                 let to = this.Trace(this, current, cmd)
                 if (!to) {
-                    PrintSystem("路径解析错误")
+                    PrintSystem("路径解析错误:" + current + "," + cmd)
                     return null
                 }
                 result.push(to)
@@ -166,6 +166,16 @@
                 option.blockedpath.push(val)
             })
         }
+        filterpath(path) {
+            let result = []
+            path.forEach(step => {
+                if (step.Command != "#skip") {
+                    result.push(step)
+                }
+            })
+            return result
+
+        }
         GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
                 to = [to]
@@ -181,7 +191,7 @@
             result.forEach(step => {
                 path.push(new Step(step.command, step.to))
             })
-            return path
+            return this.filterpath(path)
         }
         GetMapperWalkAll(rooms, fly, distance, options) {
             let result = Mapper.WalkAll(rooms, fly, distance, options)
@@ -192,7 +202,7 @@
             result.steps.forEach(step => {
                 path.push(new Step(step.command, step.to))
             })
-            return path
+            return this.filterpath(path)
         }
         GetMapperWalkOrdered(from, rooms, fly, options) {
             let path = []
@@ -206,7 +216,7 @@
                     current = rooms[i]
                 }
             }
-            return path
+            return this.filterpath(path)
         }
         OnWalking() {
             if (this.Move != null) {
@@ -216,7 +226,6 @@
         Retry() {
             if (this.Move != null) {
                 this.Move.Retry(this.Move, this)
-                this.Move.Walk(this)
             }
         }
         TrySteps(steps) {
@@ -309,6 +318,7 @@
 
     }
     let DefaultMoveRetry = function (move, map) {
+        move.Walk(map)
     }
     let DefaultMoveNext = function (move, map) {
         return []

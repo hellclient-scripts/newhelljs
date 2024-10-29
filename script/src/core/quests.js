@@ -28,10 +28,16 @@
     App.BindEvent("core.stop", function () {
         App.Quests.Stop()
     })
-    App.Quests.OnStart=()=>{
+    App.Quests.OnStart = () => {
         App.RaiseEvent(new App.Event("core.queststart"))
     }
-    App.Quests.OnStop=()=>{
+    App.Quests.OnStop = () => {
         App.RaiseEvent(new App.Event("core.queststop"))
     }
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("maxexp", function (data, target) {
+        return App.Data.Player.HP["经验"] <= (data - 0)
+    }))
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("yueli", function (data, target) {
+        return App.Data.Player.Score["阅历"] >= (data - 0)
+    }))
 })(App)            

@@ -31,8 +31,10 @@
         return new Option(quest)
     }
     let reDamage = /^【伤害统计】:你对(.+)的气血造成(.+)点伤害! $/
+    App.Core.Combat.Fail = false
     let Plan = new App.Plan(App.Positions["Combat"],
         function (task) {
+            App.Core.Combat.Fail = false
             App.Combat.Position.Term.Set("core.combat.damage", 0)
             task.AddTrigger("一边打架一边驯兽？你真是活腻了！", function () {
                 OmitOutput()
@@ -41,6 +43,10 @@
             task.AddTrigger(reDamage, function (trigger, result) {
                 let dam = result[2] - 0
                 App.Combat.Position.Term.Set("core.combat.damage", App.Combat.Position.Term.Get("core.combat.damage") + dam)
+                return true
+            })
+            task.AddTrigger("你现在没有力气战斗了。", (tri, result) => {
+                App.Core.Combat.Fail = true
                 return true
             })
             task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！", () => { OmitOutput() })
@@ -54,7 +60,7 @@
             if (result.Name == "Disconnect") {
                 return
             }
-            App.Combat.Stop()
+            App.Combat.Stop(App.Core.Combat.Fail ? "fail" : "")
         })
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
     let checkCombatCmd = "come"

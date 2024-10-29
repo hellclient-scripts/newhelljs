@@ -12,7 +12,9 @@
         let task = App.Positions["Connect"].AddTask(function (result) {
             if (result.Name == "nobusy") {
                 App.Positions["Response"].StartNewTerm()
-                cb()
+                if (cb) {
+                    cb()
+                }
             }
         })
         task.AddTimer(delay, function () {
@@ -28,7 +30,9 @@
         let task = App.Positions["Connect"].AddTask(function (result) {
             if (result.Name == "sync") {
                 App.Positions["Response"].StartNewTerm()
-                cb()
+                if (cb) {
+                    cb()
+                }
             }
         })
         task.AddTrigger("此服务已经暂停。", function () {
@@ -39,6 +43,8 @@
     App.Sync = function (cb) {
         sync(cb)
     }
+    App.CheckBusy=checkbusy
+    
     App.Commands.RegisterExecutor("nobusy", function (commands, running) {
         running.OnStart = function (arg) {
             checkbusy(running.Command.Data.Delay, running.Command.Data.Offset, function () { App.Next() })
@@ -59,12 +65,12 @@
             sync(function () { App.Next() })
         }
     })
-    App.NewSyncCommand = function (delay) {
-        return App.Commands.NewCommand("sync", delay)
+    App.NewSyncCommand = function () {
+        return App.Commands.NewCommand("sync")
     }
     App.UserQueue.UserQueue.RegisterCommand("#sync", function (uq, data) {
         uq.Commands.Append(
-            App.NewSyncCommand(data),
+            App.NewSyncCommand(),
             uq.Commands.NewFunctionCommand(function () { uq.Next() }),
         )
         uq.Commands.Next()

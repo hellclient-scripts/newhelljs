@@ -52,14 +52,6 @@ $.Module(function (App) {
     }
     MQ.OnNpcDie = function () {
         $.RaiseStage("npcdie")
-        if (MQ.Data.kills == 0) {
-            MQ.Data.start = $.Now()
-        }
-        MQ.Data.kills++
-        if (MQ.Data.kills > 3) {
-            MQ.Data.eff = MQ.Data.kills * 3600 * 1000 / ($.Now() - MQ.Data.start)
-            Note("任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务," + "线报率 " + (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(2) + "%")
-        }
     }
     MQ.OnNpcFaint = function () {
         $.RaiseStage("fait")
@@ -301,6 +293,7 @@ $.Module(function (App) {
         $.Next()
     }
     MQ.Connect = () => {
+        planQuest.Execute()
         $.PushCommands(
             $.Function(App.Core.Emergency.CheckDeath),
             $.Function(MQ.KillLoc)
@@ -310,7 +303,8 @@ $.Module(function (App) {
     let matcherDie = /^(.+)扑在地上挣扎了几下，腿一伸，口中喷出几口鲜血，死了！$/
     let matcherFaint = /^(.+)下一个不稳，跌在地上一动也不动了。$/
     let matcherFlee2 = /^你连连进击，眼看便要得手，接连数招，让(.+)已是避/
-    let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了|只有招架之功)(.*)/
+    let matcherFlee3 = /^在你一阵狂攻之下，(.+)只有招架之功，哪里还有/
+    let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了)(.*)/
     let matcherHelper = /^看起来(.+)想杀死你！$/
     let PlanCombat = new App.Plan(
         App.Positions["Combat"],
@@ -339,6 +333,13 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(matcherFlee2, (tri, result) => {
+                if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
+                    MQ.Data.NPC.Flee()
+                    Note("NPC跑了。")
+                }
+                return true
+            })
+            task.AddTrigger(matcherFlee3, (tri, result) => {
                 if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
                     MQ.Data.NPC.Flee()
                     Note("NPC跑了。")
@@ -414,13 +415,13 @@ $.Module(function (App) {
                 MQ.Data.NPC.ID = id.toLowerCase()
             }
             if (!MQ.Data.NPC.Loc) {
+                Note("接到线报:" + name + "|" + id + "|" + loc)
                 MQ.Data.helpded++
                 MQ.Data.NPC.Loc = loc
             }
             if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {
                 App.Zone.Wanted.Loc = loc
             }
-            Note("接到线报:" + name + "|" + id + "|" + loc)
             MQ.Data.NPC.Farlist = null
         }
     })
@@ -537,6 +538,24 @@ $.Module(function (App) {
             new App.HUD.UI.Word(MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) : "-", 5, true),
         ]
     }
+    let matcherreward = /^通过这次锻炼，你获得了/
+    let planQuest = new App.Plan(App.Quests.Position,
+        (task) => {
+            task.AddTrigger(matcherreward, (tri, result) => {
+                let msg = "任务成功"
+                if (MQ.Data.kills == 0) {
+                    MQ.Data.start = $.Now()
+                }
+                MQ.Data.kills++
+                if (MQ.Data.kills > 3) {
+                    MQ.Data.eff = MQ.Data.kills * 3600 * 1000 / ($.Now() - MQ.Data.start)
+                    msg += " 任务效率：" + MQ.Data.eff.toFixed() + " 个/小时,共计" + MQ.Data.kills + "个任务," + "线报率 " + (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(2) + "%"
+                }
+                Note(msg)
+                return true
+            })
+        },
+    )
     Quest.Start = function (data) {
         if (!App.Params.MasterID) {
             PrintSystem("掌门ID " + App.Params.MasterID + " 无效")
@@ -547,6 +566,7 @@ $.Module(function (App) {
             return
         }
         MQ.Data.NPC = null
+        planQuest.Execute()
         MQ.Prepare()
     }
     App.Quests.Register(Quest)

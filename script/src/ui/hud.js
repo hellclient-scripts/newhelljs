@@ -44,11 +44,14 @@
         App.Quests.Queue.forEach(rq => {
             if (!dup[rq.ID] && count < 4) {
                 dup[rq.ID] = true
-                let output = App.Quests.GetQuest(rq.ID).OnHUD()
-                if (output != null) {
-                    result = result.concat(output)
-                    result = result.concat(App.HUD.Space)
-                    count++
+                let q = App.Quests.GetQuest(rq.ID)
+                if (q) {
+                    let output = App.Quests.GetQuest(rq.ID).OnHUD()
+                    if (output != null) {
+                        result = result.concat(output)
+                        result = result.concat(App.HUD.Space)
+                        count++
+                    }
                 }
             }
         });
@@ -84,11 +87,14 @@
         App.Quests.Queue.forEach(rq => {
             if (!dup[rq.ID] && count < 3) {
                 dup[rq.ID] = true
-                let output = App.Quests.GetQuest(rq.ID).OnSummary()
-                if (output != null) {
-                    result = result.concat(output)
-                    result = result.concat(App.HUD.Space)
-                    count++
+                let q = App.Quests.GetQuest(rq.ID)
+                if (q) {
+                    let output = q.OnSummary()
+                    if (output != null) {
+                        result = result.concat(output)
+                        result = result.concat(App.HUD.Space)
+                        count++
+                    }
                 }
             }
         });

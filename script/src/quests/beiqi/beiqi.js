@@ -128,7 +128,7 @@ $.Module(function (App) {
                 $.To(Beiqi.Data.Quest.Receiver.Loc),
                 $.Nobusy(),
                 $.Do("give " + item.IDLower + " to " + Beiqi.Data.Quest.Receiver.ID),
-                $.Do("i"),
+                $.Do("i;score"),
                 $.Wait(1000),
                 $.Function(Beiqi.Go)
             )

@@ -2,7 +2,7 @@
     App.Core.Connect = {}
     App.Core.Connect.Next = null
     App.Core.Connect.CanLogin = function () {
-        return !App.Core.Emergency.NoLogin && App.Core.Connect.Running()
+        return !App.Core.Connect.Offline && !App.Core.Emergency.NoLogin && App.Core.Connect.Running()
     }
     App.Core.Connect.OnTime = function () {
         if (App.Core.Connect.CanLogin() && App.Core.Connect.Next != null && App.Core.Connect.Next <= (new Date()).getTime()) {
@@ -23,6 +23,7 @@
         print("******")
         Send("y")
     }
+    App.Core.Connect.Offline = false
     App.Core.Connect.Callback = null
     App.Core.Connect.DefaultCallback = function () {
         App.Commands.Discard()
@@ -98,6 +99,7 @@
             }
         })
     App.BindEvent("core.entermud", function () {
+        App.Core.Connect.Offline = false
         App.Core.Connect.Next = null
         let cb = App.Core.Connect.Callback
         App.Core.Connect.Callback = null

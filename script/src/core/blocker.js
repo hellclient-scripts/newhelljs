@@ -45,13 +45,15 @@
             App.Next()
             return
         } else {
-            if (App.Map.Move && App.Map.Room.ID) {
-                let step = App.Map.Move.GetLastStep()
-                if (step.Target) {
-                    App.Core.Blocker.Block(App.Map.Room.ID, step.Target)
-                    App.Map.InitTags()
-                    App.Map.Retry()
+            if (App.Map.Move) {
+                if (App.Map.Room.ID) {
+                    let step = App.Map.Move.GetLastStep()
+                    if (step.Target) {
+                        App.Core.Blocker.Block(App.Map.Room.ID, step.Target)
+                    }
                 }
+                App.Map.InitTags()
+                App.Map.Retry()
             }
         }
     }

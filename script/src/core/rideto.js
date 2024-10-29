@@ -17,15 +17,31 @@
     load("data/ridable.h", rooms)
     load("data/ridable2.h", rooms)
     load("data/rideto.h", rides)
+    Mapper.setroomname("ride-pet", "飞行坐骑")
     rides.forEach(line => {
-        paths.push(App.RoomsH.ParsePath("-1", line))
+        App.RoomsH.ParsePath("ride-pet", line).AddToMapper()
     })
+    let bindroom = (id) => {
+        let path = Mapper.newpath()
+        path.from = id
+        path.to = "ride-pet"
+        path.tags = ["ride"]
+        path.command = "#skip"
+        Mapper.addpath(id, path)
+    }
     rooms.forEach(room => {
-        paths.forEach(path => {
-            path.From = room
-            path.AddToMapper()
-        })
+        bindroom(room)
     })
+
+    // rides.forEach(line => {
+    //     paths.push(App.RoomsH.ParsePath("-1", line))
+    // })
+    // rooms.forEach(room => {
+    //     paths.forEach(path => {
+    //         path.From = room
+    //         path.AddToMapper()
+    //     })
+    // })
     ridable = function () {
         var cmd = GetVariable("cmd_ride") || ""
         cmd = cmd.trim()
@@ -62,4 +78,5 @@
         Mode = 2
         App.RaiseEvent(event)
     })
+    let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
 })(App)

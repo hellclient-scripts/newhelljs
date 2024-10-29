@@ -37,6 +37,7 @@
         if (neimin > App.Params.NeiliMin) {
             neimin = App.Params.NeiliMin
         }
+        let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
         if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= neimin) {
             if ((new Date()).getTime() - App.Core.Heal.LastSleep > App.Core.Heal.SleepInterval) {
                 return function () {
@@ -47,6 +48,17 @@
                     App.Next()
                 }
             } else {
+                if (jifaForce < 150) {
+                    return function () {
+                        Note("有效内功过低，发呆等恢复")
+                        App.Commands.PushCommands(
+                            App.Commands.NewWaitCommand(3000),
+                            App.Commands.NewDoCommand("hp"),
+                            App.NewSyncCommand(),
+                        )
+                        App.Next()
+                    }
+                }
                 return function () {
                     let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : ((App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"]) * 0.8).toFixed()
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
@@ -80,7 +92,8 @@
         return null
     }))
     App.Proposals.Register("heal", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow) {
+        let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
+        if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow && jifaForce > 100) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),

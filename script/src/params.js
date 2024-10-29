@@ -1,6 +1,6 @@
 (function () {
     return {
-        DefaultNumCmds: 38,
+        DefaultNumCmds: 42,
         Drink: "shui dai",
         DrinkMin: 3,
         DrinkCommand: "drink shui dai",
