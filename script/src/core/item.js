@@ -3,6 +3,7 @@
 
     App.Core.Item = {}
     App.Data.Item = {}
+    App.Data.QiankunBag = new objectModule.List()
     App.Data.Item.List = new objectModule.List()
     App.Data.Item.Weight = 0
     App.Data.Item.Count = 0
@@ -70,4 +71,39 @@
             checkerI.Reset()
         },
     )
+
+    let checkerQiankunBag = App.Checker.Register("qiankunbag", "l qiankunbag of me", 600000)
+    //[ 1]  丹玉磨(danyu mo)                          1          
+    let matcherQiankunBag = /^\[\s*(\d+)\]\s*(\S+)\((.+)\)\s*(\d+)\s*$/
+    let PlanQiankunBag = new App.Plan(App.Positions.Connect,
+        function (task) {
+            let mode = 0
+            task.AddTrigger("目前没有存放任何物品在如意乾坤袋里。")
+            task.AddTrigger(matcherQiankunBag, (tri, result) => {
+                let obj = App.Data.QiankunBag.NewObject(result[2], result[3]).WithKey(result[1])
+                let data = obj.GetData(true)
+                data.Name = result[2]
+                data.Count = result[4] - 0
+                App.Data.QiankunBag.Append(obj)
+                return true
+            })
+            task.AddTrigger("----------------------------------------------------", () => {
+                mode++
+                return mode == 1
+            })
+        },
+        function (result) {
+            checkerQiankunBag.Reset()
+        }
+    )
+    App.Core.Item.OnQiankunBag = function (event) {
+        event.Context.Propose(function () {
+            App.Data.QiankunBag = new objectModule.List()
+            PlanQiankunBag.Execute()
+        })
+    }
+    App.BindEvent("core.qiankunbag", App.Core.Item.OnQiankunBag)
+    App.BindEvent("core.qiankunbagchange", () => {
+        checkerQiankunBag.Force()
+    })
 })(App)

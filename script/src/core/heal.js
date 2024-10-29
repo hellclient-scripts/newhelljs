@@ -48,7 +48,7 @@
                     App.Next()
                 }
             } else {
-                if (jifaForce < 150) {
+                if (jifaForce < 120) {
                     return function () {
                         Note("有效内功过低，发呆等恢复")
                         App.Commands.PushCommands(
@@ -93,7 +93,7 @@
     }))
     App.Proposals.Register("heal", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
-        if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow && jifaForce > 100) {
+        if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow && jifaForce > 20) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),

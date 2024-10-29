@@ -11,13 +11,11 @@
         Name = ""
     }
     module.DataParaser = function (obj) {
-        if (obj.Data == null) {
-            obj.Data = new ObjectData()
-            let result = module.CNumber.Convert(obj.Label)
-            obj.Data.Count = result.Count
-            obj.Data.Unit = result.Unit
-            obj.Data.Name = result.Name
-        }
+        obj.Data = new ObjectData()
+        let result = module.CNumber.Convert(obj.Label)
+        obj.Data.Count = result.Count
+        obj.Data.Unit = result.Unit
+        obj.Data.Name = result.Name
     }
     class Object {
         constructor(label, id, raw) {
@@ -26,8 +24,14 @@
             this.Label = label
             this.#raw = raw
         }
-        GetData() {
-            module.DataParaser(this)
+        GetData(noparse) {
+            if (this.Data == null) {
+                if (!noparse) {
+                    module.DataParaser(this)
+                } else {
+                    this.Data = new ObjectData()
+                }
+            }
             return this.Data
         }
         GetRaw() {
@@ -35,6 +39,7 @@
         }
         WithKey(key) {
             this.Key = key
+            return this
         }
         WithParam(name, data) {
             this.Params[name] = data
@@ -51,6 +56,9 @@
     }
     class List {
         constructor() {
+        }
+        NewObject(label, id, raw) {
+            return new Object(label, id, raw)
         }
         IsNotEmpty() {
             return this.Items.length > 0
