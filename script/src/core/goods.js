@@ -62,7 +62,7 @@
             let item = actionModule.Parse(data).ParseNumber()
             if (item.Data) {
                 if (App.Goods.GetGood(item.Data) == null) {
-                    Note("物品 " + item.Data + " 未招到。")
+                    Note("物品 " + item.Data + " 未找到。")
                     return
                 }
                 App.Core.Goods.Items.push(item)
@@ -75,9 +75,12 @@
     }
     App.Core.Goods.Load()
 
-    App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, context, exclude) {
         for (item of App.Core.Goods.Items) {
             let num = isNaN(item.Number) ? 1 : (item.Number - 0)
+            if (num == 0) {
+                num = 1
+            }
             let count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()
             if (count < num) {
                 return function () {
