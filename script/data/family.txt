@@ -8,7 +8,7 @@
 段氏皇族|2384|duan zhengchun|2393|2383|duan
 星宿派|1168|ding chunqiu|1657|1167|xx
 慕容世家|2197|murong bo|2221|2196|mr
-华山派|2185|yue buqun|2177|2178|hs
+华山派|2185|yue buqun|2177|2186|hs
 华山剑宗|2226|feng buping|2227|2225|jz
 灵鹫宫|2013|xu zhu|2030|2012|lj
 峨嵋派|2070|miejue shitai|2076|2062|em

@@ -94,4 +94,13 @@
     App.Map.AppendTagsIniter((map) => {
         map.SetTag(App.Params.IDPass, true)
     })
+    App.Core.NPC.Kungfu = {}
+    App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {
+        App.Core.NPC.Kungfu[data[0]] = {
+            Key: data[0],
+            Name: data[1],
+            Loc: data[2],
+            ID: data[3],
+        }
+    })
 })(App)

@@ -1449,3 +1449,8 @@ Timers = []
   Name = "jiqu"
   Desc = "汲取武道设置(选填)"
   Intro = "设置数字则为最大体会，数字小于等于0不汲取，不设自动设置。\n\n#cmd可以指定多条汲取指令。不设则自动。参考\n\n400\n#cmd jiqu\n#cmd #unwield;#wpon;jiqu sword-cognize"
+
+[[RequiredParams]]
+  Name = "params"
+  Desc = "系统参数(选填)"
+  Intro = "不要手动设置，通过助理按钮的设置系统参数功能设置。"

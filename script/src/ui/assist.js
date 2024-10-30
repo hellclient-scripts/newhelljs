@@ -14,6 +14,7 @@
         list.append("reload", "重新加载变量设置")
         list.append("npc", "NPC老师清单")
         list.append("rooms", "地图房间")
+        list.append("params", "系统参数设置")
         list.publish("App.UI.Assist.OnClick")
 
     }
@@ -30,6 +31,9 @@
                 break
             case "npc":
                 App.UI.Assist.NPCShow()
+                break
+            case "params":
+                App.UI.Assist.ParamsShow()
                 break
         }
     }
@@ -70,8 +74,8 @@
     }
     App.UI.Assist.NPCShow = () => {
         var list = Userinput.newlist("NPC列表", "请选择你感兴趣的NPC", true)
-        Object.keys(App.Zone.NPCs).forEach((key) => {
-            let npc = App.Zone.NPCs[key]
+        Object.keys(App.Core.NPC.Kungfu).forEach((key) => {
+            let npc = App.Core.NPC.Kungfu[key]
             list.append(key, npc.Name + "(" + npc.ID + ") @" + npc.Loc)
 
         })
@@ -79,7 +83,7 @@
     }
     App.UI.Assist.NPCOnClick = (name, id, code, data) => {
         if (code === 0) {
-            let npc = App.Zone.NPCs[data]
+            let npc = App.Core.NPC.Kungfu[data]
             if (npc) {
                 var list = Userinput.newlist(npc.Name + "(" + npc.ID + ") @" + npc.Loc, "请选择你要进行的操作")
                 list.append("go " + npc.Loc, "前往")
@@ -98,14 +102,14 @@
                     App.Move.To(cmd[1])
                     break
                 case "teacher":
-                    var npc = App.Zone.NPCs[cmd[1]]
+                    var npc = App.Core.NPC.Kungfu[cmd[1]]
                     if (npc) {
                         App.Core.Study.SetTeacher(npc.ID, npc.Loc)
-                        Userinput.alert("","study变量内容,注意保存", GetVariable("study"))
+                        Userinput.alert("", "study变量内容,注意保存", GetVariable("study"))
                     }
                     break
                 case "learn":
-                    var npc = App.Zone.NPCs[cmd[1]]
+                    var npc = App.Core.NPC.Kungfu[cmd[1]]
                     if (npc) {
                         App.UI.Assist.NPCLastLearn = cmd[1]
                         Userinput.prompt("App.UI.Assist.NPCOnLearn", "学习技能设置", "请输入需要向" + npc.Name + "学习的技能id", "")
@@ -118,10 +122,41 @@
         let key = App.UI.Assist.NPCLastLearn
         App.UI.Assist.NPCLastLearn = ""
         if (code === 0 && key && data.trim()) {
-            var npc = App.Zone.NPCs[key]
+            var npc = App.Core.NPC.Kungfu[key]
             App.Core.Study.SetLearn("xue", data, npc.ID, npc.Loc)
-            Userinput.alert("","study变量内容,注意保存", GetVariable("study"))
+            Userinput.alert("", "study变量内容,注意保存", GetVariable("study"))
         }
     }
-
+    App.UI.Assist.NPCLastParam = null
+    App.UI.Assist.ParamsShow = () => {
+        var list = Userinput.newlist("系统参数设置00", "请选择你要设置的参数,搜索=显示已设置参数", true)
+        App.NamedParams.Params.forEach((p) => {
+            let val = App.Core.Params.Data[p.ID] ? "=" + App.Core.Params.Data[p.ID] : "未设置"
+            list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
+        })
+        list.publish("App.UI.Assist.NPCOnView")
+    }
+    App.UI.Assist.NPCOnView = (name, id, code, data) => {
+        if (code === 0 && data) {
+            let p
+            App.NamedParams.Params.forEach((param) => {
+                if (param.ID == data) {
+                    p = param
+                }
+            })
+            if (p) {
+                App.UI.Assist.NPCLastParam = p
+                let val = App.Core.Params.Data[p.ID] || ""
+                Userinput.Prompt("App.UI.Assist.NPCOnSet", `${p.Name}-#${p.ID}`, `${p.Desc}\n${p.Intro}`, val)
+            }
+        }
+    }
+    App.UI.Assist.NPCOnSet = (name, id, code, data) => {
+        let p = App.UI.Assist.NPCLastParam
+        App.UI.Assist.NPCLastParam = null
+        if (code === 0 && p) {
+            App.Core.Params.Set(p.ID, data)
+            Userinput.alert("", "params变量内容,注意保存", GetVariable("params"))
+        }
+    }
 })(App)

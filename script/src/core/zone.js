@@ -24,7 +24,7 @@
         }
     })
     let DefaultChecker = function (wanted) {
-        return map.Room.Data.Objects.FindByName(wanted.Target).First() || map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
+        return App.Map.Room.Data.Objects.FindByName(wanted.Target).First() || App.Map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
     }
     class Wanted {
         constructor(target, zone) {
@@ -97,7 +97,7 @@
                 wanted.Name = item.GetData().Name
                 wanted.ID = item.IDLower
                 if (map.Room.ID) {
-                    wanted.Loc = map.Room.ID
+                    wanted.Loc = App.Map.Room.ID
                     Note(wanted.Target + " @ " + wanted.Loc)
                 }
             }
@@ -180,14 +180,6 @@
         )
         uq.Commands.Next()
     })
-    App.Zone.NPCs = {}
-    App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {
-        App.Zone.NPCs[data[0]] = {
-            Key: data[0],
-            Name: data[1],
-            Loc: data[2],
-            ID: data[3],
-        }
-    })
+
 
 })(App)

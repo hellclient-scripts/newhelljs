@@ -40,4 +40,7 @@
     App.Include("src/core/npc.js")
     App.Include("src/core/study.js")
     App.Include("src/core/stage.js")
+
+    App.Include("src/core/params.js")//最后覆盖设置
+
 })(App)
