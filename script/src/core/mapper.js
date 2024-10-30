@@ -1,12 +1,12 @@
 (function (App) {
     let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
     App.Mapper = {}
+    App.Mapper.Lines = []
     roomshModule.CostToken = "%"
     App.RoomsH = new roomshModule.File()
     let mapfile = "data/rooms.h"
     Note("加载地图文件" + mapfile)
     App.RoomsH.Load(ReadLines(mapfile))
-    let houseexit = null
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
     App.Mapper.Addhouse = function (line) {
@@ -69,6 +69,7 @@
                     exit.AddToMapper()
                 }
             })
+            App.Mapper.Lines.push(line.Raw)
         }
     });
 
@@ -96,7 +97,10 @@
         App.Send("#unwield")
         App.RaiseEvent(event)
     })
-
+    App.Engine.SetFilter("core.walkfail", function (event) {
+        App.Send("#unwield")
+        App.RaiseEvent(event)
+    })
     App.Mapper.ExcludeRooms = {}
     App.Mapper.ExpandRooms = (rooms, expand) => {
         if (rooms == null || rooms.length == 0) {

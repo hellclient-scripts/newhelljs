@@ -67,7 +67,7 @@
         }
         App.Next()
     }
-    App.Proposals.Register("cash", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("cash", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let cash = App.Data.Item.List.FindByName("一千两银票").First()
         let num = cash ? cash.GetData().Count : 0
         if (num >= App.Params.CashMax) {
@@ -83,7 +83,7 @@
         }
         return null
     }))
-    App.Proposals.Register("gold", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("gold", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let gold = App.Data.Item.List.FindByName("黄金").First()
         let num = gold ? gold.GetData().Count : 0
         if (num >= App.Params.GoldMax) {
@@ -99,7 +99,7 @@
         }
         return null
     }))
-    App.Proposals.Register("qu", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("qu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let gold = App.Data.Item.List.FindByName("黄金").First()
         let num = gold ? gold.GetData().Count : 0
         if (num < App.Params.GoldKeep) {
@@ -115,7 +115,7 @@
         }
         return null
     }))
-    App.Proposals.Register("silver", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("silver", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let silver = App.Data.Item.List.FindByName("白银").First()
         let num = silver ? silver.GetData().Count : 0
         if (num >= App.Params.SilverMax) {
@@ -131,7 +131,7 @@
         }
         return null
     }))
-    App.Proposals.Register("coin", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("coin", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let coin = App.Data.Item.List.FindByName("铜钱").First()
         let num = coin ? coin.GetData().Count : 0
         if (num >= App.Params.CoinMax) {
@@ -147,7 +147,7 @@
         }
         return null
     }))
-    App.Proposals.Register("food", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("food", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let item = App.Data.Item.List.FindByIDLower(App.Params.Food).First()
         let num = item ? item.GetData().Count : 0
         if (num < App.Params.FoodMin) {
@@ -160,7 +160,7 @@
         }
         return null
     }))
-    App.Proposals.Register("drink", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("drink", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let item = App.Data.Item.List.FindByIDLower(App.Params.Drink).First()
         let num = item ? item.GetData().Count : 0
         if (num < App.Params.DrinkMin) {
@@ -173,11 +173,12 @@
         }
         return null
     }))
-    App.Proposals.Register("exp", App.Proposals.NewProposal(function (proposals, context,exclude) {
-        if (App.Params.ExpMax > 0 && App.Data.Player.HP["经验"] > App.Params.ExpMax) {
+    App.Proposals.Register("exp", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        let maxexp = App.Core.GetMaxExp()
+        if (maxexp > 0 && App.Data.Player.HP["经验"] > maxexp) {
             let skill = App.Core.GetMaxSkillLevel()
             let safelevel = skill["等级"] - 3
-            if ((safelevel * safelevel * safelevel / 10) > App.Params.ExpMax) {
+            if ((safelevel * safelevel * safelevel / 10) > maxexp) {
                 return function () {
                     PrintSystem("最大经验设置有误,技能 " + skill["名称"] + " 超限")
                 }

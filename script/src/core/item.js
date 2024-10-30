@@ -71,8 +71,13 @@
             checkerI.Reset()
         },
     )
-
-    let checkerQiankunBag = App.Checker.Register("qiankunbag", "l qiankunbag of me", 600000)
+    App.Core.Item.CheckQiankunBag = function () {
+        if (App.Data.Item.List.FindByID("qiankun bag").First()) {
+            App.Send("l qiankun bag of me")
+        }
+        checkerQiankunBag.Reset()
+    }
+    let checkerQiankunBag = App.Checker.Register("qiankunbag", App.Core.Item.CheckQiankunBag, 600000)
     //[ 1]  丹玉磨(danyu mo)                          1          
     let matcherQiankunBag = /^\[\s*(\d+)\]\s*(\S+)\((.+)\)\s*(\d+)\s*$/
     let PlanQiankunBag = new App.Plan(App.Positions.Connect,

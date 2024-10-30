@@ -11,6 +11,11 @@
         Tags = {}
         Command = ""
         Plan = null
+        KillInGroup = false
+        WithKillInGroup(val) {
+            this.KillInGroup = val
+            return this
+        }
         WithTags(...tags) {
             tags.forEach(tag => {
                 this.Tags[tag] = true
@@ -68,7 +73,7 @@
         App.Core.Combat.FilterActions("#send", "#wpon", "wpoff").forEach(action => {
             switch (action.Command) {
                 case "#send":
-                    App.Send(action.Data.replaceAll("$1", App.Combat.Target))
+                    App.Send(App.Core.Combat.ReplaceCommand(action.Data))
                     return
                 case "#wpoff":
                 case "#wpon":
@@ -111,19 +116,27 @@
         App.Core.Combat.DoCombat(id, data)
 
     }
+    App.Core.Combat.ReplaceCommand = (data) => {
+        data = data.replaceAll("$1", App.Combat.Target)
+        data = data.replaceAll("$wpon", App.Core.Weapon.OnCommand())
+        data = data.replaceAll("$wpoff", App.Core.Weapon.OffCommand())
+        return data
+    }
     App.Core.Combat.DoCombat = function (id, data) {
+        App.Combat.Target = id
         App.Core.Combat.FilterActions("#before").forEach(action => {
-            App.Send(action.Data.replaceAll("$1", App.Combat.Target))
+            App.Send(App.Core.Combat.ReplaceCommand(action.Data))
         })
-
+        let commands = []
         if (data.Command) {
-            App.Send(data.Command)
+            commands.push(data.Command)
         } else if (id) {
-            App.Send("kill " + id)
+            commands.push("kill " + id)
         }
         App.Core.Combat.FilterActions("#start").forEach(action => {
-            App.Send(action.Data.replaceAll("$1", App.Combat.Target))
+            commands.push(App.Core.Combat.ReplaceCommand(action.Data))
         })
+        App.Send(commands.join(";"), data.KillInGroup)
         App.Send(checkCombatCmd)
         App.Combat.Start(id, data)
     }

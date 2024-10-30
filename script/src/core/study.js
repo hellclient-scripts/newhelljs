@@ -366,6 +366,33 @@
 
     }
     App.Core.Study.Load()
+    App.Core.Study.SetLearn = (type, skill, from, loc) => {
+        let lines = GetVariable("study").split("\n")
+        if (lines.length == 1 && lines[0] == "") {
+            lines = []
+        }
+        lines.unshift(skill + "||" + type + "|" + from + "|" + loc + "||")
+        SetVariable("study", lines.join("\n"))
+        App.ReloadVariable()
+    }
+    App.Core.Study.SetTeacher = (id, loc) => {
+        let lines = GetVariable("study").split("\n")
+        if (lines.length == 1 && lines[0] == "") {
+            lines = []
+        }
+        let matched = false
+        lines.forEach((val, index) => {
+            if (val.trim().startsWith("#teacher ")) {
+                lines[index] = "#teacher " + id + "@" + loc
+                matched = true
+            }
+        })
+        if (!matched) {
+            lines.push("#teacher " + id + "@" + loc)
+        }
+        SetVariable("study", lines.join("\n"))
+        App.ReloadVariable()
+    }
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
             return function () {

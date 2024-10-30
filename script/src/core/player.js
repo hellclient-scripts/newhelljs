@@ -374,5 +374,8 @@
         checkerSkills.Force()
         checkerJifa.Force()
     })
-
+    App.Core.GetMaxExp = () => {
+        let expmax = GetVariable("max_exp").trim()
+        return (expmax && !isNaN(expmax)) ? expmax - 0 : 0
+    }
 })(App)

@@ -15,7 +15,7 @@ var onDisconnected = function () {
 }
 
 var onAssist = function () {
-
+    App.RaiseEvent(new App.Event("assist").WithType("system"))
 }
 
 var onBroadcast = function (msg, global, channel) {
@@ -27,7 +27,7 @@ var onResponse = function (type, id, data) {
 var onkeyup = function (key) {
 
 }
-var onFocus=function(){
+var onFocus = function () {
     App.RaiseEvent(new App.Event("onfocus").WithType("system"))
 }
 NoteJSON = function (data) {

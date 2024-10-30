@@ -188,29 +188,37 @@
         App.Send(App.Core.Weapon.UnwieldAllCommand(data))
     })
 
-    App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context,exclude) {
-        for(var index in App.Core.Weapon.Duration){
-            if (App.Core.Weapon.Duration[index]<App.Params.WeaponDurationMin){
-                let repair=App.Core.Weapon.Repair[index-0]
-                if (repair){
-                    return function(){
+    App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        for (var index in App.Core.Weapon.Duration) {
+            if (App.Core.Weapon.Duration[index] < App.Params.WeaponDurationMin) {
+                let repair = App.Core.Weapon.Repair[index - 0]
+                if (repair) {
+                    return function () {
                         App.Commands.PushCommands(
                             App.NewPrepareMoneyCommand(repair.Gold),
                             App.Move.NewToCommand(App.Params.LocRepair),
-                            App.Commands.NewDoCommand("repair "+repair.ID),
-                            App.Commands.NewDoCommand("repair "+repair.ID),
-                            App.Commands.NewFunctionCommand(()=>{
+                            App.Commands.NewDoCommand("repair " + repair.ID),
+                            App.Commands.NewDoCommand("repair " + repair.ID),
+                            App.Commands.NewFunctionCommand(() => {
                                 checkerDuration.Force()
                                 App.Next()
                             }),
                             App.NewNobusyCommand(),
                         )
                         App.Next()
-        
+
                     }
                 }
             }
         }
         return null
     }))
+    App.Engine.SetFilter("core.needweapon", function (event) {
+        if (App.Map.Room.ID) {
+            App.Core.Stage.Raise("wpon-" + App.Map.Room.ID)
+        }
+        App.Send("#wpon")
+        App.RaiseEvent(event)
+    })
+
 })(App)

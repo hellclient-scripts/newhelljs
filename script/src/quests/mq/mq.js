@@ -12,6 +12,7 @@ $.Module(function (App) {
         Die = false
         Fled = false
         First = true
+        NotKilled = true
         Info = []
         Farlist = null
         Flee() {
@@ -253,7 +254,7 @@ $.Module(function (App) {
         }
         if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name).First()) {
             $.Insert(
-                $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat)),
+                $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat).WithKillInGroup(MQ.Data.NPC.NotKilled)),
                 $.Function(() => {
                     if (!(MQ.Data.NPC.Died || MQ.Data.NPC.Fled)) {
                         $.Append($.Function(MQ.KillNear))
@@ -347,10 +348,14 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(matcherHelper, function (tri, result) {
-                if (MQ.Data.NPC && result[1] != MQ.Data.NPC.Name) {
-                    return
+                if (MQ.Data.NPC) {
+                    if (result[1] == MQ.Data.NPC.Name) {
+                        MQ.Data.NPC.NotKilled = false
+                    } else {
+                        return
+                    }
+                    return true
                 }
-                return true
             }).WithName("helper")
         },
         (result) => {

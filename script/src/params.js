@@ -28,7 +28,6 @@
         IDPass: "",
         NumDazuo: 0,
         NumTuna: 0,
-        ExpMax: 0,
         WeaponDurationMin: 40,
         ReloginDelay: 120000,
     }

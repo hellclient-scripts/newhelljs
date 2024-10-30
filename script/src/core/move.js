@@ -38,9 +38,11 @@
         return App.Map.NewRoute(new App.Map.Movement.Ordered(rooms), ...initers)
     }
     App.Move.LongtimeStepDelay = 60 * 1000
+    App.Move.RetryStep = false
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
+            App.Move.RetryStep = false
             let tt = task.AddTimer(App.Map.StepTimeout, function (timer) {
                 return App.Map.OnStepTimeout()
             }).WithName("timeout")
@@ -48,10 +50,16 @@
                 tt.Reset(App.Move.LongtimeStepDelay)
                 return true
             })
+
+            task.AddCatcher("core.retrymove", function () {
+                App.Move.RetryStep = true
+                return true
+            })
             task.AddCatcher("core.wrongway").WithName("wrongway")
             task.AddCatcher("core.walkbusy").WithName("walkbusy")
             task.AddCatcher("core.walkresend").WithName("walkresend")
             task.AddCatcher("core.walkretry").WithName("walkretry")
+            task.AddCatcher("core.walkfail").WithName("walkfail")
             task.AddCatcher("core.blocked", (catcher, event) => {
                 catcher.WithData(event.Data)
             }).WithName("blocked")
@@ -66,6 +74,10 @@
                         case "timeout":
                             break
                         case "wrongway":
+                            if (App.Move.RetryStep) {
+                                App.Map.Resend(0)
+                                return
+                            }
                             App.Map.Room.ID = ""
                             App.Map.Retry()
                             break
@@ -83,6 +95,9 @@
                             break
                         case "needrest":
                             App.Move.NeedReset()
+                            break
+                        case "walkfail":
+                            App.Move.OnWalkFail()
                             break
                     }
             }
@@ -102,6 +117,9 @@
         App.Next()
 
     }
+    App.Move.OnWalkFail = function (name) {
+        App.Core.Blocker.BlockStepRetry()
+    }
     App.Move.OnBlocker = function (name) {
         App.Core.Blocker.KillBlocker(name)
     }
@@ -113,7 +131,7 @@
     mapModule.DefaultOnFinish = function (move, map) {
         App.Next()
     }
-    mapModule.DefaultOnCancel= function (move, map) {
+    mapModule.DefaultOnCancel = function (move, map) {
         App.Fail()
     }
     App.Move.NewToCommand = function (target, ...initers) {

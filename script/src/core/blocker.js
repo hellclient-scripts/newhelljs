@@ -30,6 +30,18 @@
             }
         }
     })
+    App.Core.Blocker.BlockStepRetry = () => {
+        if (App.Map.Move) {
+            if (App.Map.Room.ID) {
+                let step = App.Map.Move.GetLastStep()
+                if (step.Target) {
+                    App.Core.Blocker.Block(App.Map.Room.ID, step.Target)
+                }
+            }
+            App.Map.InitTags()
+            App.Map.Retry()
+        }
+    }
     App.Core.Blocker.KillBlocker = (name, from, to) => {
         let npc = App.Core.Blocker.Npcs[name]
         Note(name + "拦路")
@@ -45,16 +57,7 @@
             App.Next()
             return
         } else {
-            if (App.Map.Move) {
-                if (App.Map.Room.ID) {
-                    let step = App.Map.Move.GetLastStep()
-                    if (step.Target) {
-                        App.Core.Blocker.Block(App.Map.Room.ID, step.Target)
-                    }
-                }
-                App.Map.InitTags()
-                App.Map.Retry()
-            }
+            App.Core.Blocker.BlockStepRetry()
         }
     }
 })(App)

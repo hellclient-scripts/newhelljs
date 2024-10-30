@@ -3,10 +3,6 @@
     let mapModule = App.RequireModule("helllibjs/map/map.js")
 
     App.Core.Room = {}
-    App.Data.Room = {}
-    App.Data.Room.Name = ""
-    App.Data.Room.Objects = new objectModule.List()
-    App.Data.Room.Exits = []
     App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
@@ -29,7 +25,6 @@
     App.Core.Room.OnExit = function (event) {
         event.Context.Propose(function () {
             let result = [...event.Data.Wildcards[1].matchAll(reExit)].map(data => data[0]).sort()
-            // App.Data.Room.Exits = result
             App.Map.Room.WithExits(result)
             App.RaiseEvent(new App.Event("room.onexit"))
             PlanOnExit.Execute()

@@ -1073,6 +1073,68 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g0nv3tsp0vip6o9bfl5"
+  Name = "core.needweapon"
+  Enabled = true
+  Match = "^(要刺墙不用家伙恐怕不行吧！)$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.FilterLineEvent(\"core.needweapon\",\"core.retrymove\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g0oicq0o5k0m6o9bhnr"
+  Name = "core.walkfail"
+  Enabled = true
+  Match = "^(你看着奔腾不息的白河，心里有点紧张，不敢乱来。|你觉得河面太宽，没有十足的把握跃过去。|你看着浩瀚的太湖，心里不禁打了个突，没敢乱来。|你觉得湖面太宽，没有十足的把握跃过去。)$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.walkfail\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -1235,6 +1297,29 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g0pbuokoia176o9brv2"
+  Name = "noob2"
+  Enabled = true
+  Match = "#noob2"
+  Send = "#start maxexp 2000>>tiejiang||maxexp 10000>>peiyao||!yueli 20>>beiqi||maxexp 29999>>letter||!yueli 2000>>beiqi||fish"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true
@@ -1303,7 +1388,7 @@ Timers = []
 [[RequiredParams]]
   Name = "combat"
   Desc = "战斗指令"
-  Intro = "战斗指令,参考：\n\n#start #wpon\nyun recover\nperform sword.kuang $1"
+  Intro = "有$1(对象),$wpon(装备武器),$wpoff(卸装备指令）3个变量\n有#before,#start,#send(默认)三种指令\n\n战斗指令,参考：\n#before yun recover\n#start $wpon\n#start perform sword.kuang $1\nyun recover\nperform sword.kuang\n\n或\n#before yun regenerate;hand bow\n#start shot $1 with arrow\nyun recover\nshot $1 with arrow"
 
 [[RequiredParams]]
   Name = "command"
@@ -1318,7 +1403,7 @@ Timers = []
 [[RequiredParams]]
   Name = "items"
   Desc = "物品配置"
-  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nlong word * 2"
+  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nfire\nlong sword\nlong bow\narrow * 30"
 
 [[RequiredParams]]
   Name = "max_exp"

@@ -180,5 +180,14 @@
         )
         uq.Commands.Next()
     })
+    App.Zone.NPCs = {}
+    App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {
+        App.Zone.NPCs[data[0]] = {
+            Key: data[0],
+            Name: data[1],
+            Loc: data[2],
+            ID: data[3],
+        }
+    })
 
 })(App)
