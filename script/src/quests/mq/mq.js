@@ -553,8 +553,7 @@ $.Module(function (App) {
     Quest.OnReport = () => {
         let eff = MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) + "个/小时" : "-"
         let rate = MQ.Data.kills > 3 ? (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(0) + "%" : "-"
-        let duration = MQ.Data.start ? App.HUD.UI.FormatTime($.Now() - MQ.Data.start) : "-"
-        return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 时长:${duration} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
+        return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
     }
     let matcherreward = /^通过这次锻炼，你获得了/
     let planQuest = new App.Plan(App.Quests.Position,
@@ -587,5 +586,14 @@ $.Module(function (App) {
         planQuest.Execute()
         MQ.Prepare()
     }
+    App.BindEvent("core.queststart", (e) => {
+        MQ.Data = {
+            kills: 0,
+            helpded: 0,
+            start: null,
+            current: null,
+            eff: 0,
+        }
+    })
     App.Quests.Register(Quest)
 })

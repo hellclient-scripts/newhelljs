@@ -45,14 +45,20 @@ $.Module(function (App) {
         ]
     }
     Quest.OnReport = () => {
-        let all = App.Core.Study.AllCanLian().map(v => v.SkillID)
+        let all = App.Core.Study.AllCanLian().map(v => `${v.SkillID}(${App.Data.Player.Skills[v.SkillID] ? App.Data.Player.Skills[v.SkillID]["等级"] : 0})`)
         return [`练习进度 (${all.length}/${App.Core.Study.Lian.length}):${all.join(",")}`]
     }
-    Quest.Start = function () {
+    Quest.GetReady = function (q, data) {
         if ((GetVariable("jifa") || "").trim() == "") {
             PrintSystem("未设置jifa变量，不能自动练功")
             return
         }
+        if (App.Core.Study.AllCanLian().length > 0) {
+            return () => { Quest.Start(data) }
+        }
+        return null
+    }
+    Quest.Start = function () {
         Lian.Start()
     }
     App.Quests.Register(Quest)

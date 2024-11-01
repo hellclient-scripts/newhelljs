@@ -1,7 +1,6 @@
 (function (app) {
     let module = {}
     module.Sep = /\|\||\n/
-
     module.DefaultParser = function (quests, line) {
         let result = []
         let data = line.split(module.Sep)
@@ -28,6 +27,14 @@
         });
         return result
     }
+    class Ready {
+        constructor(rq, execute) {
+            this.RunningQuest = rq
+            this.Execute = execute
+        }
+        RunningQuest = null
+        Execute = null
+    }
     let DefaultOnHUD = () => {
         return null
     }
@@ -36,6 +43,11 @@
     }
     let DefaultOnReport = () => {
         return null
+    }
+    let DefaultGetReady = (quest, data) => {
+        return () => {
+            quest.Start(data)
+        }
     }
     let DefaultOnStart = (quests) => {
 
@@ -60,6 +72,7 @@
         Intro = ""
         Help = ""
         Start = null
+        GetReady = DefaultGetReady
         OnHUD = DefaultOnHUD
         OnSummary = DefaultOnSummary
         OnReport = DefaultOnReport
@@ -70,7 +83,7 @@
     class RunningQuest {
         constructor() { }
         ID = ""
-        Param = ""
+        Data = ""
         Checker = DefaultChecker
     }
     class Quests {
@@ -89,7 +102,6 @@
         Commands = null
         Conditions = null
         Queue = []
-        Remain = []
         Delay = 1000
         Stopped = true
         Parser = module.DefaultParser
@@ -113,16 +125,43 @@
             if (quests.length) {
                 this.Stopped = false
                 this.Queue = quests
-                this.Remain = [...this.Queue]
                 this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             }
             this.OnStart(this)
             this.Commands.Next()
         }
         Restart() {
-            this.Remain = [...this.Queue]
             this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             this.Commands.Next()
+        }
+        GetReady() {
+            for (let i in this.Queue) {
+                let r = this.Queue[i]
+                let q = this.#registered[r.ID]
+                if (q == null) {
+                    throw new Error("Quest " + r.ID + " not found")
+                }
+                if (q && !q.InCooldown() && r.Checker()) {
+                    let exe = q.GetReady(q, r.Data)
+                    if (exe) {
+                        return new Ready(r, exe)
+                    }
+                }
+            }
+            return null
+        }
+        ExecuteReady(ready) {
+            if (ready) {
+                this.Commands.PushCommands(
+                    this.Commands.NewFunctionCommand(() => {
+                        ready.Execute()
+                    }),
+                    this.Commands.NewFunctionCommand(() => {
+                        this.Loop()
+                    })
+                )
+            }
+            App.Next()
         }
         Next() {
             if (this.Stopped) {
@@ -132,29 +171,14 @@
                 return
             }
             this.Position.StartNewTerm()
-            while (this.Remain.length) {
-                let r = this.Remain.shift()
-                if (this.#registered[r.ID] && !this.#registered[r.ID].InCooldown() && r.Checker()) {
-                    this.Commands.PushCommands(
-                        this.Commands.NewFunctionCommand(() => {
-                            let q = this.#registered[r.ID]
-                            if (q == null) {
-                                throw new Error("Quest " + r.ID + " not found")
-                            }
-                            q.Start(r.Data)
-                        }),
-                        this.Commands.NewFunctionCommand(() => {
-                            this.Loop()
-                        })
-                    )
-                    App.Next()
-                    return
-                }
+            let ready = this.GetReady()
+            if (ready) {
+                this.ExecuteReady(ready)
+                return
             }
             this.Loop()
         }
         Loop() {
-            this.Remain = [...this.Queue]
             this.Commands.PushCommands(
                 this.Commands.NewWaitCommand(this.Delay),
                 this.#nextcommand,

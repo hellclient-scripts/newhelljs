@@ -3,7 +3,7 @@
     App.UI.Assist.Show = () => {
         var status = App.Quests.Stopped ? "已停止" : "正在进行"
         var list = Userinput.newlist("助理", "当前任务" + status + ",请选择你需要的帮助", false)
-        list.append("report", "运行报告")
+        list.append("report", "工作汇报")
         if (App.Quests.Stopped) {
             if (GetVariable("quest").trim()) {
                 list.append("start", "开始任务")
@@ -71,12 +71,13 @@
         }
     }
     App.UI.Assist.CommonShow = () => {
-        var list = Userinput.newlist("常用任务", "请选择你的要执行的常用任务", false)
+        var list = Userinput.newlist("常用任务", "请选择你的要执行的常用任务", true)
         list.append("#lianskill", "#lianskill 根据lian变量设置练功，需要设置好jifa指令")
         list.append("#beiqi", "#beiqi 备齐任务")
         list.append("#liandan", "#liandan 北京炼丹")
         list.append("#noob", "#noob 新人一条龙任务，需要拜师")
         list.append("#noob2", "#noob2 新人一条龙继续钓鱼版本")
+        list.append("#eatlu", "#eatlu 去pkd吃身上的magic water")
         list.publish("App.UI.Assist.CommonOnClick")
     }
     App.UI.Assist.CommonOnClick = (name, id, code, data) => {
@@ -165,7 +166,7 @@
     App.UI.Assist.ParamsShow = () => {
         var list = Userinput.newlist("系统参数设置", "请选择你要设置的参数,搜索=显示已设置参数", true)
         App.NamedParams.Params.forEach((p) => {
-            let val = App.Core.Params.Data[p.ID] ? "=" + App.Core.Params.Data[p.ID] : "未设置"
+            let val = App.Core.Params.Data[p.ID] ? "=" + App.Core.Params.Data[p.ID] : "未设置，默认" + App.Params[p.ID]
             list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
         })
         list.publish("App.UI.Assist.NPCOnView")

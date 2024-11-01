@@ -28,3 +28,55 @@ yangjing dan|yangjing dan|养精丹|buy|65|buy 养精丹 from yaopu huoji|
 chan|chan|朱睛冰蟾|buy|2879|buy chan from wang dagui|1000
 diao gan 2|diao gan|钓竿|buy|269|buy 钓竿 from liu laoshi
 yu er|yu er|鱼饵|buy|269|buy 100 鱼饵 from liu laoshi
+
+xiongdan|xiongdan|熊胆|buy|65|buy 熊胆 from ping yizhi|1
+honghua|honghua|红花|buy|65|buy 红花 from ping yizhi|
+danggui|danggui|当归|buy|65|buy 当归 from ping yizhi|1
+lingzhi|lingzhi|灵芝|buy|65|buy 灵芝 from ping yizhi|2
+shedan|shedan|蛇胆|buy|65|buy 蛇胆 from ping yizhi|
+qian jinzi|qian jinzi|千金子|buy|65|buy 千金子 from ping yizhi|
+da huang|da huang|大黄|buy|65|buy 大黄 from ping yizhi|
+niu huang|niu huang|牛黄|buy|65|buy 牛黄 from ping yizhi|
+juhua|juhua|菊花|buy|65|buy 菊花 from ping yizhi|
+teng huang|teng huang|藤黄|buy|65|buy 藤黄 from ping yizhi|
+xiong huang|xiong huang|雄黄|buy|65|buy 雄黄 from ping yizhi|
+lurong|lurong|鹿茸|buy|65|buy 鹿茸 from ping yizhi|1
+ma huang|ma huang|麻黄|buy|65|buy 麻黄 from ping yizhi|
+lanhua|lanhua|兰花|buy|65|buy 兰花 from ping yizhi|
+du huo|du huo|独活|buy|65|buy 独活 from ping yizhi|
+yuan zhi|yuan zhi|远志|buy|65|buy 远志 from ping yizhi|
+fang feng|fang feng|防风|buy|65|buy 防风 from ping yizhi|
+sha dan|sha dan|鲨胆|buy|65|buy 鲨胆 from ping yizhi|1
+xiefen|xiefen|蝎粉|buy|65|buy 蝎粉 from ping yizhi|
+ru xiang|ru xiang|乳香|buy|65|buy 乳香 from ping yizhi|
+renshen|renshen|人参|buy|65|buy 人参 from ping yizhi|1
+shouwu|shouwu|何首乌|buy|65|buy 何首乌 from ping yizhi|1
+yan wo|yan wo|燕窝|buy|65|buy 燕窝 from ping yizhi|5
+zhenzhu fen|zhenzhu fen|珍珠粉|buy|65|buy 珍珠粉 from ping yizhi|1
+hu gu|hu gu|虎骨|buy|65|buy 虎骨 from ping yizhi|1
+xuelian|xuelian|雪莲|buy|65|buy 雪莲 from ping yizhi|3
+ha fen|ha fen|蛤粉|buy|65|buy 蛤粉 from ping yizhi|
+xuejie|xuejie|血竭|buy|65|buy 血竭 from ping yizhi|
+shan jia|shan jia|山甲|buy|65|buy 山甲 from ping yizhi|
+tu gou|tu gou|土狗|buy|65|buy 土狗 from ping yizhi|
+yang jinhua|yang jinhua|洋金花|buy|65|buy 洋金花 from ping yizhi|
+chenpi|chenpi|陈皮|buy|65|buy 陈皮 from ping yizhi|
+wu lingzhi|wu lingzhi|五灵脂|buy|65|buy 五灵脂 from ping yizhi|
+tao xian|tao xian|桃仙|buy|65|buy 桃仙 from ping yizhi|
+ling xian|ling xian|灵仙|buy|65|buy 灵仙 from ping yizhi|
+zihua|zihua|紫花|buy|65|buy 紫花 from ping yizhi|
+gan shiliu|gan shiliu|干石榴|buy|65|buy 干石榴 from ping yizhi|
+chai hu|chai hu|柴胡|buy|65|buy 柴胡 from ping yizhi|
+niu xi|niu xi|牛膝|buy|65|buy 牛膝 from ping yizhi|
+shenglong gu|shenglong gu|生龙骨|buy|65|buy 生龙骨 from ping yizhi|
+shancha|shancha|山茶花|buy|65|buy 山茶花 from ping yizhi|
+chuanwu|chuanwu|川乌|buy|65|buy 川乌 from ping yizhi|
+gui wei|gui wei|归尾|buy|65|buy 归尾 from ping yizhi|
+moyao|moyao|没药|buy|65|buy 没药 from ping yizhi|
+xi jiao|xi jiao|犀角|buy|65|buy 犀角 from ping yizhi|1
+shengdi|shengdi|生地|buy|65|buy 生地 from ping yizhi|
+tianqi|tianqi|田七|buy|65|buy 田七 from ping yizhi|
+su mu|su mu|苏木|buy|65|buy 苏木 from ping yizhi|
+fu zi|fu zi|附子|buy|65|buy 附子 from ping yizhi|
+yanbo|yanbo|研钵|buy|65|buy 研钵 from ping yizhi|
+> 

@@ -4,6 +4,7 @@
     App.Core.Stage.Stance = ""
     App.Core.Stage.ChangeStance = function (s) {
         if (App.Core.Stage.Stance != s) {
+            App.Core.Stage.Raise("stanceleave-" + App.Core.Stage.Stance)
             App.Core.Stage.Stance = s
             App.Core.Stage.Raise("stance-" + s)
         }

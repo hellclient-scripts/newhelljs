@@ -1459,6 +1459,52 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g0u6u99b30a458p2nc"
+  Name = ""
+  Enabled = true
+  Match = "#eatlu"
+  Send = "#start eatlu||stop"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1g0uc1ifh5v6g58p3is"
+  Name = ""
+  Enabled = true
+  Match = "#danyumo"
+  Send = "#start fangqi||maxexp 2000>>tiejiang||maxexp 10000>>peiyao"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true

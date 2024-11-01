@@ -7,8 +7,11 @@
     App.Include("src/quests/job/peiyao.js")
     App.Include("src/quests/job/fish.js")
     App.Include("src/quests/san/san.js")
+    App.Include("src/quests/makeyao/makeyao.js")
     App.Include("src/quests/lianskill/lianskill.js")
+    App.Include("src/quests/eatlu/eatlu.js")
     App.Include("src/quests/misc/quit.js")
     App.Include("src/quests/misc/stop.js")
+    App.Include("src/quests/misc/fangqi.js")
 
 })(App)

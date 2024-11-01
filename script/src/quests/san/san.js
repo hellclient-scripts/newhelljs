@@ -175,7 +175,7 @@ $.Module(function (App) {
                 return true
             })
 
-            
+
 
             App.Sync()
         },
@@ -330,14 +330,24 @@ $.Module(function (App) {
     Quest.OnReport = () => {
         return [`San-${San.Data.WeaponName}(${San.Data.Weapon}) 次数:${San.Data.Times}`]
     }
-
-    Quest.Start = function (data) {
+    Quest.GetReady = function (q, data) {
         let weapon = data.trim()
         if (weapon == "") {
             PrintSystem("未指定要san的武器")
             return
         }
-        San.Data.Weapon = weapon
+        if (San.Data.Weapon != weapon) {
+            San.Data.Weapon = weapon
+            San.Data.WeaponName = ""
+            San.Data.Finished = false
+        }
+        if (!San.Data.Finished) {
+            return () => { Quest.Start(data) }
+        }
+        return null
+    }
+
+    Quest.Start = function (data) {
         San.Start()
     }
     App.Quests.Register(Quest)

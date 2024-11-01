@@ -11,7 +11,7 @@
             report.push(`内力可提升${maxneili - neili} ,折天香玉露 ${lu} 个`)
         }
         report.push(`经验:${App.Data.Player.HP["经验"] || "0"} 潜能:${App.Data.Player.HP["潜能"] || "0"} 体会:${App.Data.Player.HP["体会"] || "0"} 阅历:${App.Data.Player.Score["阅历"] || "-"}`)
-        report.push(`门贡:${App.Data.Player.Score["门贡" || 0]}`)
+        report.push(`门贡:${App.Data.Player.Score["门贡"] || 0}`)
 
         report.push(`存款:${App.Data.Player.Score["存款" || 0]} 债券:${App.Data.Player.Score["债券" || 0]}`)
         report.push(`打坐位置:${App.Params.LocDazuo} 睡觉位置:${App.Params.LocSleep} 掌门ID:${App.Params.MasterID || "-"} 掌门位置:${App.Params.LocMaster || "-"}`)
@@ -28,11 +28,16 @@
             }
         }
         if (App.Core.Study.Learn.length) {
-            let all = App.Core.Study.AllCanLearn().map(v => v.SkillID)
+            let all = App.Core.Study.AllCanLearn().map(v => `${v.SkillID}(${App.Data.Player.Skills[v.SkillID] ? App.Data.Player.Skills[v.SkillID]["等级"] : 0})`)
             report.push(`学习进度 (${all.length}/${App.Core.Study.Learn.length}):`)
             report.push(`  ${all.join(",")}`)
         }
         let quests = App.Core.Quest.Current ? App.Core.Quest.Current.replaceAll("\n", "||") : "无任务"
+        if (!App.Core.Quest.Stopped) {
+            let duration = App.HUD.UI.FormatTime($.Now() - App.Core.Quest.StartedAt)
+            report.push(`任务已经持续了${duration}。`)
+        }
+
         report.push(`当前任务:`)
         report.push(`  ${quests}`)
         if (App.Core.Quest.Current) {
@@ -77,6 +82,6 @@
             report.push(`无乾坤袋`)
         }
 
-        Userinput.Note("", "状态报告", report.join("\n"))
+        Userinput.Note("", "工作汇报", report.join("\n"))
     }
 })(App)

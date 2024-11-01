@@ -39,13 +39,13 @@
         return str
     }
     module.FormatTime = (time) => {
-        if (time > 86400000) {
+        if (time > 432000000) {
             return Math.floor(time / 86400000) + "天"
         }
-        if (time > 3600000) {
+        if (time > 18000000) {
             return Math.floor(time / 3600000) + "小时"
         }
-        if (time > 60000) {
+        if (time > 300000) {
             return Math.floor(time / 60000) + "分钟"
         }
         if (time > 1000) {
