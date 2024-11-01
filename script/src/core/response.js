@@ -1,6 +1,7 @@
 (function (App) {
 
     let checkbusy = function (delay, offset, cb) {
+        let nobusy = false
         delay = delay - 0
         if (isNaN(delay) || delay <= 0) {
             delay = 1000
@@ -10,20 +11,30 @@
             offset = 0
         }
         let task = App.Positions["Connect"].AddTask(function (result) {
-            if (result.Name == "nobusy") {
+            if (result.Name == "sync") {
                 App.Positions["Response"].StartNewTerm()
                 if (cb) {
                     cb()
                 }
             }
         })
-        task.AddTimer(delay, function () {
+        var timer = task.AddTimer(delay, function () {
             App.Send("bai")
             return true
         }).Reset(offset)
         task.AddTrigger("指令格式：apprentice | bai [cancel]|<对象>", function () {
             OmitOutput()
-        }).WithName("nobusy")
+            if (!nobusy) {
+                nobusy = true
+                timer.Enable(false)
+                App.Send("mail")
+            }
+            return true
+        })
+        task.AddTrigger("此服务已经暂停。", function () {
+            OmitOutput()
+        }).WithName("sync")
+
         App.Send("bai")
     }
     let sync = function (cb) {
@@ -43,8 +54,8 @@
     App.Sync = function (cb) {
         sync(cb)
     }
-    App.CheckBusy=checkbusy
-    
+    App.CheckBusy = checkbusy
+
     App.Commands.RegisterExecutor("nobusy", function (commands, running) {
         running.OnStart = function (arg) {
             checkbusy(running.Command.Data.Delay, running.Command.Data.Offset, function () { App.Next() })

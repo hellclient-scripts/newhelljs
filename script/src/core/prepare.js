@@ -35,6 +35,24 @@
         return App.Commands.NewFunctionCommand(() => { App.PrepareMoney(num) })
     }
     let eventBeforeCheck = new App.Event("core.beforecheck")
+    App.Check = () => {
+        App.RaiseEvent(eventBeforeCheck)
+        let checks = App.Checker.Check()
+        if (checks.length == 0) {
+            App.Next()
+            return
+        }
+        App.PushCommands(
+            App.Commands.NewFunctionCommand(function () {
+                checks.forEach(check => {
+                    check()
+                });
+                App.Next()
+            }),
+            App.NewSyncCommand(),
+        )
+        App.Next()
+    }
     App.Prepare = function (id, context) {
         App.RaiseEvent(eventBeforeCheck)
         let checks = App.Checker.Check()

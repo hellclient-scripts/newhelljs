@@ -39,6 +39,7 @@
         Finished = false
         Stack = ""
         StartedAt = 0
+        Data = null
         Callback = null
         #timers = []
         #triggers = []
@@ -208,9 +209,11 @@
                 offset = 0
             }
             this.Last = (new Date).getTime() + offset
+            return this
         }
         Enable(e) {
             this.Enabled = (e == true)
+            return this
         }
         OnTime() {
             if (this.Enabled) {
@@ -332,24 +335,25 @@
             this.Term = new Term()
             this.OnTermStart(this)
         }
-        Snap(){
-            let term=this.Term
-            this.Term=new Term()
+        Snap() {
+            let term = this.Term
+            this.Term = new Term()
             return term
         }
-        Rollback(snap){
-            if (snap==null){
+        Rollback(snap) {
+            if (snap == null) {
                 return
             }
-            let term=this.Term
-            this.Term=snap
+            let term = this.Term
+            this.Term = snap
             return term
         }
         StartNewTerm() {
-            this.Term.End()
+            let term=this.Term//避免在cancel的处理中绑定到老的Term
             this.Term = new Term()
+            term.End()
         }
-        Discard(){
+        Discard() {
             this.Term = new Term()
         }
         AddTimer(duration, callback, disabled, norepeat) {

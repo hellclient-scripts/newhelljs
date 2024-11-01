@@ -32,13 +32,29 @@
         }
     }
     let reDruation = /^耐 久 值 :\s*(\d+)\/\d+\s*$/
+    let reLevel = /^(.+)的等级：(\d+)\/(\d+)$/
+    let reDamage = /^装备效果 : 兵器伤害力 \+(\d+)$/
+
     let PlanDuation = new App.Plan(App.Positions["Connect"],
         function (task) {
             App.Core.Weapon.Duration = {}
             let current = null
+            let duration = null
+            let level = null
+            let damage = null
+            let name = null
+            task.AddTrigger(reLevel, function (trigger, result) {
+                name = result[1]
+                level = result[2] - 0
+                return true
+            })
+            task.AddTrigger(reDamage, function (trigger, result) {
+                damage = result[1]
+                return true
+            })
             task.AddTrigger(reDruation, function (trigger, result) {
                 if (current != null) {
-                    App.Core.Weapon.Duration[current] = result[1] - 0
+                    duration = result[1] - 0
                 }
                 return true
             })
@@ -46,11 +62,31 @@
                 current = null
                 return true
             })
+            let setduration=()=>{
+                if (current != null) {
+                    let repair = App.Core.Weapon.Repair[current - 0]
+                    App.Core.Weapon.Duration[current] = {
+                        ID: repair ? repair.ID : "",
+                        Duration: duration,
+                        Damage: damage,
+                        Name: name,
+                        Level: level,
+                    }
+                }
+
+            }
             task.AddCatcher("core.echo.core.weapon.duration", function (catcher, event) {
+                setduration()
+                duration = null
+                level = null
+                damage = null
+                name = null
                 current = event.Data
                 return true
             })
-            task.AddCatcher("core.echo.core.weapon.duration.end")
+            task.AddCatcher("core.echo.core.weapon.duration.end",function(){
+                setduration()
+            })
             App.Core.Weapon.Repair.forEach((repair, index) => {
                 App.Echo("core.weapon.duration", "" + index)
                 App.Send("l " + repair.ID + " of me")
@@ -190,7 +226,7 @@
 
     App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
         for (var index in App.Core.Weapon.Duration) {
-            if (App.Core.Weapon.Duration[index] < App.Params.WeaponDurationMin) {
+            if (App.Core.Weapon.Duration[index].Duration < App.Params.WeaponDurationMin) {
                 let repair = App.Core.Weapon.Repair[index - 0]
                 if (repair) {
                     return function () {

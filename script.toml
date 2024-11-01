@@ -1108,7 +1108,7 @@ Timers = []
   ID = "d1g0oicq0o5k0m6o9bhnr"
   Name = "core.walkfail"
   Enabled = true
-  Match = "^(你看着奔腾不息的白河，心里有点紧张，不敢乱来。|你觉得河面太宽，没有十足的把握跃过去。|你看着浩瀚的太湖，心里不禁打了个突，没敢乱来。|你觉得湖面太宽，没有十足的把握跃过去。)$"
+  Match = "^(你看着奔腾不息的白河，心里有点紧张，不敢乱来。|你觉得河面太宽，没有十足的把握跃过去。|你看着浩瀚的太湖，心里不禁打了个突，没敢乱来。|你觉得湖面太宽，没有十足的把握跃过去。|你想把门推开，却发觉门被人从里面闩上了。)$"
   Send = ""
   ColourChangeType = 0
   Colour = 0
@@ -1116,6 +1116,99 @@ Timers = []
   SoundFileName = ""
   SoundIfInactive = false
   Script = "App.LineEvent(\"core.walkfail\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g0ra5fkjq1th58bvj2"
+  Name = "core.login"
+  Enabled = true
+  Match = "^目前共有.+位巫师、.+位玩家在线上，以及.+位使用者尝试连线中。$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.login\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = false
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g0ruqf4sfiqq58e2g0"
+  Name = "core.skillimproved"
+  Enabled = true
+  Match = "你的.+进步了！"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.skillimproved\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = false
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g0sk3d79l8oa58hoed"
+  Name = "core.pkdroomname"
+  Enabled = true
+  Match = "^(屠人场|宰人场|剁人场|碎尸场|喋血场|毒人场|丧命场|殒命场|送命场|宰人场|诛人场|戮人场)$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.roomname\")"
   SendTo = 0
   Sequence = 100
   ExpandVariables = false
@@ -1162,7 +1255,7 @@ Timers = []
   ID = "d1fv62osn8i7nf726vpqu6"
   Name = "queue"
   Enabled = true
-  Match = "#(to|wait|do|loop|nobusy|sync|search|killin|prepare|kill|wpon|wpoff|unwield|buy|study)((\\s|\\|\\|).*)?$"
+  Match = "#(to|wait|do|loop|nobusy|sync|search|killin|prepare|kill|wpon|wpoff|unwield|buy|study|jifa)((\\s|\\|\\|).*)?$"
   Send = ""
   Script = "App.UserQueue.OnAlias"
   SendTo = 0
@@ -1320,6 +1413,52 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g0rtud72i9te58e03a"
+  Name = ""
+  Enabled = true
+  Match = "#lianskill"
+  Send = "#start lianskill||stop"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1g0sr6pqv9d7h58k938"
+  Name = ""
+  Enabled = true
+  Match = "#san (.+)$"
+  Send = "#start san %1||stop"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true
@@ -1378,7 +1517,7 @@ Timers = []
 [[RequiredParams]]
   Name = "cmd_ride"
   Desc = "骑坐骑的指令"
-  Intro = "比如ride bao-feiji。\n留空则不尝试rideto。\n如果不需要召唤坐骑，可以设为t"
+  Intro = "比如ride bao-feiji。\n留空则不尝试rideto。"
 
 [[RequiredParams]]
   Name = "quest"
@@ -1421,6 +1560,21 @@ Timers = []
   Intro = "格式为\n\n技能ID|学习限制|类型|目标|位置|开始指令|结束指令\n除了技能ID都能省略，类型默认为yanjiu\n技能ID以!开头代表强制优先学习\n可以 #teacher ID@位置的方式设置老师信息\n参考:\n\nsword|180|xue|feng buping|2226|wield sword\nforce|180|xue\nhuashan-xinfa\n!zuoyou-hubo|360|xue|zhou botong|779\n#teacher feng buping@2226"
 
 [[RequiredParams]]
+  Name = "min_pot"
+  Desc = "潜能下限(实时更新,选填)"
+  Intro = ""
+
+[[RequiredParams]]
+  Name = "jifa"
+  Desc = "激发指令(选填，实时生效)"
+  Intro = "用于设置jifa和bei的指令\n用于练习结束后，或者通过#jifa指令手动调用。\n确保使用正确的武功做任务"
+
+[[RequiredParams]]
+  Name = "lian"
+  Desc = "练习指令(选填)"
+  Intro = "一行一个练习内容\n格式同学习指令\n技能ID|学习限制|类型|基本功夫|位置|开始指令|结束指令\n可以通过助理按钮初始化，再调整"
+
+[[RequiredParams]]
   Name = "num_cmds"
   Desc = "每心跳指令数(选填)"
   Intro = "应该是2的倍数，留空默认"
@@ -1441,11 +1595,6 @@ Timers = []
   Intro = "留空从门派自动判断"
 
 [[RequiredParams]]
-  Name = "min_pot"
-  Desc = "潜能下限(实时更新,选填)"
-  Intro = ""
-
-[[RequiredParams]]
   Name = "jiqu"
   Desc = "汲取武道设置(选填)"
   Intro = "设置数字则为最大体会，数字小于等于0不汲取，不设自动设置。\n\n#cmd可以指定多条汲取指令。不设则自动。参考\n\n400\n#cmd jiqu\n#cmd #unwield;#wpon;jiqu sword-cognize"
@@ -1454,3 +1603,8 @@ Timers = []
   Name = "params"
   Desc = "系统参数(选填)"
   Intro = "不要手动设置，通过助理按钮的设置系统参数功能设置。"
+
+[[RequiredParams]]
+  Name = "autorun"
+  Desc = "大米自动执行任务(选填)"
+  Intro = "填写后，机器打开就会自动执行对应的命令。\n\n一般给各种大米用。"

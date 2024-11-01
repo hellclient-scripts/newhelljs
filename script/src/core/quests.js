@@ -17,10 +17,14 @@
         PrintSystem("quest变量为空，未指定任务。")
     }
     App.Quest = {}
+    App.Core.Quest.Current = ""
     App.Core.Quest.Exec = function (line) {
         App.Commands.PushCommands(
             App.Commands.NewFunctionCommand(App.Init),
-            App.Commands.NewFunctionCommand(() => { App.Quests.StartLine(line.trim()) }),
+            App.Commands.NewFunctionCommand(() => {
+                App.Core.Quest.Current = line.trim()
+                App.Quests.StartLine(line.trim())
+            }),
         )
         App.Next()
     }
@@ -32,6 +36,7 @@
         App.RaiseEvent(new App.Event("core.queststart"))
     }
     App.Quests.OnStop = () => {
+        App.Core.Quest.Current = ""
         App.RaiseEvent(new App.Event("core.queststop"))
     }
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("maxexp", function (data, target) {

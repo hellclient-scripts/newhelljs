@@ -1,21 +1,44 @@
 (function (App) {
     App.Core.Connect = {}
-    App.Core.Connect.Next = null
+    App.Core.Connect.Next = (new Date()).getTime() + 1000
+    App.Core.Connect.Entered = false
     App.Core.Connect.CanLogin = function () {
         return !App.Core.Connect.Offline && !App.Core.Emergency.NoLogin && App.Core.Connect.Running()
     }
     App.Core.Connect.OnTime = function () {
-        if (App.Core.Connect.CanLogin() && App.Core.Connect.Next != null && App.Core.Connect.Next <= (new Date()).getTime()) {
-            if (!IsConnected()) {
-                Connect()
-            } else {
-                App.Core.Connect.Login()
-                App.Core.Connect.Next = null
-            }
+        let next = App.Core.Connect.Next
+        if (next == null && App.Core.Connect.GetAutorun()) {
+            next = 0
+        }
+        if (!IsConnected() && App.Core.Connect.CanLogin() && next != null && App.Core.Connect.Next <= (new Date()).getTime()) {
+            Connect()
         }
     }
+    App.Core.Connect.OnLogin = function (event) {
+        if (App.Core.Connect.GetAutorun() && App.Core.Connect.Callback == null) {
+            App.Core.Connect.Callback = App.Core.Connect.DefaultCallback
+        }
+        App.Core.Connect.Entered = false
+        event.Context.Propose(function () {
+            PlanOnConnected.Execute()
+        })
+        if (App.Core.Connect.CanLogin()) {
+            App.Core.Connect.Login()
+            App.Core.Connect.Next = null
+        }
+    }
+    App.BindEvent("core.login", App.Core.Connect.OnLogin)
+    App.Core.Connect.GetAutorun = () => {
+        let autorun = GetVariable("autorun")
+        if (autorun != null) {
+            autorun = autorun.trim()
+        } else {
+            autorun = ""
+        }
+        return autorun
+    }
     App.Core.Connect.Running = function () {
-        return App.Quests.IsStopped() == false
+        return App.Quests.IsStopped() == false || App.Core.Connect.GetAutorun()
     }
     App.Core.Connect.Login = function () {
         Send(GetVariable("id"))
@@ -30,13 +53,24 @@
         App.Commands.PushCommands(
             App.Commands.NewFunctionCommand(App.Core.Emergency.CheckDeath),
             App.NewPrepareCommand(""),
-            App.Commands.NewFunctionCommand(() => {
-                if (!App.Quests.IsStopped()) {
+        )
+        if (!App.Quests.IsStopped()) {
+            App.Commands.Append(
+                App.NewPrepareCommand(""),
+                App.Commands.NewFunctionCommand(() => {
                     Note("重新执行任务队列")
                     App.Quests.Restart()
-                }
-            })
-        )
+                })
+            )
+        } else {
+            let autorun = App.Core.Connect.GetAutorun()
+            App.Commands.Append(
+                App.Commands.NewFunctionCommand(() => {
+                    Note("执行自动任务" + autorun)
+                    Execute(autorun)
+                })
+            )
+        }
         App.Next()
     }
     App.Reconnect = function (delay, callback) {
@@ -50,9 +84,6 @@
         App.Core.Connect.Login()
     }
     App.BindEvent("connected", function (event) {
-        event.Context.Propose(function () {
-            PlanOnConnected.Execute()
-        })
     })
     App.BindEvent("disconnected", function (event) {
         Metronome.Discard(true)
@@ -101,6 +132,7 @@
     App.BindEvent("core.entermud", function () {
         App.Core.Connect.Offline = false
         App.Core.Connect.Next = null
+        App.Core.Connect.Entered = true
         let cb = App.Core.Connect.Callback
         App.Core.Connect.Callback = null
         if (cb) { cb() }

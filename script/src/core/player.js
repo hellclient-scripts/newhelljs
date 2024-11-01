@@ -142,8 +142,9 @@
     var matcherScoreEnd = /^└─+┴─+.+─+┘$/
     var matcherScoreFamily = /^│年龄：(\S+)\s+婚姻：(\S+)\s+│门派：(\S+)\s+│$/
     var matcherScoreBank = /^│钱庄：(\d+)\.\d+\.\d+\s*│帮派：.*│$/
-    var matcherScoreBond = /^│债券：(\S+)\s*│威望：(\d)+\s*│$/
+    var matcherScoreBond = /^│债券：(\S+)\s*│威望：(\d+)\s*│$/
     var matcherScoreYueli = /^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
+    var matcherScoreMenzhong = /^│住宅：(\S+)\s+│门贡：(\d+)\s*点\s*│$/
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
@@ -165,7 +166,12 @@
                 App.Data.Player.Score["阅历"] = result[3] - 0
                 return true
             })
+            task.AddTrigger(matcherScoreMenzhong, (tri, result) => {
+                App.Data.Player.Score["住宅"] = result[1]
+                App.Data.Player.Score["门贡"] = result[2] - 0
 
+                return true
+            })
             task.AddTimer(5000)
             task.AddTrigger(matcherScoreEnd)
         },
@@ -377,5 +383,76 @@
     App.Core.GetMaxExp = () => {
         let expmax = GetVariable("max_exp").trim()
         return (expmax && !isNaN(expmax)) ? expmax - 0 : 0
+    }
+    let PlanLeavePkd = new App.Plan(
+        App.Positions["Response"],
+        (task) => {
+            task.AddTrigger("你逃出了屠人场。", (tri, result) => {
+                task.Data = "leave"
+                return true
+            })
+
+            App.Send("quit")
+            App.Sync()
+        },
+        (result) => {
+            switch (result.Task.Data) {
+                case "leave":
+                    App.Next()
+                    return
+            }
+            App.Fail()
+        }
+    )
+
+    let PlanEatLu = new App.Plan(
+        App.Positions["Response"],
+        (task) => {
+            task.AddTrigger("你眼前忽然一花...", (tri, result) => {
+                task.Data = "enter"
+                return true
+            })
+            App.Send("join")
+            App.Sync()
+        },
+        (result) => {
+            switch (result.Task.Data) {
+                case "enter":
+                    App.Next()
+                    return
+            }
+            App.Fail()
+        }
+    )
+    let pkd = {
+        "屠人场": true,
+        "宰人场": true,
+        "剁人场": true,
+        "碎尸场": true,
+        "喋血场": true,
+        "毒人场": true,
+        "丧命场": true,
+        "殒命场": true,
+        "送命场": true,
+        "宰人场": true,
+        "诛人场": true,
+        "戮人场": true,
+    }
+    App.Core.EatLu = () => {
+        $.PushCommands(
+            $.To("306"),
+            $.Plan(PlanEatLu),
+            $.Function(() => {
+                if (pkd[App.Map.Room.Name]) {
+                    App.Send("eat magic water;hp;hp -m;i")
+                    App.Next()
+                    return
+                }
+                App.Fail()
+            }),
+            $.Nobusy(),
+            $.Plan(PlanLeavePkd)
+        )
+        $.Next()
     }
 })(App)

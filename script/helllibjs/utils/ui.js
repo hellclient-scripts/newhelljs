@@ -20,6 +20,39 @@
         let newlength = str.length + offset
         return front ? str.padStart(newlength, " ") : str.padEnd(newlength, " ")
     }
+    module.Cut = (str, length, overflowtoken) => {
+        str = str || ""
+        length = length || 1
+        overflowtoken = overflowtoken || "+"
+        overflowtokenlength = overflowtoken.charCodeAt(i) < 256 ? 1 : 2
+        let count = 0
+        for (var i = 0; i < str.length; i++) {
+            if (str.charCodeAt(i) < 256) {
+                count += 1
+            } else {
+                count += 2
+            }
+            if (count + overflowtokenlength >= length) {
+                return str.slice(0, i - 1) + overflowtoken
+            }
+        }
+        return str
+    }
+    module.FormatTime = (time) => {
+        if (time > 86400000) {
+            return Math.floor(time / 86400000) + "天"
+        }
+        if (time > 3600000) {
+            return Math.floor(time / 3600000) + "小时"
+        }
+        if (time > 60000) {
+            return Math.floor(time / 60000) + "分钟"
+        }
+        if (time > 1000) {
+            return Math.floor(time / 1000) + "秒"
+        }
+        return "0"
+    }
     class Word {
         constructor(text, space, padstart) {
             this.Text = text

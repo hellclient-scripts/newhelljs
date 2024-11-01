@@ -6,7 +6,6 @@
     App.HUD.UI = uiModule
     App.Word = App.HUD.UI.Word
     App.HUD.Update = () => {
-        App.Utils.Pad
         let line1 = App.HUD.Line1()
         let line2 = App.HUD.Line2()
         let line3 = App.HUD.Line3()
@@ -64,8 +63,9 @@
     }
 
     App.HUD.Line4 = () => {
-        let line = JSON.parse(NewLine())
-        return line
+        let label = new App.Word("当前任务队列：").WithColor("BrightWhite")
+        let value = new App.Word(uiModule.Cut(App.Core.Quest.Current ? App.Core.Quest.Current.replaceAll("\n", "||") : "无任务", 140))
+        return App.Word.Join(App.HUD.Space, label, value)
     }
     App.HUD.SummaryLine1 = () => {
         let banklabel = new App.Word("存:").WithColor("BrightYellow")

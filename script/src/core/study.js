@@ -10,11 +10,16 @@
         App.Core.Study.LearnMode = 0
         App.Core.Study.TeacherID = ""
         App.Core.Study.TeacherLoc = ""
+        App.Core.Study.Lian = []
+        App.Core.Study.LianMode = 0
     }
     App.Core.Study.LearnMode = 0
     App.Core.Study.LearnMax = 100
     App.Core.Study.YanjiuMax = 100
+    App.Core.Study.LianMax = 50
     App.Core.Study.Learn = []
+    App.Core.Study.LianMode = 0
+    App.Core.Study.Lian = []
     App.Core.Study.TeacherID = ""
     App.Core.Study.TeacherLoc = ""
 
@@ -36,16 +41,19 @@
         }
     )
     class Learn {
-        constructor(line) {
+        constructor(line, defaultType) {
             line = line.trim()
             if (line[0] == "!") {
                 this.Important = true
                 line = line.slice(1)
             }
+            if (!defaultType) {
+                defaultType = "yanjiu"
+            }
             let data = line.split("|")
             this.SkillID = data[0].trim()
             this.Limit = data[1] ? data[1].split(",").map((val) => val.trim()) : []
-            this.Type = data[2] ? data[2] : "yanjiu"
+            this.Type = data[2] ? data[2] : defaultType
             this.From = data[3] ? data[3] : ""
             this.Loc = data[4] ? data[4] : ""
             this.Before = data[5] ? data[5] : ""
@@ -58,7 +66,7 @@
                 result += " 限制：" + this.Limit.join(",")
             }
             result += " 类型："
-            result += this.Type ? this.Type : "yanjiu"
+            result += this.Type
             if (this.From) {
                 result += " 目标:" + this.From
             }
@@ -100,6 +108,26 @@
                     )
                     $.Next()
                     break
+                case "lian":
+                    var loc = this.Loc
+                    if (!loc) {
+                        loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
+                    }
+                    var times = App.Core.Study.LianMax
+                    var cmds = [`jifa ${this.From} ${this.SkillID}`, `lian ${this.From} ${times}`]
+                    if (this.Before) { cmds.unshift(this.Before) }
+                    if (this.After) { cmds.push(this.After) }
+                    $.PushCommands(
+                        $.To(loc),
+                        $.Do("yun recover"),
+                        $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do(cmds.join(";")),
+                        $.Do("hp"),
+                        $.Wait(1000),
+                        $.Sync(),
+                    )
+                    $.Next()
+                    break
                 case "xue":
                     var loc = this.Loc || App.Core.Study.TeacherLoc
                     if (!loc) {
@@ -127,9 +155,8 @@
                         $.Sync(),
                     )
                     $.Next()
-
                     break
-                case "exec":
+                case "cmd":
                     if (!this.Loc) {
                         PrintSystem("未知的学习位置 " + this.Loc)
                         return
@@ -171,6 +198,16 @@
                     return false
                 }
             }
+            if (this.Type == "lian") {
+                if (!skill) {
+                    return false
+                }
+                let base = App.Data.Player.Skills[this.From]
+                if (!base || skill["等级"] >= base["等级"]) {
+                    return false
+                }
+            }
+
             for (var limit of this.Limit) {
                 if (!isNaN(limit)) {
                     if (skill && skill["等级"] >= limit) {
@@ -214,13 +251,14 @@
         Loc = ""
         Before = ""
         After = ""
-        Import = false
+        Important = false
         Next = 0
+        DefaultType = ""
     }
-    App.Core.Study.FilterSkill = () => {
+    let filterskill = (list, mode) => {
         let filtered = []
         let important = null
-        App.Core.Study.Learn.forEach(learn => {
+        list.forEach(learn => {
             if (learn.Check()) {
                 filtered.push(learn)
                 if (learn.Important && important == null) {
@@ -232,7 +270,7 @@
             return important
         }
         if (filtered.length) {
-            switch (App.Core.Study.LearnMode) {
+            switch (mode) {
                 case 0://最低优先模式
                     let lowest = null
                     let lowestlevel = null
@@ -254,6 +292,31 @@
             }
         }
         return null
+
+    }
+    App.Core.Study.FilterSkill = () => {
+        return filterskill(App.Core.Study.Learn, App.Core.Study.LearnMode)
+    }
+    App.Core.Study.AllCanLearn = () => {
+        let result = []
+        App.Core.Study.Learn.forEach(learn => {
+            if (learn.Check()) {
+                result.push(learn)
+            }
+        })
+        return result
+    }
+    App.Core.Study.AllCanLian = () => {
+        let result = []
+        App.Core.Study.Lian.forEach(learn => {
+            if (learn.Check()) {
+                result.push(learn)
+            }
+        })
+        return result
+    }
+    App.Core.Study.FilterLian = () => {
+        return filterskill(App.Core.Study.Lian, App.Core.Study.LianMode)
     }
     App.Core.Study.CurrentSkill = null
     App.Core.Study.LastPot = 0
@@ -363,6 +426,23 @@
                 Note("老师信息:" + App.Core.Study.TeacherID + "@" + App.Core.Study.TeacherLoc)
             }
         }
+        App.LoadVariable("lian").forEach(line => {
+            let action = actionModule.Parse(line)
+            switch (action.Command) {
+                case "#random":
+                    App.Core.Study.LearnMode = 1
+                    break
+                case "#order":
+                    App.Core.Study.LearnMode = 2
+                    break
+                case "#lowest":
+                    App.Core.Study.LearnMode = 0
+                    break
+                case "":
+                    App.Core.Study.Lian.push(new Learn(action.Data, "lian"))
+                    break
+            }
+        })
 
     }
     App.Core.Study.Load()
@@ -435,6 +515,15 @@
     App.UserQueue.UserQueue.RegisterCommand("#study", function (uq, data) {
         uq.Commands.Append(
             App.NewPrepareCommand("commonWithStudy")
+        )
+        uq.Commands.Next()
+    })
+    App.Sender.RegisterAlias("#jifa", function (data) {
+        App.Send(GetVariable("jifa"))
+    })
+    App.UserQueue.UserQueue.RegisterCommand("#jifa", function (uq, data) {
+        uq.Commands.Append(
+            App.Commands.NewDoCommand(GetVariable("jifa"))
         )
         uq.Commands.Next()
     })

@@ -49,6 +49,7 @@ $.Module(function (App) {
         kills: 0,
         helpded: 0,
         start: null,
+        current: null,
         eff: 0,
     }
     MQ.OnNpcDie = function () {
@@ -95,12 +96,14 @@ $.Module(function (App) {
     let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前杀了/
     let reNoMaster = "这里没有这个人，你怎么领任务？"
     let reNoQuest = "你现在没有领任何任务！"
+    let reCurrent = /^师长交给你的任务，你已经连续完成了 (\d+) 个。$/
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             let fled = false
             MQ.Data.NoMaster = false
             MQ.Data.NPC = null
+            MQ.Data.current = null
             task.AddTrigger(reQuest, (tri, result) => {
                 MQ.Data.NPC = new NPC(result[2])
                 return true
@@ -129,6 +132,10 @@ $.Module(function (App) {
             })
             task.AddTrigger(reNoMaster, () => {
                 MQ.Data.NoMaster = true
+                return true
+            })
+            task.AddTrigger(reCurrent, (tri, result) => {
+                MQ.Data.current = result[1] - 0
                 return true
             })
             task.AddTrigger(reNoQuest)
@@ -542,6 +549,12 @@ $.Module(function (App) {
             new App.HUD.UI.Word("效:"),
             new App.HUD.UI.Word(MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) : "-", 5, true),
         ]
+    }
+    Quest.OnReport = () => {
+        let eff = MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) + "个/小时" : "-"
+        let rate = MQ.Data.kills > 3 ? (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(0) + "%" : "-"
+        let duration = MQ.Data.start ? App.HUD.UI.FormatTime($.Now() - MQ.Data.start) : "-"
+        return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 时长:${duration} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
     }
     let matcherreward = /^通过这次锻炼，你获得了/
     let planQuest = new App.Plan(App.Quests.Position,

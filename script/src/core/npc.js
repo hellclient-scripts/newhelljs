@@ -90,6 +90,10 @@
         if (App.Params.IDPass) {
             Note("门派标签为 " + App.Params.IDPass)
         }
+        if (GetVariable("house").trim()) {
+            App.Params.LocDazuo = "1949"
+            App.Params.LocSleep = "1949"
+        }
     }
     App.Map.AppendTagsIniter((map) => {
         map.SetTag(App.Params.IDPass, true)

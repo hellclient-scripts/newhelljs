@@ -3,6 +3,7 @@
     App.UI.Assist.Show = () => {
         var status = App.Quests.Stopped ? "已停止" : "正在进行"
         var list = Userinput.newlist("助理", "当前任务" + status + ",请选择你需要的帮助", false)
+        list.append("report", "运行报告")
         if (App.Quests.Stopped) {
             if (GetVariable("quest").trim()) {
                 list.append("start", "开始任务")
@@ -15,11 +16,18 @@
         list.append("npc", "NPC老师清单")
         list.append("rooms", "地图房间")
         list.append("params", "系统参数设置")
+        list.append("lian", "初始化练习清单")
         list.publish("App.UI.Assist.OnClick")
 
     }
     App.UI.Assist.OnClick = (name, id, code, data) => {
         switch (data) {
+            case "start":
+                Execute("#start")
+                break
+            case "stop":
+                Execute("#stop")
+                break
             case "common":
                 App.UI.Assist.CommonShow()
                 break
@@ -35,10 +43,36 @@
             case "params":
                 App.UI.Assist.ParamsShow()
                 break
+            case "lian":
+                if (App.InitCommad) {
+                    $.PushCommands(
+                        $.Function(App.Init),
+                        $.Function(App.Check),
+                        $.Function(App.UI.Assist.LianShow)
+                    )
+                    $.Next()
+                    return
+                }
+                App.UI.Assist.LianShow()
+                break
+            case "report":
+                if (App.InitCommad) {
+                    $.PushCommands(
+                        $.Function(App.Init),
+                        $.Function(App.Check),
+                        $.Function(App.UI.Report.Show)
+                    )
+                    $.Next()
+                    return
+                }
+                App.UI.Report.Show()
+                break
+
         }
     }
     App.UI.Assist.CommonShow = () => {
         var list = Userinput.newlist("常用任务", "请选择你的要执行的常用任务", false)
+        list.append("#lianskill", "#lianskill 根据lian变量设置练功，需要设置好jifa指令")
         list.append("#beiqi", "#beiqi 备齐任务")
         list.append("#liandan", "#liandan 北京炼丹")
         list.append("#noob", "#noob 新人一条龙任务，需要拜师")
@@ -129,7 +163,7 @@
     }
     App.UI.Assist.NPCLastParam = null
     App.UI.Assist.ParamsShow = () => {
-        var list = Userinput.newlist("系统参数设置00", "请选择你要设置的参数,搜索=显示已设置参数", true)
+        var list = Userinput.newlist("系统参数设置", "请选择你要设置的参数,搜索=显示已设置参数", true)
         App.NamedParams.Params.forEach((p) => {
             let val = App.Core.Params.Data[p.ID] ? "=" + App.Core.Params.Data[p.ID] : "未设置"
             list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
@@ -159,4 +193,38 @@
             Userinput.alert("", "params变量内容,注意保存", GetVariable("params"))
         }
     }
+    let nolian = {
+        "force": true,
+        "poison": true,
+    }
+    App.UI.Assist.LianShow = () => {
+        var list = Userinput.newlist("请选择你要练习的技能", "注意，选择后你当前的lian变量会清除。请注意备份", true)
+        list.setmutli(true)
+        let skills = []
+        for (var id in App.Data.Player.Skills) {
+            let skill = App.Data.Player.Skills[id]
+            if (skill["基本"] != skill.ID && skill["受限经验"] && !nolian[skill["基本"]]) {
+                skills.push(skill)
+            }
+        }
+        skills.sort((a, b) => {
+            if (a["基本"] == b["基本"]) {
+                return a.ID < b.ID ? -1 : 1
+            }
+            return a["基本"] < b["基本"] ? -1 : 1
+        })
+        skills.forEach((skill) => {
+            let cmd = `${skill.ID}||lian|${skill["基本"]}|||`
+            list.append(cmd, cmd)
+        })
+        list.publish("App.UI.Assist.LianOnAction")
+    }
+    App.UI.Assist.LianOnAction = (name, id, code, data) => {
+        if (code == 0) {
+            let skills = JSON.parse(data)
+            SetVariable("lian", skills.join("\n"))
+            Userinput.alert("", "lian变量内容,请设置好开始结束指令后，保存并重新加载变量设置", GetVariable("lian"))
+        }
+    }
+
 })(App)

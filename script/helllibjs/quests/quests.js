@@ -34,6 +34,9 @@
     let DefaultOnSummary = () => {
         return null
     }
+    let DefaultOnReport = () => {
+        return null
+    }
     let DefaultOnStart = (quests) => {
 
     }
@@ -59,6 +62,7 @@
         Start = null
         OnHUD = DefaultOnHUD
         OnSummary = DefaultOnSummary
+        OnReport = DefaultOnReport
     }
     let DefaultChecker = function () {
         return true
