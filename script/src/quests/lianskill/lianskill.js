@@ -30,6 +30,20 @@ $.Module(function (App) {
     Quest.Desc = "练习lian变量中设置的技能"
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.OnHUD = () => {
+        let all = App.Core.Study.AllCanLian().map(v => v.SkillID)
+        return [
+            new App.HUD.UI.Word("练功:"),
+            new App.HUD.UI.Word(`${all.length}/${App.Core.Study.Lian.length}`, 5, true),
+        ]
+    }
+    Quest.OnSummary = () => {
+        let all = App.Core.Study.AllCanLian().map(v => v.SkillID)
+        return [
+            new App.HUD.UI.Word("练:"),
+            new App.HUD.UI.Word(`${all.length}/${App.Core.Study.Lian.length}`, 5, true),
+        ]
+    }
     Quest.OnReport = () => {
         let all = App.Core.Study.AllCanLian().map(v => v.SkillID)
         return [`练习进度 (${all.length}/${App.Core.Study.Lian.length}):${all.join(",")}`]
