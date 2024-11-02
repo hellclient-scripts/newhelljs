@@ -31,6 +31,22 @@ $.Module(function (App) {
     Quest.Desc = "新人配药任务"
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.OnHUD = () => {
+        return [
+            new App.HUD.UI.Word("丹玉磨:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(App.Data.Item.List.FindByIDLower("danyu mo").Sum()), 5, true),
+        ]
+    }
+    Quest.OnSummary = () => {
+        return [
+            new App.HUD.UI.Word("磨:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(App.Data.Item.List.FindByIDLower("danyu mo").Sum()), 5, true),
+        ]
+    }
+    Quest.OnReport = () => {
+        return [`配药-获得了 ${App.Data.Item.List.FindByIDLower("danyu mo").Sum()}个丹玉磨`]
+    }
+
     Quest.Start = function (data) {
         Tiejiang.Start()
     }

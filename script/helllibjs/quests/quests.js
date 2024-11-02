@@ -105,6 +105,9 @@
         Delay = 1000
         Stopped = true
         Parser = module.DefaultParser
+        RegisteredQuests(){
+            return this.#registered
+        }
         Register = function (quest) {
             this.#registered[quest.ID] = quest
         }

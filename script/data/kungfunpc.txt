@@ -189,8 +189,8 @@ ge huaimin|葛怀敏|2861|ge huaimin
 pan guangyu|潘光裕|2862|pan guangyu
 kong shouzheng|孔守正|2875|kong shouzheng
 gao hua|高化|2876|gao hua
-	"wen zhengming|文征明|2799|wen zhengming
+wen zhengming|文征明|2799|wen zhengming
 wang xu|王诩|2800|wang xu
 puzhi dashi|普智大师|2801|puzhi dashi
 zhang junfang|张君房|2802|zhang junfang	
-nan xian|南贤",			"loc":	1551|nan xian"}
+yao chun|姚春|1388|yao chuan

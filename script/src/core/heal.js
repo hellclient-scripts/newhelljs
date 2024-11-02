@@ -160,7 +160,25 @@
     }
     App.Commands.RegisterExecutor("rest", function (commands, running) {
         running.OnStart = function (arg) {
-            if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
+            if (App.Data.Player.HP["内力上限"] == 0 && (App.Data.Player.HP["当前气血"] * 100 / App.Data.Player.HP["气血上限"]) <= App.Params.NeiliMin) {
+                Note("无内力，发呆等恢复")
+                App.Commands.PushCommands(
+                    App.Commands.NewWaitCommand(3000),
+                    App.Commands.NewDoCommand("hp"),
+                    App.NewSyncCommand(),
+                )
+            } else if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
+                let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
+                if (jifaForce < 120) {
+                    Note("有效内功过低，发呆等恢复")
+                    App.Commands.PushCommands(
+                        App.Commands.NewWaitCommand(3000),
+                        App.Commands.NewDoCommand("hp"),
+                        App.NewSyncCommand(),
+                    )
+                    App.Next()
+                    return
+                }
                 let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : ((App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"]) * 0.8).toFixed()
                 if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                 if (num < 10) { num = 10 }

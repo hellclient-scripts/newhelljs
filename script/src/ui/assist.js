@@ -17,6 +17,8 @@
         list.append("rooms", "地图房间")
         list.append("params", "系统参数设置")
         list.append("lian", "初始化练习清单")
+        list.append("advance", "高级设置")
+        list.append("help", "使用帮助")
         list.publish("App.UI.Assist.OnClick")
 
     }
@@ -67,7 +69,12 @@
                 }
                 App.UI.Report.Show()
                 break
-
+            case "advance":
+                App.UI.Assist.AdvanceShow()
+                break
+            case "help":
+                App.Help()
+                break
         }
     }
     App.UI.Assist.CommonShow = () => {
@@ -227,5 +234,35 @@
             Userinput.alert("", "lian变量内容,请设置好开始结束指令后，保存并重新加载变量设置", GetVariable("lian"))
         }
     }
-
+    App.UI.Assist.AdvanceShow = () => {
+        var list = Userinput.newlist("高级设置", "请选择你感兴趣的高级设置", true)
+        list.append("quests", "可用任务一览")
+        list.publish("App.UI.Assist.AdvanceOnAction")
+    }
+    App.UI.Assist.AdvanceOnAction = (name, id, code, data) => {
+        if (code == 0) {
+            switch (data) {
+                case "quests":
+                    App.UI.Assist.QuestsShow()
+                    break
+            }
+        }
+    }
+    App.UI.Assist.QuestsShow = () => {
+        var list = Userinput.newlist("可用任务一览", "请选择你感兴趣的任务", true)
+        let allq = App.Quests.RegisteredQuests()
+        Object.keys(allq).sort().forEach(key => {
+            let q = allq[key]
+            list.append(key, `${q.ID} ${q.Name} ${q.Desc}`)
+        })
+        list.publish("App.UI.Assist.QuestsOnAction")
+    }
+    App.UI.Assist.QuestsOnAction = (name, id, code, data) => {
+        if (code == 0) {
+            let q = App.Quests.GetQuest(data)
+            if (q) {
+                Userinput.Note("", `任务 ${q.Name} (${q.ID})`, `${q.Desc}\n${q.Intro}`)
+            }
+        }
+    }
 })(App)

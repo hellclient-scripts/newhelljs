@@ -1,5 +1,9 @@
 $.Module(function (App) {
     let Letter = {}
+    let fangqi = {
+        "襄阳": true,
+        "关外": true,
+    }
     class NPC {
         constructor(name) {
             this.Name = name
@@ -47,7 +51,7 @@ $.Module(function (App) {
     }
     let reQuest = /^([^：()\[\]]{2,5})吩咐你在.+之前把信件送到(.+)手中，取回执交差。$/
     let reStart = /^据闻不久前此人曾经在(.+)。$/
-    let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前杀了/
+    let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前把信送到/
     let reNoMaster = "这里没有这个人，你怎么领任务？"
     let reNoQuest = "你现在没有领任何任务！"
     let PlanQuest = new App.Plan(
@@ -74,7 +78,7 @@ $.Module(function (App) {
             task.AddTrigger(reNoQuest)
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
-            App.Send("give receipt to " + App.Params.MasterID + ";drop receipt;drop receipt 2")
+            App.Send("give receipt to " + App.Params.MasterID + ";drop receipt;drop receipt 2;drop letter")
             App.Send("quest " + App.Params.MasterID)
             App.Send("quest")
         },
@@ -135,6 +139,11 @@ $.Module(function (App) {
             if (Letter.Data.NPC.Gived) {
                 Note("交差")
                 Letter.GiveReceipt()
+                return
+            }
+            if (fangqi[Letter.Data.NPC.Zone]) {
+                Note(`区域${Letter.Data.NPC.Zone}不适合，放弃`)
+                Letter.AskQuest()
                 return
             }
             Note("找人")
