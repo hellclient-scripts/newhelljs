@@ -72,4 +72,10 @@
         return null
     }))
 
+    App.BindEvent("core.hurt", function () {
+        let result = App.Core.Medicine.EatCmd("疗伤")
+        if (result) {
+            App.Send(result)
+        }
+    })
 })(App)

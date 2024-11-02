@@ -61,9 +61,21 @@
         App.LoadVariable("items").forEach(data => {
             let item = actionModule.Parse(data).ParseNumber()
             if (item.Data) {
-                if (App.Goods.GetGood(item.Data) == null) {
-                    Note("物品 " + item.Data + " 未找到。")
-                    return
+                if (item.Command == "") {
+                    item.Command = "#buy"
+                }
+                switch (item.Command) {
+                    case "#buy":
+                        if (App.Goods.GetGood(item.Data) == null) {
+                            Note("物品 " + item.Data + " 未找到。")
+                            return
+                        }
+                        break
+                    case "#fetch":
+                    case "#qu":
+                        break
+                    default:
+                        PrintSystem(`item变量有未知的道具指令${item.Command}`)
                 }
                 App.Core.Goods.Items.push(item)
                 items.push(item.Data)
@@ -74,22 +86,77 @@
         }
     }
     App.Core.Goods.Load()
+    let fetch = (f, item) => {
+        let num = item.Param - 0
+        if (isNaN(num) || num < 0) {
+            num = 1
+        }
+        if (num > f.GetData().Count) {
+            num = f.GetData().Count
+        }
+        App.Commands.PushCommands(
+            App.Commands.NewDoCommand(`fetch ${f.Key} ${num};i;l qiankun bag`),
+            App.NewSyncCommand(),
+        )
+        App.Next()
 
+    }
     App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, context, exclude) {
         for (item of App.Core.Goods.Items) {
             let num = isNaN(item.Number) ? 1 : (item.Number - 0)
             if (num == 0) {
                 num = 1
             }
-            let count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()
-            if (count < num) {
-                return function () {
-                    App.Commands.PushCommands(
-                        App.Goods.NewBuyCommand(item.Data),
-                        App.NewNobusyCommand(),
-                    )
-                    App.Next()
-                }
+            switch (item.Command) {
+                case "#buy":
+                    var count = App.Data.Item.List.FindByID(App.Goods.GetGood(item.Data).ID).Sum()
+                    if (count < num) {
+
+                        return function () {
+                            App.Commands.PushCommands(
+                                App.Goods.NewBuyCommand(item.Data),
+                                App.NewNobusyCommand(),
+                            )
+                            App.Next()
+                        }
+                    }
+                    break
+                case "#fetch":
+                    var count = App.Data.Item.List.FindByIDLower(item.Data).Sum()
+                    if (count < num) {
+                        let f = App.Data.QiankunBag.FindByID(item.Data).First()
+                        if (f) {
+                            return () => {
+                                fetch(f, item)
+                            }
+                        }
+                    }
+                    break
+                case "#qu":
+                    var count = App.Data.Item.List.FindByIDLower(item.Data).Sum()
+                    if (count < num) {
+                        let f = App.Data.QiankunBag.FindByID(item.Data).First()
+                        if (f) {
+                            return () => {
+                                fetch(f, item)
+                            }
+                        } else {
+                            return () => {
+                                let num = item.Param - 0
+                                if (isNaN(num) || num < 0) {
+                                    num = 1
+                                }
+                                App.Commands.PushCommands(
+                                    App.Move.NewToCommand("2682"),
+                                    App.Commands.NewDoCommand(`take ${num} ${item.Data};i`),
+                                    App.NewNobusyCommand(),
+                                )
+                                App.Next()
+
+                            }
+                        }
+                    }
+                    break
             }
         }
         return null

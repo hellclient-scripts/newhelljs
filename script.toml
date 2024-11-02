@@ -1228,6 +1228,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g11nftf0058u73hc7sb5"
+  Name = "core.hurt"
+  Enabled = true
+  Match = "( 你已经陷入半昏迷状态，随时都可能摔倒晕去。)"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.hurt)"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -1611,7 +1642,7 @@ Timers = []
 [[RequiredParams]]
   Name = "items"
   Desc = "物品配置"
-  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nfire\nlong sword\nlong bow\narrow * 30"
+  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nfire\nlong sword\nlong bow\narrow * 30\n#qu.10 jiuhua wan *5\n#fetch.3 jiuhua wan *3"
 
 [[RequiredParams]]
   Name = "max_exp"
