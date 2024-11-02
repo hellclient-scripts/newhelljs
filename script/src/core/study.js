@@ -479,10 +479,11 @@
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),
                     App.NewNobusyCommand(),
+                    App.Commands.NewDoCommand("yun regenerate"),
                     App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("hp"),
-                    App.NewSyncCommand("hp"),
+                    App.NewSyncCommand(),
                 )
                 App.Next()
             }
