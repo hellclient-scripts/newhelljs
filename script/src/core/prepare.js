@@ -214,6 +214,7 @@
     }))
 
     let common = App.Proposals.NewProposalGroup(
+        "eatyao",
         "cash",
         "gold",
         "qu",

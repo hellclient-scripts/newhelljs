@@ -23,7 +23,7 @@
         report.push("武器列表")
         for (var index in App.Core.Weapon.Duration) {
             let weapon = App.Core.Weapon.Duration[index]
-            if (weapon.ID && weapon.Name && weapon.Damage) {
+            if (weapon.ID!=null && weapon.Name && weapon.Damage) {
                 report.push(`  ${weapon.Name}(${weapon.ID}) + ${weapon.Damage} ${weapon.Level ? "LV " + weapon.Level : ""}`)
             }
         }

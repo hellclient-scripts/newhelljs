@@ -3,6 +3,9 @@
     App.Core.Connect.Next = (new Date()).getTime() + 1000
     App.Core.Connect.Entered = false
     App.Core.Connect.CanLogin = function () {
+        if (App.Core.Dispel.Need && (App.Data.Player.HP["气血百分比"] < 10 || App.Data.Player.HP["精气百分比"] < 10)) {
+            return false
+        }
         return !App.Core.Connect.Offline && !App.Core.Emergency.NoLogin && App.Core.Connect.Running()
     }
     App.Core.Connect.OnTime = function () {

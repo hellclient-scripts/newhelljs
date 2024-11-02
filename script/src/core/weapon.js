@@ -33,7 +33,7 @@
     }
     let reDruation = /^耐 久 值 :\s*(\d+)\/\d+\s*$/
     let reLevel = /^(.+)的等级：(\d+)\/(\d+)$/
-    let reDamage = /^装备效果 : 兵器伤害力 \+(\d+)$/
+    let reDamage = /^装备效果 : (兵器|空手)伤害力 \+(\d+)$/
 
     let PlanDuation = new App.Plan(App.Positions["Connect"],
         function (task) {
@@ -49,7 +49,7 @@
                 return true
             })
             task.AddTrigger(reDamage, function (trigger, result) {
-                damage = result[1]
+                damage = result[2]
                 return true
             })
             task.AddTrigger(reDruation, function (trigger, result) {
@@ -62,7 +62,7 @@
                 current = null
                 return true
             })
-            let setduration=()=>{
+            let setduration = () => {
                 if (current != null) {
                     let repair = App.Core.Weapon.Repair[current - 0]
                     App.Core.Weapon.Duration[current] = {
@@ -84,7 +84,7 @@
                 current = event.Data
                 return true
             })
-            task.AddCatcher("core.echo.core.weapon.duration.end",function(){
+            task.AddCatcher("core.echo.core.weapon.duration.end", function () {
                 setduration()
             })
             App.Core.Weapon.Repair.forEach((repair, index) => {

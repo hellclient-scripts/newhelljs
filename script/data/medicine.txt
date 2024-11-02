@@ -1,0 +1,4 @@
+//name|id|疗伤(t/f)|疗精(t/f)|回精力(t/f)|回内力(t/f)
+
+
+九花玉露丸|jiuhua wan|t|t|t|t

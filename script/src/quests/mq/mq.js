@@ -56,7 +56,7 @@ $.Module(function (App) {
         $.RaiseStage("npcdie")
     }
     MQ.OnNpcFaint = function () {
-        $.RaiseStage("fait")
+        $.RaiseStage("npcfaint")
     }
     MQ.CheckYou = () => {
         $.PushCommands(
@@ -309,7 +309,7 @@ $.Module(function (App) {
         $.Next()
     }
     let matcherDie = /^(.+)扑在地上挣扎了几下，腿一伸，口中喷出几口鲜血，死了！$/
-    let matcherFaint = /^(.+)下一个不稳，跌在地上一动也不动了。$/
+    let matcherFaint = /^(.+)脚下一个不稳，跌在地上一动也不动了。$/
     let matcherFlee2 = /^你连连进击，眼看便要得手，接连数招，让(.+)已是避/
     let matcherFlee3 = /^在你一阵狂攻之下，(.+)只有招架之功，哪里还有/
     let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了)(.*)/
