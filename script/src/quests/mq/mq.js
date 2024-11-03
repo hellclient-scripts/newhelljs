@@ -15,6 +15,7 @@ $.Module(function (App) {
         NotKilled = true
         Info = []
         Farlist = null
+        Head = false
         Flee() {
             this.First = false
             this.Fled = true
@@ -88,6 +89,30 @@ $.Module(function (App) {
             $.Function(MQ.Verify),
         )
         $.Next()
+    }
+    MQ.CanAccept = () => {
+        if (App.Quests.Stopped) {
+            return false
+        }
+        if (App.QuestParams["mqletter"] == 1) {
+            return false
+        }
+        if (App.Core.Dispel.Need) {
+            return false
+        }
+        if (MQ.Data.NPC.Head == false) {
+            return true
+        }
+        let context = {
+            NeiliMin: 15,
+            JiquMax: 0,
+            HealBelow: 50,
+        }
+        let submit = App.Proposals.Submit("commonWithExp", context)
+        if (submit) {
+            return false
+        }
+        return true
     }
     let reQuest = /^([^：()\[\]]{2,5})对你道：“我早就看(.*)不顺眼，听说他最近在(.*)，你去做了他，带他的人头来交差！/
     let reQuest2 = /^([^：()\[\]]{2,5})对你道：“(.*)(这个败类打家劫舍，无恶不作，听说他最近在|这个所谓大侠屡次和我派作对，听说他最近在)/
@@ -201,12 +226,105 @@ $.Module(function (App) {
         }
         return null
     }
+    let matcherLetter = /.*(突然一位|忽听“嗖”的一声|你转身一看|你一回头|你正欲离开|只见你刚想离开|只听扑倏扑倏几声)(.*)(弟子急急忙忙地跑了上来，拍拍你的肩膀|一件暗器从你背后飞来|竟见到一只灰点信鸽飞至身旁，你赶紧|只见一位同门装束的弟子满头大汗地跑了过来|忽然发现不远处的地上一块石头上刻着些什么|一位同门装束的弟子追了上来|一只白鸽飞了过来，落在你肩头)/
+    let matcherlq1 = /^“字谕弟子(.*)：(得闻恶贼|武林人士|得闻所谓大侠)(.*)(屡次和我派作对|打家劫舍|所为甚是讨厌)(.*)/
+    let matcherlq2 = /(.*)正是大好机会将他除去，你若愿意/
+    let matcherAccept = /^如果你愿意接受此任务，请在(.*)秒之内/
+    let PlanWaitLetter = new App.Plan(
+        App.Positions["Connect"],
+        (task) => {
+            let mode = 0
+            let location = ""
+            let name = ""
+            task.AddTrigger(matcherLetter, (tri, result) => {
+                if (mode == 0) {
+                    mode = 1
+                    App.Send("l letter of me");
+                }
+                return true
+            })
+            task.AddTrigger(matcherlq1, (tri, result) => {
+                if (mode == 1) {
+                    mode = 2
+                    name = result[3]
+                    location = result[5]
+                }
+                return true
+            })
+            task.AddTrigger(matcherlq2, (tri, result) => {
+                if (mode == 2) {
+                    mode = 3
+                    location += result[1]
+                }
+                return true
+            })
+            task.AddTrigger(matcherAccept, (tri, result) => {
+                if (mode == 3) {
+                    mode = 4
+                    if (location.indexOf("西域") != -1 || location.indexOf("大理") != -1) {
+                        return false
+                    }
+                    App.Send("accept quest;quest;drop head")
+                }
+                return true
+            })
+            task.AddTrigger(reStart, (tri, result) => {
+                if (mode == 4) {
+                    if (name) {
+                        task.Data = new NPC(name)
+                        task.Data.SetZone(result[1].slice(0, 2))
+                        return false
+                    }
+                }
+                return true
+            })
+            task.AddTimer(10000)
+        },
+        (result) => {
+            if (result.Task.Data) {
+                MQ.Data.NPC = result.Task.Data
+            }
+            App.Send("halt;yun recover;hp")
+            $.PushCommands(
+                $.Sync(),
+                $.Function(result.Task.Data ? MQ.Ready : MQ.GiveHead),
+            )
+            $.Next()
+        }
+    )
+    MQ.WaitLetter = () => {
+        Note("接信")
+        if (App.Data.Player.HP["气血上限"] && (App.Data.Player.HP["当前气血"] * 100 / App.Data.Player.HP["气血上限"] < App.Params.HealBelow)) {
+            App.Send("yun heal")
+        } else if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
+            App.Send(App.Random(App.Core.Study.Jiqu.Commands))
+        } else if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
+            let num = App.Data.Player.HP["当前气血"]
+            if (num < 10) {
+                num = 10
+            }
+            App.Send(`dazuo ${num}`)
+        }
+        $.RaiseStage("mqletter")
+        PlanWaitLetter.Execute()
+    }
     MQ.Ready = () => {
 
         if (MQ.Data.NPC) {
             if (MQ.Data.NPC.Died) {
-                Note("交头")
-                MQ.GiveHead()
+                $.PushCommands(
+                    $.Function(App.Check),
+                    $.Function(function () {
+                        Note("交头")
+                        if (MQ.CanAccept()) {
+                            MQ.WaitLetter()
+                            return
+                        }
+                        Note("不接信")
+                        MQ.GiveHead()
+                    }),
+                )
+                $.Next()
                 return
             }
             if (MQ.Data.NPC.Fled) {
@@ -248,7 +366,7 @@ $.Module(function (App) {
         if (App.Map.Room.ID && !MQ.Data.NPC.Fled && !MQ.Data.NPC.Died) {
             MQ.Data.NPC.Loc = null
             let rooms = App.Mapper.ExpandRooms(App.Map.Room.ID, 2)
-            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, MQ.Data.NPC.Name.Zone).WithChecker(Checker).WithID(MQ.Data.NPC.ID)
+            App.Zone.Wanted = $.NewWanted(MQ.Data.NPC.Name, MQ.Data.NPC.Zone).WithChecker(Checker).WithID(MQ.Data.NPC.ID)
             $.PushCommands(
                 $.Rooms(rooms, App.Zone.Finder),
                 $.Function(MQ.KillLoc),
@@ -565,9 +683,16 @@ $.Module(function (App) {
         let rate = MQ.Data.kills > 3 ? (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(0) + "%" : "-"
         return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
     }
+    let matcherHead = /^你捡起一颗(.+)的人头。$/
     let matcherreward = /^通过这次锻炼，你获得了/
     let planQuest = new App.Plan(App.Quests.Position,
         (task) => {
+            task.AddTrigger(matcherHead, (tri, result) => {
+                if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
+                    MQ.Data.NPC.Head = true
+                }
+                return true
+            })
             task.AddTrigger(matcherreward, (tri, result) => {
                 let msg = "任务成功"
                 if (MQ.Data.kills == 0) {

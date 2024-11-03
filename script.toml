@@ -1728,6 +1728,11 @@ Timers = []
   Intro = "不要手动设置，通过助理按钮的设置系统参数功能设置。"
 
 [[RequiredParams]]
+  Name = "quest_params"
+  Desc = "任务参数(选填)"
+  Intro = "任务相关参数的设置\n不要手动设置，通过助理按钮的设置系统参数功能设置。"
+
+[[RequiredParams]]
   Name = "autorun"
   Desc = "大米自动执行任务(选填)"
   Intro = "填写后，机器打开就会自动执行对应的命令。\n\n一般给各种大米用。"

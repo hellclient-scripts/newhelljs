@@ -93,7 +93,8 @@
     }))
     App.Proposals.Register("heal", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
-        if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow && jifaForce > 20) {
+        let healBelow=context["HealBelow"]!=null?context["HealBelow"]:App.Params.HealBelow
+        if (App.Data.Player.HP["气血百分比"] <= healBelow && jifaForce > 20) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),
