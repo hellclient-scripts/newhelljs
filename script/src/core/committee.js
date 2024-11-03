@@ -7,7 +7,7 @@
   App.Engine.BindEventHandler(function (event) { App.Committee.OnEvent(event) })
   App.Engine.BindTimeHandler(function () { App.Committee.OnTime() })
   App.Positions["Connect"] = App.Committee.RegisterPosition("Connect")
-  App.Committee.EventBus.BindEvent("connected", function () { App.Positions["Connect"].StartNewTerm() })
+  App.Committee.EventBus.BindEvent("disconnected", function () { App.Positions["Connect"].StartNewTerm() })
   App.Positions["Quest"] = App.Committee.RegisterPosition("Quest")
   App.Positions["Room"] = App.Committee.RegisterPosition("Room")
   App.Positions["Combat"] = App.Committee.RegisterPosition("Combat")

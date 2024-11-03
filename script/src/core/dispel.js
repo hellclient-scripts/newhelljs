@@ -16,6 +16,7 @@
         if (App.Core.Dispel.Need && App.Data.Player.Jifa["force"] && App.Data.Player.Jifa["force"].Level > 100) {
             return function () {
                 App.Commands.PushCommands(
+                    App.Move.NewToCommand(App.Params.LocDazuo),
                     App.Commands.NewDoCommand("yun dispel;hp"),
                     App.NewNobusyCommand(),
                 )

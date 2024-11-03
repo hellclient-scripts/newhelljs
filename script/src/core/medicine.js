@@ -38,17 +38,17 @@
     }
     let eatyao = (type) => {
         var now = (new Date()).getTime()
-        if (now > App.Core.Medicine.Next[type]) {
-            App.Core.Medicine.Next[type] = now + App.Core.Medicine.Interval
+        if (now < App.Core.Medicine.Next[type]) {
             return null
         }
+        App.Core.Medicine.Next[type] = now + App.Core.Medicine.Interval
         let result = App.Core.Medicine.EatCmd(type)
         if (result) {
             return () => {
                 App.PushCommands(
                     App.Commands.NewDoCommand(result),
                     App.Commands.NewDoCommand("hp;i"),
-                    App.Commands.NewSyncCommand(),
+                    App.NewSyncCommand(),
                 )
                 App.Next()
             }

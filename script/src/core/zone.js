@@ -110,7 +110,6 @@
             move.Walk(map)
         }
     }
-
     App.Zone.Search = function (wanted) {
         let rooms = App.Zone.Maps[wanted.Zone]
         if (!rooms) {
@@ -118,6 +117,9 @@
             App.Fail()
             return
         }
+        App.Zone.SearchRooms(rooms, wanted)
+    }
+    App.Zone.SearchRooms = function (rooms, wanted) {
         App.Zone.Wanted = wanted
         wanted.Loc = null
         let move = wanted.Ordered ? App.Move.NewOrderedCommand(rooms, App.Zone.Finder) : App.Move.NewRoomsCommand(rooms, App.Zone.Finder)

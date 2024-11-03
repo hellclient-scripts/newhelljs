@@ -139,6 +139,11 @@
     }
     App.Commands.RegisterExecutor("to", function (commands, running) {
         running.OnStart = function (arg) {
+            let target=running.Command.Data.Target
+            if (typeof(target)=="string"){
+                target=[target]
+            }
+            Note(`前往 ${target.join(",")}`)
             App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })

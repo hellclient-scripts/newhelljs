@@ -60,7 +60,7 @@
                     }
                 }
                 return function () {
-                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : ((App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"]) * 0.8).toFixed()
+                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * neimin - App.Data.Player.HP["当前内力"]).toFixed()
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                     if (num < 10) { num = 10 }
                     App.Commands.PushCommands(
@@ -110,12 +110,12 @@
     App.Proposals.Register("tuna", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
             return function () {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"])
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin - App.Data.Player.HP["当前精力"]).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),
-                    App.Commands.NewDoCommand("dazuo " + num),
+                    App.Commands.NewDoCommand("tuna " + num),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
@@ -179,7 +179,7 @@
                     App.Next()
                     return
                 }
-                let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : ((App.Data.Player.HP["内力上限"] - App.Data.Player.HP["当前内力"]) * 0.8).toFixed()
+                let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * App.Params.NeiliMin - App.Data.Player.HP["当前内力"]).toFixed()
                 if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(

@@ -163,6 +163,7 @@ $.Module(function (App) {
 
     MQ.AskQuest = () => {
         $.PushCommands(
+            $.To(App.Params.LocMaster),
             $.Plan(PlanQuest),
             $.Function(() => {
                 if (MQ.Data.NoMaster) {
@@ -259,6 +260,7 @@ $.Module(function (App) {
         if (App.Zone.Wanted.ID) {
             MQ.Data.NPC.ID = App.Zone.Wanted.ID
         }
+
         if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name).First()) {
             $.Insert(
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat).WithKillInGroup(MQ.Data.NPC.NotKilled)),
@@ -269,6 +271,8 @@ $.Module(function (App) {
                     App.Next()
                 })
             )
+        } else {
+            MQ.Data.NPC.Loc = null
         }
         $.Next()
     }
@@ -289,7 +293,13 @@ $.Module(function (App) {
         $.PushCommands(
             $.Prepare(),
             $.To(Cities[MQ.Data.NPC.Zone].Loc),
-            $.Function(() => { App.Zone.Search(wanted) }),
+            $.Function(() => {
+                if (MQ.Data.NPC.Loc) {
+                    App.Zone.SearchRooms(MQ.Data.NPC.Loc, wanted)
+                } else {
+                    App.Zone.Search(wanted)
+                }
+            }),
             $.Function(MQ.KillLoc),
             $.Function(() => {
                 MQ.Data.NPC.Times++
@@ -426,7 +436,7 @@ $.Module(function (App) {
             if (!MQ.Data.NPC.ID && id) {
                 MQ.Data.NPC.ID = id.toLowerCase()
             }
-            if (!MQ.Data.NPC.Loc) {
+            if (!MQ.Data.NPC.Loc && !MQ.Data.NPC.Died) {
                 Note("接到线报:" + name + "|" + id + "|" + loc)
                 MQ.Data.helpded++
                 MQ.Data.NPC.Loc = loc

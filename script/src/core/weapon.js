@@ -101,7 +101,7 @@
         PlanDuation.Execute()
     }
     let checkerDuration = App.Checker.Register("weaponduration", App.Core.Weapon.CheckDuration, 5 * 60 * 1000)
-    App.Core.Weapon.GetWeapon = function () {
+    App.Core.Weapon.PickWeapon = function () {
         if (App.Core.Weapon.Wield.length) {
             App.Send("get " + App.Core.Weapon.Wield[0].ID)
         }
@@ -256,5 +256,8 @@
         App.Send("#wpon")
         App.RaiseEvent(event)
     })
-
+    App.BindEvent("core.disarmed",(e)=>{
+        App.Core.Weapon.PickWeapon()
+        App.Send(App.Core.Weapon.OnCommand())
+    })
 })(App)

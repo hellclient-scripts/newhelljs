@@ -6,7 +6,7 @@ $.Module(function (App) {
             let skill = App.Core.Study.FilterLian()
             if (skill) {
                 let context = {}
-                context.NeiliMin = 25
+                context.NeiliMin = 15
                 Lian.NeedJifa = true
                 $.PushCommands(
                     $.Prepare("common", context),

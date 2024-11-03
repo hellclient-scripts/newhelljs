@@ -1559,6 +1559,29 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g136egesalbv73hc9gm7"
+  Name = "core.disarmed"
+  Enabled = true
+  Match = "^你(手腕一麻|觉得眼前眼花缭乱|只觉周围气流涌动)，手中(.*)脱手"
+  Send = ""
+  Script = "App.LineEvent(\"core.disarmed\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true
