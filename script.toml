@@ -1655,7 +1655,7 @@ Timers = []
 [[RequiredParams]]
   Name = "command"
   Desc = "指令"
-  Intro = "设置在不同场景下发送的指令。\n会在游戏提示触发场景时发送对应的命令。\n比如\n\n#prepare yun powerup;yun shield"
+  Intro = "设置在不同场景下发送的指令。\n会在游戏提示触发场景时发送对应的命令。\n比如\n\n#prepare yun powerup;yun shield;#wpoff 2\n#npcfaint #wpoff 1;#wpon 2\n#npcdie #wpoff 2\n#mqletter yun heal;jiqu;dazuo 1000"
 
 [[RequiredParams]]
   Name = "weapon"
