@@ -1259,6 +1259,37 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g15b03lrsvhl73hcepds"
+  Name = "core.disarmed"
+  Enabled = true
+  Match = "^你(手腕一麻|觉得眼前眼花缭乱|只觉周围气流涌动)，手中(.*)脱手"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.disarmed\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -1559,29 +1590,6 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
-  ID = "d1g136egesalbv73hc9gm7"
-  Name = "core.disarmed"
-  Enabled = true
-  Match = "^你(手腕一麻|觉得眼前眼花缭乱|只觉周围气流涌动)，手中(.*)脱手"
-  Send = ""
-  Script = "App.LineEvent(\"core.disarmed\")"
-  SendTo = 0
-  Sequence = 100
-  ExpandVariables = false
-  Temporary = false
-  OneShot = false
-  Regexp = true
-  Group = "event"
-  IgnoreCase = false
-  KeepEvaluating = true
-  Menu = false
-  OmitFromLog = false
-  Variable = ""
-  ReverseSpeedwalk = false
-  OmitFromOutput = false
-  OmitFromCommandHistory = false
-
-[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true
@@ -1655,7 +1663,7 @@ Timers = []
 [[RequiredParams]]
   Name = "command"
   Desc = "指令"
-  Intro = "设置在不同场景下发送的指令。\n会在游戏提示触发场景时发送对应的命令。\n比如\n\n#prepare yun powerup;yun shield;#wpoff 2\n#npcfaint #wpoff 1;#wpon 2\n#npcdie #wpoff 2\n#mqletter yun heal;jiqu;dazuo 1000"
+  Intro = "设置在不同场景下发送的指令。\n会在游戏提示触发场景时发送对应的命令。\n比如\n\n#prepare yun powerup;yun shield;#wpoff 2\n#npcfaint #wpoff 1;#wpon 2\n#npcdie #wpoff 2\n#mqletter jiqu 100;dazuo 1000"
 
 [[RequiredParams]]
   Name = "weapon"
@@ -1665,7 +1673,7 @@ Timers = []
 [[RequiredParams]]
   Name = "items"
   Desc = "物品配置"
-  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n\n如：\nfire\nlong sword\nlong bow\narrow * 30\n#qu.10 jiuhua wan *5\n#fetch.3 jiuhua wan *3"
+  Intro = "一行一个物品id。\n需要多个可以 id * 数量\n如：\nfire\nlong sword\nlong bow\narrow * 30\n#qu.10 jiuhua wan *5\n#fetch.3 jiuhua wan *3\n\n#qu为从乾坤袋或者箱子里取。#fetch为从乾坤袋里拿，没有就放弃。小数点后是一次拿几个。\n支持吃药，包括回阳无极丹，修罗无常丹，罗刹无常丹，玉洞黑石丹，无常丹，九花玉露丸，白虎夺命丹，天王保命丹，生生造化丹，九转熊蛇丸。\n带身上会自动吃"
 
 [[RequiredParams]]
   Name = "max_exp"

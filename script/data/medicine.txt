@@ -1,4 +1,12 @@
 //name|id|疗伤(t/f)|疗精(t/f)|回精力(t/f)|回内力(t/f)
 
-
+回阳无极丹|huiyang dan|t|f|f|f
+修罗无常丹|luosha dan|f|f|t|f
+罗刹无常丹|luosha dan|f|f|f|t
+玉洞黑石丹|heishi dan|f|f|f|t
+无常丹|wuchang dan|f|f|f|t
 九花玉露丸|jiuhua wan|t|t|t|t
+白虎夺命丹|duoming dan|t|t|t|t
+天王保命丹|baoming dan|t|t|t|t
+生生造化丹|shengsheng dan|t|t|t|t
+九转熊蛇丸|xiongshe wan|t|t|t|t

@@ -155,7 +155,7 @@
                 }
             }
             this.#temporaryPaths.forEach(tp => {
-                Mapper.AddTemporaryPath(tp.from, tp.path)
+                Mapper.AddTemporaryPath(tp.From, tp.Path)
             })
         }
         UpdateMapperOption(option) {

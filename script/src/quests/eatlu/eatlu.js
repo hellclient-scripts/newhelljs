@@ -12,7 +12,12 @@ $.Module(function (App) {
     }
 
     Quest.Start = function (data) {
-        App.Core.EatLu()
+        $.PushCommands(
+            $.Do("i"),
+            $.Sync(),
+            $.Function(App.Core.EatLu),
+        )
+        $.Next()
     }
     App.Quests.Register(Quest)
 })

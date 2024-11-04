@@ -16,6 +16,7 @@
         list.append("npc", "NPC老师清单")
         list.append("rooms", "地图房间")
         list.append("params", "系统参数设置")
+        list.append("questparams", "任务参数设置")
         list.append("lian", "初始化练习清单")
         list.append("advance", "高级设置")
         list.append("help", "使用帮助")
@@ -44,6 +45,9 @@
                 break
             case "params":
                 App.UI.Assist.ParamsShow()
+                break
+            case "questparams":
+                App.UI.Assist.QuestParamsShow()
                 break
             case "lian":
                 if (App.InitCommad) {
@@ -169,16 +173,16 @@
             Userinput.alert("", "study变量内容,注意保存", GetVariable("study"))
         }
     }
-    App.UI.Assist.NPCLastParam = null
+    App.UI.Assist.ParamLast = null
     App.UI.Assist.ParamsShow = () => {
         var list = Userinput.newlist("系统参数设置", "请选择你要设置的参数,搜索=显示已设置参数", true)
         App.NamedParams.Params.forEach((p) => {
             let val = App.Core.Params.Data[p.ID] ? "=" + App.Core.Params.Data[p.ID] : "未设置，默认" + App.Params[p.ID]
             list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
         })
-        list.publish("App.UI.Assist.NPCOnView")
+        list.publish("App.UI.Assist.ParamsOnView")
     }
-    App.UI.Assist.NPCOnView = (name, id, code, data) => {
+    App.UI.Assist.ParamsOnView = (name, id, code, data) => {
         if (code === 0 && data) {
             let p
             App.NamedParams.Params.forEach((param) => {
@@ -187,20 +191,53 @@
                 }
             })
             if (p) {
-                App.UI.Assist.NPCLastParam = p
+                App.UI.Assist.ParamLast = p
                 let val = App.Core.Params.Data[p.ID] || ""
-                Userinput.Prompt("App.UI.Assist.NPCOnSet", `${p.Name}-#${p.ID}`, `${p.Desc}\n${p.Intro}`, val)
+                Userinput.Prompt("App.UI.Assist.ParamsOnSet", `${p.Name}-#${p.ID}`, `${p.Desc}\n${p.Intro}`, val)
             }
         }
     }
-    App.UI.Assist.NPCOnSet = (name, id, code, data) => {
-        let p = App.UI.Assist.NPCLastParam
-        App.UI.Assist.NPCLastParam = null
+    App.UI.Assist.ParamsOnSet = (name, id, code, data) => {
+        let p = App.UI.Assist.ParamLast
+        App.UI.Assist.ParamLast = null
         if (code === 0 && p) {
             App.Core.Params.Set(p.ID, data)
             Userinput.alert("", "params变量内容,注意保存", GetVariable("params"))
         }
     }
+    App.UI.Assist.QuestParamLast = null
+    App.UI.Assist.QuestParamsShow = () => {
+        var list = Userinput.newlist("任务参数设置", "请选择你要设置的任务参数,搜索=显示已设置参数", true)
+        App.QuestNamedParams.Params.forEach((p) => {
+            let val = App.Core.Params.QuestData[p.ID] ? "=" + App.Core.Params.QuestData[p.ID] : "未设置，默认" + App.Params[p.ID]
+            list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
+        })
+        list.publish("App.UI.Assist.QuestParamsOnView")
+    }
+    App.UI.Assist.QuestParamsOnView = (name, id, code, data) => {
+        if (code === 0 && data) {
+            let p
+            App.QuestNamedParams.Params.forEach((param) => {
+                if (param.ID == data) {
+                    p = param
+                }
+            })
+            if (p) {
+                App.UI.Assist.QuestParamLast = p
+                let val = App.Core.Params.QuestData[p.ID] || ""
+                Userinput.Prompt("App.UI.Assist.QuestParamsOnSet", `${p.Name}-#${p.ID}`, `${p.Desc}\n${p.Intro}`, val)
+            }
+        }
+    }
+    App.UI.Assist.QuestParamsOnSet = (name, id, code, data) => {
+        let p = App.UI.Assist.QuestParamLast
+        App.UI.Assist.QuestParamLast = null
+        if (code === 0 && p) {
+            App.Core.Params.SetQuest(p.ID, data)
+            Userinput.alert("", "quest_params变量内容,注意保存", GetVariable("quest_params"))
+        }
+    }
+
     let nolian = {
         "force": true,
         "poison": true,

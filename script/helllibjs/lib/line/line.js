@@ -55,7 +55,7 @@
             this.Text = this.Text + word.Text
             if (this.Words.length > 0) {
                 let last = this.Words[this.Words.length - 1]
-                if (last.GetShortStyle() == word    .GetShortStyle()) {
+                if (last.GetShortStyle() == word.GetShortStyle()) {
                     this.Words[this.Words.length - 1] = word.CopyStyle(last.Text + word.Text)
                     return this
                 }
@@ -85,29 +85,30 @@
             }
             let skip = start
             let result = new Line()
-            for (value of this.Words) {
-                if (value.Text.length < skip) {
-                    skip = skip - value.Text.length
-                } else {
-                    if (skip + length >= value.Text.length) {
-                        result.AppendWord(value.CopyStyle(value.Text.slice(skip)))
-                        length = length - (value.text - skip + 1)
-                        skip = 0
+            for (let value of this.Words) {
+                if (value.Text.length > 0) {
+                    if (value.Text.length <= skip) {
+                        skip = skip - value.Text.length
                     } else {
-                        result.AppendWord(value.CopyStyle(value.Text, skip, skip + length - 1))
-                        return result
+                        if (skip + length > value.Text.length) {
+                            result.AppendWord(value.CopyStyle(value.Text.slice(skip)))
+                            length = length - (value.text - skip + 1)
+                            skip = 0
+                        } else {
+                            result.AppendWord(value.CopyStyle(value.Text, skip, skip + length - 1))
+                            return result
+                        }
                     }
                 }
-
             }
             return result
         }
-        static FromOutput(output){
-            let line=new Line()
-            output.Words.forEach(word=>{
-                let w=new Word(word.Text)
-                w.Background=word.Background
-                w.Color=word.Color
+        static FromOutput(output) {
+            let line = new Line()
+            output.Words.forEach(word => {
+                let w = new Word(word.Text)
+                w.Background = word.Background
+                w.Color = word.Color
                 w.Color = word.Color
                 w.Background = word.Background
                 w.Bold = word.Bold
@@ -121,7 +122,7 @@
 
         static Parse(data) {
             let line = new Line()
-            let word=null
+            let word = null
             let index = 0
             let length = data.length
             while (index < length) {
@@ -214,8 +215,8 @@
     }
     class Word {
         constructor(text) {
-            if (text){
-                this.Text=text
+            if (text) {
+                this.Text = text
             }
         }
         Text = ''
@@ -279,7 +280,7 @@
             return this.GetShortStyle() + this.Text.replaceAll("#", "##")
         }
     }
-    module.Line=Line
-    module.Word=Word
+    module.Line = Line
+    module.Word = Word
     return module
 })()

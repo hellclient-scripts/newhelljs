@@ -13,5 +13,6 @@
     App.Include("src/quests/misc/quit.js")
     App.Include("src/quests/misc/stop.js")
     App.Include("src/quests/misc/fangqi.js")
+    App.Include("src/quests/xuemo/xuemo.js")
 
 })(App)

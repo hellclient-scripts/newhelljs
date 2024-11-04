@@ -41,6 +41,7 @@
     App.Include("src/core/study.js")
     App.Include("src/core/stage.js")
     App.Include("src/core/medicine.js")
+    App.Include("src/core/fuben.js")
     App.Include("src/core/params.js")//最后覆盖设置
 
 })(App)

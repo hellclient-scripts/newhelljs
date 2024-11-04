@@ -10,10 +10,10 @@
         Position = null
         InitFunc = null
         Callback = null
-        Execute() {
+        Execute(data) {
             let task = this.Position.AddTask(this.Callback)
             if (this.InitFunc) {
-                this.InitFunc(task)
+                this.InitFunc(task, this, data)
             }
             return task
         }
@@ -349,7 +349,7 @@
             return term
         }
         StartNewTerm() {
-            let term=this.Term//避免在cancel的处理中绑定到老的Term
+            let term = this.Term//避免在cancel的处理中绑定到老的Term
             this.Term = new Term()
             term.End()
         }

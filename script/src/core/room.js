@@ -31,8 +31,8 @@
         })
     }
     App.BindEvent("core.onexit", App.Core.Room.OnExit)
-    let matcherOnHeal = /^    (\S{2,8})正坐在地下(修炼内力)。$/
-    let matcherOnObj = /^    ((\S+) )?(\S*「.+」)?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
+    let matcherOnHeal = /^    (\S{2,8})正坐在地下(.+)。$/
+    let matcherOnObj = /^    ((\S+) )?(\S*[「\(].+[\)」])?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
     var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherOnObj, function (trigger, result, event) {

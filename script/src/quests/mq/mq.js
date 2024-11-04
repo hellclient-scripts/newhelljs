@@ -294,7 +294,7 @@ $.Module(function (App) {
     )
     MQ.WaitLetter = () => {
         Note("接信")
-        if (App.Data.Player.HP["气血上限"] && (App.Data.Player.HP["当前气血"] * 100 / App.Data.Player.HP["气血上限"] < App.Params.HealBelow)) {
+        if (App.Data.Player.HP["气血百分比"]  < App.Params.HealBelow) {
             App.Send("yun heal")
         } else if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
             App.Send(App.Random(App.Core.Study.Jiqu.Commands))

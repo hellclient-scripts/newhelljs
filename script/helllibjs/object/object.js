@@ -113,6 +113,24 @@
             })
             return result
         }
+        SearchName(key) {
+            let result = new List()
+            this.Items.forEach(item => {
+                if (item.GetData().Name.indexOf(key) > -1) {
+                    result.Append(item)
+                }
+            })
+            return result
+        }
+        SearchLabel(key) {
+            let result = new List()
+            this.Items.forEach(item => {
+                if (item.Label.indexOf(key) > -1) {
+                    result.Append(item)
+                }
+            })
+            return result
+        }
         FindByFilter(filter) {
             let result = new List()
             this.Items.forEach(item => {

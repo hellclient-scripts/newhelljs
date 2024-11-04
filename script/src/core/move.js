@@ -134,16 +134,28 @@
     mapModule.DefaultOnCancel = function (move, map) {
         App.Fail()
     }
+    App.Move.NewPathCommand = function (path, ...initers) {
+        return App.Commands.NewCommand("path", { Target: path, Initers: initers })
+    }
+    App.Commands.RegisterExecutor("path", function (commands, running) {
+        running.OnStart = function (arg) {
+            let target = running.Command.Data.Target
+            if (typeof (target) == "string") {
+                target = target.split(",")
+            }
+            App.Move.NewPath(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
+        }
+    })
     App.Move.NewToCommand = function (target, ...initers) {
         return App.Commands.NewCommand("to", { Target: target, Initers: initers })
     }
     App.Commands.RegisterExecutor("to", function (commands, running) {
         running.OnStart = function (arg) {
-            let target=running.Command.Data.Target
-            if (typeof(target)=="string"){
-                target=[target]
+            let target = running.Command.Data.Target
+            if (typeof (target) == "string") {
+                target = [target]
             }
-            Note(`前往 ${target.join(",")}`)
+            Note(`${App.Map.Room.ID} 前往 ${ target.join(",") }`)
             App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })

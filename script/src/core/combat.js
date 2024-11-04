@@ -24,6 +24,7 @@
         }
         WithCommand(cmd) {
             this.Command = cmd
+            return this
         }
         WithPlan(plan) {
             this.Plan = plan

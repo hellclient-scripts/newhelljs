@@ -58,5 +58,7 @@ $.NewCombat = App.NewCombat
 
 $.NewWanted=App.NewWanted
 
+$.Rest=App.Core.Heal.NewRestCommand
+
 $.RaiseStage=App.Core.Stage.Raise
 $.Now = function () { return (new Date()).getTime() }

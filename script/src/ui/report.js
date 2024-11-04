@@ -10,7 +10,7 @@
             let lu = Math.floor((maxneili - neili) / 180)
             report.push(`内力可提升${maxneili - neili} ,折天香玉露 ${lu} 个`)
         }
-        report.push(`经验:${App.Data.Player.HP["经验"] || "0"} 潜能:${App.Data.Player.HP["潜能"] || "0"} 体会:${App.Data.Player.HP["体会"] || "0"} 阅历:${App.Data.Player.Score["阅历"] || "-"}`)
+        report.push(`经验:${App.Data.Player.HP["经验"] || "0"} 潜能:${App.Data.Player.HP["潜能"] || "0"} 体会:${App.Data.Player.HP["体会"] || "0"} 阅历:${App.Data.Player.Score["阅历"] || "-"} 当前等级 ${App.Data.Player.HPM["当前等级"]}`)
         report.push(`门贡:${App.Data.Player.Score["门贡"] || 0}`)
 
         report.push(`存款:${App.Data.Player.Score["存款" || 0]} 债券:${App.Data.Player.Score["债券" || 0]}`)
