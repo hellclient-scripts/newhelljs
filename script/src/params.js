@@ -17,7 +17,7 @@
     App.NamedParams.AddString("MasterID", "").WithName("掌门ID").WithDesc("掌门ID，未指定会根据门派自动判定")
     App.NamedParams.AddString("LocMaster", "").WithName("掌门坐标").WithDesc("掌门坐标，未指定会根据门派自动判定")
     App.NamedParams.AddString("LocDazuo", "1927").WithName("打坐坐标").WithDesc("打坐坐标，未指定会根据门派自动判定")
-    App.NamedParams.AddString("LocSleep", "179").WithName("睡觉坐标").WithDesc("睡觉坐标，未指定会根据门派自动判定")
+    App.NamedParams.AddString("LocSleep", "1929").WithName("睡觉坐标").WithDesc("睡觉坐标，未指定会根据门派自动判定")
     App.NamedParams.AddNumber("HealBelow", 75).WithName("气血下限").WithDesc("低于这个值会疗伤")
     // App.NamedParams.AddNumber("InspireBleow", 75).WithName("精气下限").WithDesc("低于这个值会疗伤")
     App.NamedParams.AddNumber("WeaponDurationMin", 40).WithName("武器最小耐久").WithDesc("武器耐久低于这个值会去修理")

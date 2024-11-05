@@ -1590,6 +1590,52 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g17mieulscal73jt452m"
+  Name = ""
+  Enabled = true
+  Match = "#mq"
+  Send = "#start mq"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1g17ql9bd93ps73jt4ebs"
+  Name = ""
+  Enabled = true
+  Match = "#dazuo( (.+))?"
+  Send = "#start dazuo %2||stop"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true

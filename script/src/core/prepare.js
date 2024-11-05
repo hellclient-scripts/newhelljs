@@ -195,8 +195,8 @@
         let maxexp = App.Core.GetMaxExp()
         if (maxexp > 0 && App.Data.Player.HP["经验"] > maxexp) {
             let skill = App.Core.GetMaxSkillLevel()
-            let safelevel = skill ? skill["等级"] : 0 - 2
-            if ((safelevel * safelevel * safelevel / 10) > maxexp) {
+            let safelevel = skill ? skill["等级"] : 0 - 3
+            if ((safelevel * safelevel * safelevel / 10) > maxexp + 1000) {
                 return function () {
                     PrintSystem("最大经验设置有误,技能 " + skill["名称"] + " 超限")
                 }

@@ -145,7 +145,13 @@
             num = num / 1000
             unit = "M"
         }
-        return num.toFixed(tofixed) + unit
+        if (tofixed) {
+            let pow = Math.pow(10, tofixed)
+            num = Math.floor(num / pow) * pow
+        } else {
+            num = Math.floor(num)
+        }
+        return num + unit
     }
     return module
 })

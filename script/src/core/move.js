@@ -155,7 +155,9 @@
             if (typeof (target) == "string") {
                 target = [target]
             }
-            Note(`${App.Map.Room.ID} 前往 ${ target.join(",") }`)
+            if (target) {
+                Note(`${App.Map.Room.ID} 前往 ${target.join(",")}`)
+            }
             App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })
