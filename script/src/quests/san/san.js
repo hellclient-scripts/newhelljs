@@ -136,7 +136,7 @@ $.Module(function (App) {
         App.Append($.Function(San.GoImbue))
         App.Next()
     }
-    let matcherNPCName = /^你拿出一柄.+对(.+)说：恳请大师为此神兵圣化...$/
+    let matcherNPCName = /^你拿出一..+对(.+)说：恳请大师为此神兵圣化...$/
     let matecherSaned = /^(.+)说道： 现在(.+)已经被充分的圣化了，需要浸入神物以进一步磨练。$/
     let matecherOk = /^(.+)轻轻抚过(.+)，两指点于其上，/
     let matcherNext = /^(.+)说道： 我已经为(.+)圣化过了，你需要去寻求他人帮助以继续圣化。$/

@@ -160,4 +160,27 @@
     }
     App.Map.AppendTagsIniter(App.Mapper.InitTag)
 
+    let matcherssl = /^象一蓬蓬巨伞般伸向天空，把阳光遮得丝毫也无。尺把厚的松针/
+    let matchergc = "错节，据传已有千年的树龄，是这座城市的历史见证。树干底部有一个很大"
+    let matcheryp = "抽屉里散发出来的。神医平一指坐在茶几旁，独自喝着茶，看也不看你一眼。"
+    let PlanLocate = new App.Plan(
+        App.Positions["Room"],
+        (task) => {
+            task.AddCatcher("core.onexit")
+            task.AddTrigger(matcherssl).WithData("2400")
+            task.AddTrigger(matchergc).WithData("0")
+            task.AddTrigger(matcheryp).WithData("65")
+            task.AddTimer(3000)
+        },
+        (result) => {
+            if (result.Data != null) {
+                App.Map.Room.ID = result.Data
+            }
+        }
+    )
+    App.BindEvent("core.roomname", () => {
+        if (!App.Map.Room.ID) {
+            PlanLocate.Execute()
+        }
+    })
 })(App)

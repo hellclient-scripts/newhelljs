@@ -4,6 +4,7 @@ $.Module(function (App) {
         Target: "",
         Count: 0,
         All: 0,
+        Formula: null,
         Number: 0,
     }
     Lianyao.Finish = () => {
@@ -75,8 +76,77 @@ $.Module(function (App) {
         }
     )
     Lianyao.Make = () => {
+        // PlanMake.Execute()
+        if (Lianyao.Data.Formula == null) {
+            Lianyao.Formula()
+            return
+        }
+        let needbuy = []
+        Lianyao.Data.Formula.forEach(item => {
+            let sum = App.Data.Item.List.FindByName(item.Name).Sum()
+            if (sum < item.Count) {
+                needbuy.push(`buy ${item.Count - sum} ${item.Name} from ping yizhi`)
+            }
+        });
+        if (needbuy.length) {
+            Lianyao.BuyAll(needbuy)
+            return
+        }
         PlanMake.Execute()
     }
+    Lianyao.BuyAll = (cmds) => {
+        $.PushCommands(
+            $.To("65"),
+            $.Do(cmds.join("\n")),
+            $.Do("i"),
+            $.Wait(1000),
+            $.Sync(),
+            $.Function(Lianyao.Make)
+        )
+        $.Next()
+    }
+    let marcherFormualStart = /^炼制.+需要以下这些药材：$/
+    let marcherFormualItem = /^([一二三四五六七八九十]+).(\S+)$/
+    let PlanFormula = new App.Plan(
+        App.Positions["Response"],
+        (task) => {
+            let result = []
+            let mode = 0
+            task.AddTrigger(marcherFormualStart, (t, r) => {
+                mode = 1
+                result = []
+                return true
+            })
+            task.AddTrigger(marcherFormualItem, (t, r, e) => {
+                mode = 2
+                result.push({ Name: r[2], Count: App.CNumber.ParseNumber(r[1]) })
+                e.Context.Set("quest.makeyao.formulaitem", true)
+                return true
+            })
+            task.AddCatcher("line", (c, e) => {
+                if (mode == 2 && !e.Context.Get("quest.makeyao.formulaitem")) {
+                    mode = 3
+                    task.Data = result
+                }
+                return true
+            })
+            App.Send(`make ${Lianyao.Data.Target} ?`)
+            App.Sync()
+        },
+        (result) => {
+            if (result.Task.Data) {
+                Lianyao.Data.Formula = result.Task.Data
+                Lianyao.Make()
+                return
+            }
+            App.Send("keep danyu mo")
+            PrintSystem(`配方获取出错，请检查药物名${Lianyao.Data.Target}是否正确。`)
+        }
+    )
+    Lianyao.Formula = () => {
+        PlanFormula.Execute()
+    }
+
     Lianyao.CheckMo = () => {
         if (App.Data.Item.List.FindByIDLower("danyu mo").First() == null && App.Data.Item.List.FindByIDLower("yanbo").First() == null) {
             let qkmo = App.Data.QiankunBag.FindByIDLower("danyu mo").First()
@@ -106,7 +176,10 @@ $.Module(function (App) {
     Lianyao.Start = () => {
         if (!App.Quests.Stopped && Sum() < Lianyao.Data.Number) {
             $.PushCommands(
-                $.Prepare(),
+                $.Prepare("", {
+                    GoldKeep: 30,
+                    GoldMax: 100,
+                }),
                 $.Function(Lianyao.CheckMo),
             )
         }
@@ -154,6 +227,7 @@ $.Module(function (App) {
                 Fail: 0,
                 Number: 0,
                 All: 0,
+                Formula: null,
             }
         }
         Lianyao.Data.Number = data[1] - 0

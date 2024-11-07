@@ -3,6 +3,8 @@
     let module = {}
     module.DefaultStepTimeout = 3000
     module.DefaultResendDelay = 500
+    module.DefaultOnModeChange = (map, oldmode, newmode) => {
+    }
     class Room {
         ID = ""
         Name = ""
@@ -10,6 +12,7 @@
         Zone = ""
         Exits = []
         Data = {}
+        Keep = false//设为true，不更新room,一般用于look更新当前房间信息
         WithName(name) {
             this.Name = name
             return this
@@ -81,6 +84,15 @@
         StepPlan = null
         StepTimeout = 0
         ResendDelay = 0
+        Mode = ""
+        ChangeMode(mode) {
+            if (mode != this.Mode) {
+                let om = this.Mode
+                this.Mode = mode
+                this.OnModeChange(this, om, mode)
+            }
+        }
+        OnModeChange = module.DefaultOnModeChange
         Mazes = {}
         Trace = DefaultTrace
         AppendTagsIniter(fn) {
@@ -118,7 +130,10 @@
             return result
         }
         EnterNewRoom() {
-            this.Room = new Room()
+            if (!this.Room.Keep) {
+                this.Room = new Room()
+            }
+            this.Room.Keep = false
             this.Position.StartNewTerm()
             return this.Room
         }
@@ -288,6 +303,7 @@
         StartMove(move) {
             this.Move = move
             this.MovePosition.StartNewTerm()
+            this.ChangeMode("")
             move.Walk(this)
         }
         NewRoute(...initers) {
@@ -373,7 +389,7 @@
                 steps = this.Next(this, map)
             }
             if (typeof steps == "function") {
-                steps(map)
+                steps(this, map)
                 return
             }
             if (steps == null || steps.length == 0) {
@@ -383,6 +399,7 @@
             if (steps.length == 1 && this.#maze == null && map.Room.ID) {
                 let maze = map.CheckEnterMaze(map, this, steps[0])
                 if (maze != null) {
+                    map.ChangeMode("maze")
                     this.#maze = maze
                     maze.NextRoom = steps[0].Next
                     maze.Walk(maze, this, map)

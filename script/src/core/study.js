@@ -516,7 +516,8 @@
     }))
     App.UserQueue.UserQueue.RegisterCommand("#study", function (uq, data) {
         uq.Commands.Append(
-            App.NewPrepareCommand("commonWithStudy")
+            App.NewPrepareCommand("commonWithStudy"),
+            uq.Commands.NewFunctionCommand(function () { uq.Next() }),
         )
         uq.Commands.Next()
     })
@@ -525,7 +526,8 @@
     })
     App.UserQueue.UserQueue.RegisterCommand("#jifa", function (uq, data) {
         uq.Commands.Append(
-            App.Commands.NewDoCommand(GetVariable("jifa"))
+            App.Commands.NewDoCommand(GetVariable("jifa")),
+            uq.Commands.NewFunctionCommand(function () { uq.Next() }),
         )
         uq.Commands.Next()
     })

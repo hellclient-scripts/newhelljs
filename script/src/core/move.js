@@ -4,6 +4,36 @@
     App.Map.Movement.MutlipleStepConverter.Checker = function (step, index, move, map) {
         return index != 0 && dfsModule.Backward[step.Command] != null
     }
+    App.Map.Movement.DefaultLocateNext = (move, map, locate) => {
+        //避免被关在房间里
+        if (App.Map.Room.Exits.length == 0) {
+            App.Send("open door;open gate")
+            App.Look()
+            return () => {
+                App.Sync(() => {
+                    let steps = locate.MoveNext(move, map)
+                    move.TrySteps(map, steps)
+                })
+            }
+        }
+        return locate.MoveNext(move, map)
+    }
+    App.Map.Movement.CheckRoomCmd = "#l"
+    App.Look = () => {
+        App.Map.Room.Keep = true
+        App.Send("l")
+    }
+    App.Sender.RegisterAlias("#l", function (data) {
+        App.Look()
+    })
+
+    App.Map.OnModeChange = (map, old, mode) => {
+        if (mode == "locate") {
+            App.Send("unset brief")
+        } else {
+            App.Send("set brief")
+        }
+    }
     App.Move = {}
     let refilter = /[。·！]/g;
     App.Move.Filterdir = function (dir) {
@@ -29,6 +59,9 @@
         return App.Map.NewRoute(new App.Map.Movement.Path(path.map(value => App.Map.NewStep(value))), ...initers)
     }
     App.Move.NewTo = function (target, ...initers) {
+        if (typeof target == "string") {
+            target = target.split(",").map((val) => val.trim())
+        }
         return App.Map.NewRoute(new App.Map.Movement.To(target), ...initers)
     }
     App.Move.NewRooms = function (rooms, ...initers) {
@@ -118,7 +151,9 @@
 
     }
     App.Move.OnWalkFail = function (name) {
-        App.Core.Blocker.BlockStepRetry()
+        App.Map.Position.Wait(1000, 0, () => {
+            App.Core.Blocker.BlockStepRetry()
+        })
     }
     App.Move.OnBlocker = function (name) {
         App.Core.Blocker.KillBlocker(name)

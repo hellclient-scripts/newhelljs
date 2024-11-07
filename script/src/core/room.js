@@ -10,7 +10,7 @@
     initRoom()
     App.Engine.SetFilter("core.normalroomname", function (event) {
         let words = App.History.CurrentOutput.Words
-        if (words.length == 1 && words[0].Color == "Cyan" && words[0].Bold == true) {
+        if (words.length == 1 && words[0].Color != "" && words[0].Bold == true) {
             App.RaiseEvent(event)
         }
     })

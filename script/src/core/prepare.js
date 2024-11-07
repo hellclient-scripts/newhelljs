@@ -104,11 +104,13 @@
     App.Proposals.Register("gold", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let gold = App.Data.Item.List.FindByName("黄金").First()
         let num = gold ? gold.GetData().Count : 0
-        if (num >= App.Params.GoldMax) {
+        let goldmax = context.GoldMax != null ? context.GoldMax : App.Params.GoldMax
+        let goldkeep = context.GoldKeep != null ? context.GoldKeep : App.Params.GoldKeep
+        if (num >= goldmax) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("cun " + Math.floor((num - (App.Params.GoldMax - App.Params.GoldKeep) / 2)) + " gold;i;score"),
+                    App.Commands.NewDoCommand("cun " + Math.floor((num - (goldmax - goldkeep) / 2)) + " gold;i;score"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )
@@ -120,11 +122,13 @@
     App.Proposals.Register("qu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let gold = App.Data.Item.List.FindByName("黄金").First()
         let num = gold ? gold.GetData().Count : 0
-        if (num < App.Params.GoldKeep) {
+        let goldmax = context.GoldMax != null ? context.GoldMax : App.Params.GoldMax
+        let goldkeep = context.GoldKeep != null ? context.GoldKeep : App.Params.GoldKeep
+        if (num < goldkeep) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocBank),
-                    App.Commands.NewDoCommand("qu " + Math.floor(((App.Params.GoldMax - App.Params.GoldKeep) / 2 - num)) + " gold;i;score"),
+                    App.Commands.NewDoCommand("qu " + Math.floor(((goldmax + goldkeep) / 2 - num)) + " gold;i;score"),
                     App.NewSyncCommand(),
                     App.Commands.NewWaitCommand(1000),
                 )

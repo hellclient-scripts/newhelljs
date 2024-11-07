@@ -1,5 +1,5 @@
 (function (App) {
-    let cancelMove = (map) => { map.CancelMove() }
+    let cancelMove = (move, map) => { map.CancelMove() }
     let module = {}
     module.CheckRoomCmd = "l"
     module.Filter = (steps, filter) => {
@@ -22,14 +22,19 @@
         })
         return result
     }
+    module.DefaultLocateNext = (move, map, locate) => {
+        return locate.MoveNext(move, map)
+    }
+
     let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
     class Locate {
         DFS = null
+        LocateNext = module.DefaultLocateNext
         OnFound(move, map) {
             if (map.Room.ID) {
                 if (this.DFS) {
                     this.DFS = null
-                    App.RaiseEvent(new App.Event("lib.map.roomfound", move))
+                    map.ChangeMode("")
                 }
             }
         }
@@ -48,9 +53,12 @@
             return true
         }
         Next(move, map) {
+            return this.LocateNext(move, map, this)
+        }
+        MoveNext(move, map) {
             if (this.DFS == null) {
                 this.DFS = new dfsModule.DFS().New()
-                App.RaiseEvent(new App.Event("lib.map.roommiss", move))
+                map.ChangeMode("locate")
                 return [map.NewStep(module.CheckRoomCmd)]
             }
             this.DFS = this.DFS.Arrive(map.Room.Exits).Next()
@@ -281,6 +289,7 @@
     module.Ordered = Ordered
     module.MaxStep = 5
     module.Locate = Locate
+
     let DefaultChecker = function (step, index, move, map) {
         return dfsModule.Backward[step.Command] != null
     }
