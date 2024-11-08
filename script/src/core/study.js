@@ -474,11 +474,10 @@
         App.ReloadVariable()
     }
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        let max=context["JiquMax"]!=null?context["JiquMax"]:App.Core.Study.Jiqu.Max
+        let max = context["JiquMax"] != null ? context["JiquMax"] : App.Core.Study.Jiqu.Max
         if (App.Data.Player.HP["经验"] > 100000 && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Move.NewToCommand(App.Params.LocDazuo),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun regenerate"),
                     App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
@@ -486,6 +485,9 @@
                     App.Commands.NewDoCommand("hp"),
                     App.NewSyncCommand(),
                 )
+                if (App.Map.Room.Data["NoFight"]) {
+                    App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
+                }
                 App.Next()
             }
         }

@@ -90,5 +90,7 @@
         })
     }
     App.BindEvent("core.idhere", App.Core.Room.OnIDHere)
-
+    App.BindEvent("core.nofight", function () {
+        App.Map.Room.Data["NoFight"] = true
+    })
 })(App)

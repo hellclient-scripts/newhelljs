@@ -1,5 +1,6 @@
 (function (App) {
     let module = {}
+    module.Adjust = -50//timer有最小间隔，避免触发到下一秒
     let eventModule = App.RequireModule("helllibjs/event/event.js")
     class Plan {
         constructor(position, initfn, callback) {
@@ -218,7 +219,7 @@
         OnTime() {
             if (this.Enabled) {
                 let now = (new Date).getTime()
-                if (now > (this.Last + this.Duration)) {
+                if (now >= (this.Last + this.Duration + module.Adjust)) {
                     this.Last = (new Date()).getTime()
                     if (this.NoRepeat) {
                         this.Enabled = false

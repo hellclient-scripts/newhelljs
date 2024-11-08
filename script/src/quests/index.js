@@ -10,6 +10,7 @@
     App.Include("src/quests/makeyao/makeyao.js")
     App.Include("src/quests/lianskill/lianskill.js")
     App.Include("src/quests/dazuo/dazuo.js")
+    App.Include("src/quests/tuna/tuna.js")
     App.Include("src/quests/eatlu/eatlu.js")
     App.Include("src/quests/misc/quit.js")
     App.Include("src/quests/misc/stop.js")

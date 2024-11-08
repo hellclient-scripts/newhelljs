@@ -64,12 +64,14 @@
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                     if (num < 10) { num = 10 }
                     App.Commands.PushCommands(
-                        App.Move.NewToCommand(App.Params.LocDazuo),
                         App.Commands.NewDoCommand("dazuo " + num),
                         App.NewNobusyCommand(),
                         App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                         App.NewSyncCommand(),
                     )
+                    if (App.Map.Room.Data["NoFight"]) {
+                        App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
+                    }
                     App.Next()
                 }
             }
@@ -93,11 +95,10 @@
     }))
     App.Proposals.Register("heal", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
-        let healBelow=context["HealBelow"]!=null?context["HealBelow"]:App.Params.HealBelow
+        let healBelow = context["HealBelow"] != null ? context["HealBelow"] : App.Params.HealBelow
         if (App.Data.Player.HP["气血百分比"] <= healBelow && jifaForce > 20) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Move.NewToCommand(App.Params.LocDazuo),
                     App.Commands.NewDoCommand("yun heal"),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),

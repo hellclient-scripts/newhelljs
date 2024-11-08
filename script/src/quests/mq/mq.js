@@ -94,14 +94,14 @@ $.Module(function (App) {
         if (App.Quests.Stopped) {
             return false
         }
-        if (App.QuestParams["mqletter"] == 1) {
-            return false
-        }
         if (App.Core.Dispel.Need) {
             return false
         }
         if (MQ.Data.NPC.Head == false) {
             return true
+        }
+        if (App.QuestParams["mqletter"] == 0) {
+            return false
         }
         let context = {
             NeiliMin: 15,
@@ -244,7 +244,7 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(matcherlq1, (tri, result) => {
-                if (mode == 1) {
+                if (mode == 1 || mode == 0) {
                     mode = 2
                     name = result[3]
                     location = result[5]
@@ -279,6 +279,7 @@ $.Module(function (App) {
                 return true
             })
             task.AddTimer(10000)
+            App.Send("l letter of me")
         },
         (result) => {
             if (result.Task.Data) {
@@ -294,7 +295,7 @@ $.Module(function (App) {
     )
     MQ.WaitLetter = () => {
         Note("接信")
-        if (App.Data.Player.HP["气血百分比"]  < App.Params.HealBelow) {
+        if (App.Data.Player.HP["气血百分比"] < App.Params.HealBelow) {
             App.Send("yun heal")
         } else if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
             App.Send(App.Random(App.Core.Study.Jiqu.Commands))
