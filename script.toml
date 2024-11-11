@@ -395,7 +395,7 @@ Timers = []
   ID = "d1fv5jkjvdotit726vp8pf"
   Name = "core.walkbusy"
   Enabled = true
-  Match = "^(你现在正忙着呢。|你突然发现眼前的景象有些迷乱。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
+  Match = "^(你现在正忙着呢。|你的动作还没有完成，不能移动|你逃跑失败|你被拦住了去路|什么都等你忙完了再说吧|等你忙完了再说吧|等你打完了架再说吧|你正忙，等有空了再说。|你觉得.*的感觉相当飘忽|你发现有洞穴内并不安全，还是还先清理掉虾兵虾将在走也不迟|你上一个动作还没有完成，先等等吧。)"
   Send = ""
   ColourChangeType = 0
   Colour = 0
@@ -1290,6 +1290,68 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g1fa90otbd14719uqq9l"
+  Name = "core.walkresend"
+  Enabled = true
+  Match = "^(你突然发现眼前的景象有些迷乱。)$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.walkresend\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g1nfmk2a6lu5723hlbia"
+  Name = "core.needneili"
+  Enabled = true
+  Match = "^(你现在真气不够|你现在内力太弱)"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.needneili\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -1737,7 +1799,7 @@ Timers = []
 [[RequiredParams]]
   Name = "weapon"
   Desc = "武器"
-  Intro = "武器相关设置\n\n支持\n#wield 武器ID\n#wear 空手武器ID\n#wield.别名 武器ID\n的格式\n\n以及\n#repair 修理装备id\n#repair 修理装备id * 修理需要的黄金\n的格式"
+  Intro = "武器相关设置\n\n支持\n#wield 武器ID\n#wear 空手武器ID\n#wield.别名 武器ID\n的格式\n\n以及\n#repair 修理装备id\n#repair 修理装备id * 修理需要的黄金\n的格式\n\n有10 lv的话通过\n\n#touch 武器id\n\n设置touch的武器"
 
 [[RequiredParams]]
   Name = "items"

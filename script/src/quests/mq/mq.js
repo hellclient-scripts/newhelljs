@@ -306,7 +306,7 @@ $.Module(function (App) {
             }
             App.Send(`dazuo ${num}`)
         }
-        $.RaiseStage("mqletter")
+        $.RaiseStage("wait")
         PlanWaitLetter.Execute()
     }
     MQ.Ready = () => {

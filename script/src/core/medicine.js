@@ -57,7 +57,7 @@
 
     }
     App.Proposals.Register("eatyao", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= 20) {
+        if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
             return eatyao("回精")
         }
         if (App.Data.Player.HP["气血百分比"] <= 20) {
@@ -66,7 +66,7 @@
         if (App.Data.Player.HP["精气百分比"] <= 20) {
             return eatyao("疗精")
         }
-        if (App.Core.Dispel.Need && (App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= 10) {
+        if (App.Core.Dispel.Need && (App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= 10 && App.Core.Weapon.Touch == "") {
             return eatyao("回内")
         }
         return null

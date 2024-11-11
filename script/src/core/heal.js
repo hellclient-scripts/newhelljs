@@ -39,6 +39,15 @@
         }
         let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
         if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= neimin) {
+            if (App.Core.Weapon.Touch) {
+                return function () {
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand(`touch ${App.Core.Weapon.Touch};yun recover;yun regenerate;hp`),
+                        App.NewSyncCommand(),
+                    )
+                    App.Next()
+                }
+            }
             if ((new Date()).getTime() - App.Core.Heal.LastSleep > App.Core.Heal.SleepInterval) {
                 return function () {
                     App.Commands.PushCommands(
@@ -169,7 +178,29 @@
                     App.Commands.NewDoCommand("hp"),
                     App.NewSyncCommand(),
                 )
+            }
+            else if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin - App.Data.Player.HP["当前精力"]).toFixed()
+                if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
+                if (num < 10) { num = 10 }
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand("tuna " + num),
+                    App.NewNobusyCommand(),
+                    App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
+                    App.NewSyncCommand(),
+                    App.Core.Heal.NewRestCommand(),
+
+                )
             } else if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
+                if (App.Core.Weapon.Touch) {
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand(`touch ${App.Core.Weapon.Touch};yun recover;yun regenerate;hp`),
+                        App.NewSyncCommand(),
+                        App.Core.Heal.NewRestCommand(),
+                    )
+                    App.Next()
+                    return
+                }
                 let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
                 if (jifaForce < 120) {
                     Note("有效内功过低，发呆等恢复")
@@ -177,6 +208,7 @@
                         App.Commands.NewWaitCommand(3000),
                         App.Commands.NewDoCommand("hp"),
                         App.NewSyncCommand(),
+                        App.Core.Heal.NewRestCommand(),
                     )
                     App.Next()
                     return

@@ -32,6 +32,9 @@
         Data = ""
         Exclude = false
     }
+    let NeverCondition = new Condition()
+    NeverCondition.Type = "never"
+
     class Conditions {
         #registered = []
         Parse = module.Parse
@@ -64,6 +67,8 @@
                 return this.Check(conditions, target)
             }
         }
+        Never = [NeverCondition]
+        Always = []
     }
     module.Condition = Condition
     module.Conditions = Conditions

@@ -9,12 +9,6 @@
         if (App.Map.Room.Exits.length == 0) {
             App.Send("open door;open gate")
             App.Look()
-            return () => {
-                App.Sync(() => {
-                    let steps = locate.MoveNext(move, map)
-                    move.TrySteps(map, steps)
-                })
-            }
         }
         return locate.MoveNext(move, map)
     }

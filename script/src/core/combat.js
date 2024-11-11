@@ -3,6 +3,11 @@
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
 
     App.Core.Combat = {}
+    class Block {
+        Name = ""
+        Conditions = []
+        Actions = []
+    }
     class Option {
         constructor(quest) {
             this.Quest = quest
@@ -32,7 +37,7 @@
         }
     }
     App.Core.Combat.Actions = []
-
+    App.Core.Combat.Blocks = []
     App.NewCombat = function (quest) {
         return new Option(quest)
     }
@@ -44,6 +49,12 @@
             App.Combat.Position.Term.Set("core.combat.damage", 0)
             task.AddTrigger("一边打架一边驯兽？你真是活腻了！", function () {
                 OmitOutput()
+                return true
+            })
+            task.AddCatcher("core.needneili", () => {
+                if (App.Core.Weapon.Touch) {
+                    App.Send(`touch ${App.Core.Weapon.Touch}`)
+                }
                 return true
             })
             task.AddTrigger(reDamage, function (trigger, result) {
@@ -123,8 +134,23 @@
         data = data.replaceAll("$wpoff", App.Core.Weapon.OffCommand())
         return data
     }
+    let pickActions = () => {
+        for (var i in App.Core.Combat.Blocks) {
+            let block = App.Core.Combat.Blocks[i]
+            for (var conditionindex in block.Conditions) {
+                if (App.Quests.Conditions.Check(block.Conditions[conditionindex])) {
+                    Note(`采用战术[${block.Name}]`)
+                    App.Core.Combat.Actions = block.Actions
+                    return
+                }
+            }
+        }
+    }
     App.Core.Combat.DoCombat = function (id, data) {
         App.Combat.Target = id
+        App.Combat.Data = data
+        App.Core.Combat.Actions = []
+        pickActions()
         App.Core.Combat.FilterActions("#before").forEach(action => {
             App.Send(App.Core.Combat.ReplaceCommand(action.Data))
         })
@@ -169,19 +195,44 @@
         commands.forEach(c => { filter[c] = true })
         let result = []
         App.Core.Combat.Actions.forEach(action => {
-            if (filter[action.Command]) {
-                result.push(action)
+            if (App.Quests.Conditions.Check(action.Conditions)) {
+                if (filter[action.Command]) {
+                    result.push(action)
+                }
             }
         })
         return result
     }
     App.Core.Combat.Load = function () {
         App.Core.Combat.Actions = []
+        let currentBlock = new Block()
+        currentBlock.Conditions.push(App.Quests.Conditions.Always)
+        App.Core.Combat.Blocks.push(currentBlock)
         App.LoadVariable("combat").forEach(data => {
             let action = actionModule.Parse(data)
-            if (action.Command == "") { action.Command = "#send" }
-            App.Core.Combat.Actions.push(action)
+            switch (action.Command) {
+                case "#block":
+                    currentBlock = new Block()
+                    currentBlock.Name = action.Data
+                    currentBlock.Conditions = [App.Quests.Conditions.Never]
+                    App.Core.Combat.Blocks.unshift(currentBlock)
+                    return
+                case "#apply":
+                    currentBlock.Conditions.push(action.Conditions)
+                    return
+                case "":
+                    action.Command = "#send"
+                    break
+            }
+            currentBlock.Actions.push(action)
+            // App.Core.Combat.Actions.push(action)
         })
     }
     App.Core.Combat.Load()
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("ctype", function (data, target) {
+        return App.Combat.Data && App.Combat.Data.Quest == data.trim()
+    }))
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("ctag", function (data, target) {
+        return App.Combat.Data && App.Combat.Data.Tags[data.trim()]
+    }))
 })(App)

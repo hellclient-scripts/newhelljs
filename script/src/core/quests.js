@@ -46,4 +46,7 @@
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("yueli", function (data, target) {
         return App.Data.Player.Score["阅历"] >= (data - 0)
     }))
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("pot", function (data, target) {
+        return App.Data.Player.HP["潜能"] >= (data - 0)
+    }))
 })(App)            

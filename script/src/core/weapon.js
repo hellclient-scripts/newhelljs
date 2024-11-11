@@ -4,6 +4,7 @@
     App.Core.Weapon.Wield = []
     App.Core.Weapon.Named = {}
     App.Core.Weapon.Repair = []
+    App.Core.Weapon.Touch = ""
     App.Core.Weapon.Last = 0
     App.Core.Weapon.Duration = {}
     class Repair {
@@ -33,6 +34,7 @@
     }
     let reDruation = /^耐 久 值 :\s*(\d+)\/\d+\s*$/
     let reLevel = /^(.+)的等级：(\d+)\/(\d+)$/
+    let reLevel10 = /^(.+)的等级：无上神品  LV10$/
     let reDamage = /^装备效果 : (兵器|空手)伤害力 \+(\d+)$/
 
     let PlanDuation = new App.Plan(App.Positions["Connect"],
@@ -46,6 +48,11 @@
             task.AddTrigger(reLevel, function (trigger, result) {
                 name = result[1]
                 level = result[2] - 0
+                return true
+            })
+            task.AddTrigger(reLevel10, function (trigger, result) {
+                name = result[1]
+                level = 10
                 return true
             })
             task.AddTrigger(reDamage, function (trigger, result) {
@@ -158,6 +165,7 @@
     App.Core.Weapon.Load = function () {
         App.Core.Weapon.Wield = []
         App.Core.Weapon.Named = {}
+        App.Core.Weapon.Touch = ""
         let named = {}
         App.Core.Weapon.Repair = []
         let index = 1
@@ -170,6 +178,10 @@
                     return
                 }
                 App.Core.Weapon.Repair.push(repair)
+                return
+            }
+            if (action.Command == "#touch") {
+                App.Core.Weapon.Touch = action.Data.trim()
                 return
             }
             if (action.Command.trim() == "") { action.Command = "#wield" }
@@ -225,8 +237,9 @@
     })
 
     App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        let dur = context.WeaponDurationMin || App.Params.WeaponDurationMin
         for (var index in App.Core.Weapon.Duration) {
-            if (App.Core.Weapon.Duration[index].Duration < App.Params.WeaponDurationMin) {
+            if (App.Core.Weapon.Duration[index].Duration < dur) {
                 let repair = App.Core.Weapon.Repair[index - 0]
                 if (repair) {
                     return function () {
@@ -235,6 +248,7 @@
                             App.Move.NewToCommand(App.Params.LocRepair),
                             App.Commands.NewDoCommand("repair " + repair.ID),
                             App.Commands.NewDoCommand("repair " + repair.ID),
+                            App.Commands.NewDoCommand("i"),
                             App.Commands.NewFunctionCommand(() => {
                                 checkerDuration.Force()
                                 App.Next()
@@ -256,7 +270,7 @@
         App.Send("#wpon")
         App.RaiseEvent(event)
     })
-    App.BindEvent("core.disarmed",(e)=>{
+    App.BindEvent("core.disarmed", (e) => {
         App.Core.Weapon.PickWeapon()
         App.Send(App.Core.Weapon.OnCommand())
     })

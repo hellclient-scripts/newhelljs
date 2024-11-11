@@ -102,8 +102,10 @@
                         $.To(loc),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
+                        $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
                         $.Wait(1000),
+                        $.Do("halt"),
                         $.Sync(),
                     )
                     $.Next()
@@ -122,8 +124,10 @@
                         $.Do("yun recover"),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
+                        $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
                         $.Wait(1000),
+                        $.Do("halt"),
                         $.Sync(),
                     )
                     $.Next()
@@ -150,8 +154,10 @@
                         $.To(loc),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
+                        $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
                         $.Wait(1000),
+                        $.Do("halt"),
                         $.Sync(),
                     )
                     $.Next()
@@ -226,6 +232,9 @@
                         }
                     default:
                         let tskill = App.Data.Player.Skills[data[0]]
+                        if (data[1]==null||isNaN(data1)){
+                            data[1]="0"
+                        }
                         if (tskill && !isNaN(data[1])) {
                             let level = data[1] ? data[1].trim() : "0"
                             let abs = 1
@@ -255,14 +264,16 @@
         Next = 0
         DefaultType = ""
     }
-    let filterskill = (list, mode) => {
+    let filterskill = (list, mode, type) => {
         let filtered = []
         let important = null
         list.forEach(learn => {
             if (learn.Check()) {
-                filtered.push(learn)
-                if (learn.Important && important == null) {
-                    important = learn
+                if (!type || learn.Type == type) {
+                    filtered.push(learn)
+                    if (learn.Important && important == null) {
+                        important = learn
+                    }
                 }
             }
         })
@@ -294,8 +305,8 @@
         return null
 
     }
-    App.Core.Study.FilterSkill = () => {
-        return filterskill(App.Core.Study.Learn, App.Core.Study.LearnMode)
+    App.Core.Study.FilterSkill = (type) => {
+        return filterskill(App.Core.Study.Learn, App.Core.Study.LearnMode, type)
     }
     App.Core.Study.AllCanLearn = () => {
         let result = []
@@ -315,8 +326,8 @@
         })
         return result
     }
-    App.Core.Study.FilterLian = () => {
-        return filterskill(App.Core.Study.Lian, App.Core.Study.LianMode)
+    App.Core.Study.FilterLian = (type) => {
+        return filterskill(App.Core.Study.Lian, App.Core.Study.LianMode, type)
     }
     App.Core.Study.CurrentSkill = null
     App.Core.Study.LastPot = 0
@@ -473,6 +484,63 @@
         SetVariable("study", lines.join("\n"))
         App.ReloadVariable()
     }
+    App.Sender.RegisterAlias("#yanjiu", function (data) {
+        let skill = App.Core.Study.FilterSkill("yanjiu")
+        if (skill) {
+            let times = data - 0
+            if (isNaN(times) || times <= 0) {
+                times = 100
+            }
+            if (App.Data.Player.HP["潜能"] > times) {
+                var cmds = ["yanjiu " + skill.SkillID + " " + times]
+                if (skill.Before) { cmds.unshift(skill.Before) }
+                if (skill.After) { cmds.push(skill.After) }
+                App.Send(cmds.join("\n"))
+                App.Send("yun recover;yun regenerate;hp")
+            }
+        }
+    })
+    App.Sender.RegisterAlias("#lian", function () {
+        let skill = App.Core.Study.FilterLian("lian")
+        if (skill) {
+            var times = App.Core.Study.LianMax
+            var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
+            if (skill.Before) { cmds.unshift(skill.Before) }
+            if (skill.After) { cmds.push(skill.After) }
+            App.Send(cmds.join("\n"))
+            App.Send("yun recover;yun regenerate;hp")
+        }
+    })
+    App.Sender.RegisterAlias("#yanjiulian", function (data) {
+        let skill = App.Core.Study.FilterSkill("yanjiu")
+        let learned = false
+        if (skill) {
+            let times = data - 0
+            if (isNaN(times) || times <= 0) {
+                times = 100
+            }
+            if (App.Data.Player.HP["潜能"] > times) {
+                learned = true
+                var cmds = ["yanjiu " + skill.SkillID + " " + times]
+                if (skill.Before) { cmds.unshift(skill.Before) }
+                if (skill.After) { cmds.push(skill.After) }
+                App.Send(cmds.join("\n"))
+            }
+        }
+        skill = App.Core.Study.FilterLian("lian")
+        if (skill) {
+            learned = true
+            var times = App.Core.Study.LianMax
+            var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
+            if (skill.Before) { cmds.unshift(skill.Before) }
+            if (skill.After) { cmds.push(skill.After) }
+            App.Send(cmds.join("\n"))
+        }
+        if (learned) {
+            App.Send("yun recover;yun regenerate;hp")
+        }
+    })
+
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let max = context["JiquMax"] != null ? context["JiquMax"] : App.Core.Study.Jiqu.Max
         if (App.Data.Player.HP["经验"] > 100000 && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {

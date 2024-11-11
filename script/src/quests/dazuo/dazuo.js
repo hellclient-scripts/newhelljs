@@ -16,11 +16,12 @@ $.Module(function (App) {
                     if (num < 10) {
                         num = 10
                     }
+                    let jifaForce = App.Data.Player.Jifa["force"] ? App.Data.Player.Jifa["force"].Level : 0
                     $.PushCommands(
                         $.To(App.Params.LocDazuo),
                         $.Do(`dazuo ${num}`),
                         $.Nobusy(),
-                        $.Do("hp"),
+                        $.Do(`${jifaForce < 120 ? "" : "yun recover"};hp`),
                         $.Sync(),
                     )
                 }

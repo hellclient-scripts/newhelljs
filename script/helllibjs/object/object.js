@@ -122,6 +122,15 @@
             })
             return result
         }
+        SearchID(key) {
+            let result = new List()
+            this.Items.forEach(item => {
+                if (item.ID.indexOf(key) > -1) {
+                    result.Append(item)
+                }
+            })
+            return result
+        }
         SearchLabel(key) {
             let result = new List()
             this.Items.forEach(item => {
@@ -130,6 +139,16 @@
                 }
             })
             return result
+        }
+        ExcludeID(id) {
+            let result = new List()
+            this.Items.forEach(item => {
+                if (item.ID != id) {
+                    result.Append(item)
+                }
+            })
+            return result
+
         }
         FindByFilter(filter) {
             let result = new List()

@@ -116,11 +116,8 @@
         }
         Retry(move, map) {
             this.Path = null
-            if (this.Locate.DFS == null) {
-                move.Walk(map)
-            } else {
-                this.Locate.OnStepTimeout(move, map)
-            }
+            this.Locate.DFS = null
+            move.Walk(map)
         }
         Next(move, map) {
             if (this.Path != null) {
@@ -161,11 +158,8 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            if (this.Locate.DFS == null) {
-                move.Walk(map)
-            } else {
-                this.Locate.OnStepTimeout(move, map)
-            }
+            this.Locate.DFS = null
+            move.Walk(map)
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {
@@ -232,11 +226,8 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            if (this.Locate.DFS == null) {
-                move.Walk(map)
-            } else {
-                this.Locate.OnStepTimeout(move, map)
-            }
+            this.Locate.DFS = null
+            move.Walk(map)
         }
         OnStepTimeout(move, map) {
             if (this.Locate) {
