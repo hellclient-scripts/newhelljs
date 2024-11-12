@@ -36,7 +36,7 @@
             return this
         }
     }
-    App.Core.Combat.Actions = []
+    App.Core.Combat.Actions = null
     App.Core.Combat.Blocks = []
     App.NewCombat = function (quest) {
         return new Option(quest)
@@ -135,6 +135,9 @@
         return data
     }
     let pickActions = () => {
+        if (App.Core.Combat.Actions == null) {
+            App.Core.Combat.Actions = []
+        }
         for (var i in App.Core.Combat.Blocks) {
             let block = App.Core.Combat.Blocks[i]
             for (var conditionindex in block.Conditions) {
@@ -149,7 +152,7 @@
     App.Core.Combat.DoCombat = function (id, data) {
         App.Combat.Target = id
         App.Combat.Data = data
-        App.Core.Combat.Actions = []
+        App.Core.Combat.Actions = null
         pickActions()
         App.Core.Combat.FilterActions("#before").forEach(action => {
             App.Send(App.Core.Combat.ReplaceCommand(action.Data))
@@ -191,6 +194,9 @@
         }
     })
     App.Core.Combat.FilterActions = function (...commands) {
+        if (App.Core.Combat.Actions == null) {
+            pickActions()
+        }
         let filter = {}
         commands.forEach(c => { filter[c] = true })
         let result = []
@@ -204,7 +210,7 @@
         return result
     }
     App.Core.Combat.Load = function () {
-        App.Core.Combat.Actions = []
+        App.Core.Combat.Actions = null
         let currentBlock = new Block()
         currentBlock.Conditions.push(App.Quests.Conditions.Always)
         App.Core.Combat.Blocks.push(currentBlock)

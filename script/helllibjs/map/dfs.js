@@ -22,7 +22,7 @@
         "southdown": "northup", "sd": "nu",
         "westdown": "eastup", "eu": "wd",
     }
-    module.Depath = 8
+    module.Depath = 20
     let DFS = function (depth, backward) {
         //最大步数
         this.Depth = depth ? depth : module.Depath

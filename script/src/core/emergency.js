@@ -10,8 +10,25 @@
         Note("治疗被人打了")
         App.Reconnect()
     }
+    App.Core.Emergency.Reset = () => {
+        for (var key in App.Positions) {
+            App.Positions[key].Discard()
+        }
+        App.Commands.Discard()
+        if (!App.Quests.IsStopped()) {
+            App.Commands.Append(
+                App.Commands.NewFunctionCommand(() => {
+                    Note("重新执行任务队列")
+                    App.Quests.Restart()
+                })
+            )
+        }
+        App.Next()
+    }
     App.BindEvent("core.healcombat", App.Core.Emergency.OnHealCombat)
-
+    App.BindEvent("core.fubenfail", (event) => {
+        event.Context.Propose(App.Core.Emergency.Reset)
+    })
     let checkdeathmode = 0
     let PlanCheckDeath = new App.Plan(App.Positions.Connect,
         function (task) {
@@ -50,7 +67,7 @@
             App.Next()
         }
     )
-    App.Core.Emergency.NoLogin=false
+    App.Core.Emergency.NoLogin = false
     App.Core.Emergency.CheckDeath = function () {
         App.Commands.PushCommands(
             App.Commands.NewDoCommand("hp;i;cha force"),

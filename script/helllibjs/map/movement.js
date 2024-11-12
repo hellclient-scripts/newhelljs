@@ -40,13 +40,10 @@
         }
         OnStepTimeout(move, map) {
             if (this.DFS != null) {
-                let level = this.DFS.Skip()
-                if (level == null) {
-                    map.CancelMove()
-                    return false
+                this.DFS = this.DFS.Skip().Next()
+                if (this.DFS != null) {
+                    move.Pending = [map.NewStep(this.DFS.Command)]
                 }
-                this.DFS = level.Next()
-                move.Pending = [map.NewStep(this.DFS.Command)]
                 move.Walk(map)
                 return false
             }

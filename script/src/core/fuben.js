@@ -2,6 +2,7 @@
     let line = App.Include("helllibjs/lib/line/line.js")
 
     App.Core.Fuben = {}
+    App.Core.Fuben.Last = 0
     App.Core.Fuben.Current = null
     App.Core.Fuben.NewMaze = () => {
         if (App.Core.Fuben.Current) {
