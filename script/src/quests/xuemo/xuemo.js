@@ -142,7 +142,7 @@ $.Module(function (App) {
     Xuemo.Entered = () => {
         Note("进入副本，打探地图")
         Quest.Cooldown(120000)
-        App.Core.Fuben.Last=$.Now()
+        App.Core.Fuben.Last = $.Now()
         $.PushCommands(
             $.Path(["s"]),
             $.Function(App.Core.Fuben.LoadMazeMap),
@@ -342,8 +342,18 @@ $.Module(function (App) {
                 case 1:
                     Note("寻找第一步NPC")
                     if (App.Map.Room.Data.Objects.FindByName("巫妖").First() == null) {
-                        if ((Xuemo.Data.僵尸 == false && objs.FindByName("僵尸").First()) || (Xuemo.Data.骷髅 == false && objs.FindByName("骷髅").First()) || (Xuemo.Data.幽灵 == false && objs.FindByName("幽灵").First())) {
-                            Xuemo.KillAll()
+                        let cmds = []
+                        if (Xuemo.Data.僵尸 == false && objs.FindByName("僵尸").First()) {
+                            cmds.push("kill zombie")
+                        }
+                        if (Xuemo.Data.骷髅 == false && objs.FindByName("骷髅").First()) {
+                            cmds.push("kill skeleton")
+                        }
+                        if (Xuemo.Data.幽灵 == false && objs.FindByName("幽灵").First()) {
+                            cmds.push("kill ghost")
+                        }
+                        if (cmds.length) {
+                            Xuemo.KillAll(cmds.join(";"))
                             return
                         }
                     }
@@ -352,14 +362,27 @@ $.Module(function (App) {
                 case 2:
                     Note("寻找第二步NPC")
                     if (App.Map.Room.Data.Objects.FindByName("巫妖").First() == null) {
-                        if ((Xuemo.Data.骷髅武士 == false && objs.FindByName("骷髅武士").First()) ||
-                            (Xuemo.Data.骷髅法师 == false && objs.FindByName("骷髅法师").First()) ||
-                            (Xuemo.Data.幽灵之眼 == false && objs.FindByName("幽冥之眼").First()) ||
-                            (Xuemo.Data.幽灵之火 == false && objs.FindByName("幽冥之火").First()) ||
-                            (Xuemo.Data.血僵尸 == false && objs.FindByName("血僵尸").First()) ||
-                            (Xuemo.Data.尸煞 == false && objs.FindByName("尸煞").First())
-                        ) {
-                            Xuemo.KillAll()
+                        let cmds = []
+                        if (Xuemo.Data.骷髅武士 == false && objs.FindByName("骷髅武士").First()) {
+                            cmds.push("kill skeleton fighter")
+                        }
+                        if (Xuemo.Data.骷髅法师 == false && objs.FindByName("骷髅法师").First()) {
+                            cmds.push("kill skeleton mage")
+                        }
+                        if (Xuemo.Data.幽灵之眼 == false && objs.FindByName("幽冥之眼").First()) {
+                            cmds.push("kill ghost eye")
+                        }
+                        if (Xuemo.Data.幽灵之火 == false && objs.FindByName("幽冥之火").First()) {
+                            cmds.push("kill ghost fire")
+                        }
+                        if (Xuemo.Data.血僵尸 == false && objs.FindByName("血僵尸").First()) {
+                            cmds.push("kill blood zombie")
+                        }
+                        if (Xuemo.Data.尸煞 == false && objs.FindByName("尸煞").First()) {
+                            cmds.push("kill power zombie")
+                        }
+                        if (cmds.length) {
+                            Xuemo.KillAll(cmds.join(";"))
                             return
                         }
                     }
