@@ -27,7 +27,14 @@
     }
     App.BindEvent("core.healcombat", App.Core.Emergency.OnHealCombat)
     App.BindEvent("core.fubenfail", (event) => {
-        event.Context.Propose(App.Core.Emergency.Reset)
+        event.Context.Propose(() => {
+            let cb = event.Context.Get("callback")
+            if (cb) {
+                cb()
+                return
+            }
+            App.Core.Emergency.Reset()
+        })
     })
     let checkdeathmode = 0
     let PlanCheckDeath = new App.Plan(App.Positions.Connect,

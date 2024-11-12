@@ -17,6 +17,11 @@
         Command = ""
         Plan = null
         KillInGroup = false
+        HitAndRun = ""
+        WithHitAndRun(val) {
+            this.HitAndRun = val
+            return this
+        }
         WithKillInGroup(val) {
             this.KillInGroup = val
             return this
@@ -73,6 +78,10 @@
             if (App.Combat.Data.Plan) {
                 App.Combat.Data.Plan.Execute()
             }
+            task.AddCatcher("core.onexit", () => {
+                App.Combat.Data.HitAndRun = ""
+                return true
+            })
         }, function (result) {
             if (result.Name == "Disconnect") {
                 return
@@ -82,6 +91,10 @@
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
     let checkCombatCmd = "come"
     App.Core.Combat.Perform = function () {
+        if (App.Combat.Data.HitAndRun) {
+            App.Send(App.Combat.Data.HitAndRun)
+            return
+        }
         App.Core.Combat.FilterActions("#send", "#wpon", "wpoff").forEach(action => {
             switch (action.Command) {
                 case "#send":

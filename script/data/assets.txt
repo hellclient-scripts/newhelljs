@@ -1,1 +1,4 @@
 wielded>#carry any
+#sell id=da yuanbao
+#store id=chipped agate,chipped crystal,crystal,agate,diamond,chipped diamond,jade,chipped jade
+#sell name=金块,金条,金锭,小金元宝,大金元宝,玄冰寒铁,乌金丝,银轮

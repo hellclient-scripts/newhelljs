@@ -84,6 +84,22 @@
                         App.NewSyncCommand(),
                     )
                     break
+                case "#store":
+                    if (App.Data.Item.List.FindByID("qiankun bag").First()) {
+                        App.Commands.PushCommands(
+                            App.Commands.NewDoCommand("keep " + result.Asset.Item.IDLower),
+                            App.Commands.NewDoCommand("i"),
+                            App.NewSyncCommand()
+                        )
+                    } else {
+                        App.Commands.PushCommands(
+                            App.Move.NewToCommand("2682"),
+                            App.Commands.NewDoCommand("store " + result.Asset.Item.IDLower),
+                            App.Commands.NewDoCommand("i"),
+                            App.NewSyncCommand()
+                        )
+                    }
+                    break
                 case "#pack":
                     if (App.Data.Item.List.FindByID("qiankun bag").First()) {
                         App.Commands.PushCommands(
@@ -108,17 +124,21 @@
                     break
                 default:
                     App.Fatal("assets", "未知的处理指令" + result.Command)
+                    return
             }
         }
         App.Next()
     }
     App.Core.Assets.PrepareDataKey = "assetsrules"
-    App.Proposals.Register("assets", App.Proposals.NewProposal(function (proposals, context,exclude) {
+    App.Proposals.Register("assets", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        let canStore = (App.Data.Item.List.FindByID("qiankun bag").First() != null) || (GetVariable("house").trim() != "" && App.Data.Item.List.FindByID("key").First() != null)
         for (item of App.Data.Item.List.Items) {
             let result = App.Core.Assets.Maintain(item, context[App.Core.Assets.PrepareDataKey] || [])
             if (result && result.Command != "" && result.Command != "#carry") {
-                return function () {
-                    App.Core.Assets.GoMaintain(result)
+                if (canStore || result.Command != "#store") {
+                    return function () {
+                        App.Core.Assets.GoMaintain(result)
+                    }
                 }
                 return
             }

@@ -79,4 +79,3 @@ tianqi|tianqi|田七|buy|65|buy 田七 from ping yizhi|
 su mu|su mu|苏木|buy|65|buy 苏木 from ping yizhi|
 fu zi|fu zi|附子|buy|65|buy 附子 from ping yizhi|
 yanbo|yanbo|研钵|buy|65|buy 研钵 from ping yizhi|
-> 

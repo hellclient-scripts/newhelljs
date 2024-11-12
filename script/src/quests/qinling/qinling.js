@@ -1,6 +1,26 @@
 $.Module(function (App) {
     let Qinling = {}
+    Qinling.Data = {
+        Finished: false,
+    }
+    let PlanQuest = new App.Plan(
+        App.Positions["Quest"],
+        (task) => {
+            task.AddCatcher("core.fubenfail", (catcher, event) => {
+                if (Qinling.Data.Finished) {
+                    event.Context.Set("callback", () => {
+                        Note("离开副本")
+                    })
+                }
+                Quest.Cooldown(120000)
+                return true
+            })
+        })
     Qinling.Start = () => {
+        Qinling.Data = {
+            Finished: false,
+        }
+        PlanQuest.Execute()
         Qinling.Enter()
     }
     let PlanEnter = new App.Plan(
@@ -54,7 +74,8 @@ $.Module(function (App) {
         }
         Qinling.AddApth()
         $.PushCommands(
-            $.To("2824")
+            $.To("2824"),
+            $.Function(Qinling.KillQin),
         )
         $.Next()
     }
@@ -63,6 +84,44 @@ $.Module(function (App) {
         App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], "2820", "n")
         App.Core.Fuben.Current.AddPath("2823", App.Core.Fuben.Current.Landmark["exit"], "n")
         App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "2823", "s")
+    }
+    Qinling.KillQin = () => {
+        $.PushCommands(
+            $.Rest(),
+            $.Path(["n"]),
+            $.Function(() => {
+                if (App.Map.Room.Data.Objects.FindByName("秦始皇僵尸").First()) {
+                    $.Insert(
+                        App.NewKillCommand("qin shihuang", App.NewCombat("qinling").WithHitAndRun("s")),
+                        $.Function(Qinling.KillQin)
+                    )
+                    $.Next()
+                    return
+                }
+                App.Map.Room.Data.Objects.Items.forEach(item => {
+                    switch (item.IDLower) {
+                        case "skeleton fighter":
+                        case "corpse":
+                        case "skeleton":
+                            break
+                        default:
+                            App.Send(`get ${item.IDLower}`)
+                    }
+                })
+                App.Send("i")
+                $.Insert(
+                    $.Path(["s"]),
+                    $.Function(() => {
+                        Qinling.Data.Finished = true
+                        App.Next()
+                    }),
+                    $.Path(["out"]),
+                    $.Prepare(),
+                )
+                App.Next()
+            })
+        )
+        $.Next()
     }
     let Quest = App.Quests.NewQuest("qinling")
     Quest.Name = "秦岭副本"
