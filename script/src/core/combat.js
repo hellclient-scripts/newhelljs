@@ -18,6 +18,7 @@
         Plan = null
         KillInGroup = false
         HitAndRun = ""
+        Ticker = 0
         WithHitAndRun(val) {
             this.HitAndRun = val
             return this
@@ -43,6 +44,9 @@
     }
     App.Core.Combat.Actions = null
     App.Core.Combat.Blocks = []
+    App.Core.Combat.CanStop = () => {
+        return App.Combat.Data.HitAndRun == ""
+    }
     App.NewCombat = function (quest) {
         return new Option(quest)
     }
@@ -71,9 +75,18 @@
                 App.Core.Combat.Fail = true
                 return true
             })
-            task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！", () => { OmitOutput() })
-            task.AddTrigger("已经有野兽跟着你了！", () => { OmitOutput() })
-            task.AddTrigger("你要让什么野兽跟随你？", () => { OmitOutput() })
+            task.AddTrigger("你的驭兽术还不纯熟，无法让野兽跟随你！", () => {
+                OmitOutput()
+                return !App.Core.Combat.CanStop()
+            })
+            task.AddTrigger("已经有野兽跟着你了！", () => {
+                OmitOutput()
+                return !App.Core.Combat.CanStop()
+            })
+            task.AddTrigger("你要让什么野兽跟随你？", () => {
+                OmitOutput()
+                return !App.Core.Combat.CanStop()
+            })
             task.AddCatcher("disconnected").WithName("Disconnect")
             if (App.Combat.Data.Plan) {
                 App.Combat.Data.Plan.Execute()
@@ -82,6 +95,12 @@
                 App.Combat.Data.HitAndRun = ""
                 return true
             })
+            task.AddCatcher("core.wrongway", () => {
+                App.Core.Combat.Fail = true
+                App.Combat.Data.HitAndRun = ""
+                return true
+            })
+
         }, function (result) {
             if (result.Name == "Disconnect") {
                 return
@@ -92,7 +111,9 @@
     let checkCombatCmd = "come"
     App.Core.Combat.Perform = function () {
         if (App.Combat.Data.HitAndRun) {
-            App.Send(App.Combat.Data.HitAndRun)
+            if (App.Combat.Data.Ticker > 1) {
+                App.Send(App.Combat.Data.HitAndRun)
+            }
             return
         }
         App.Core.Combat.FilterActions("#send", "#wpon", "wpoff").forEach(action => {
@@ -109,6 +130,7 @@
     }
     App.Combat.Ticker = function (combat) {
         let msg = ""
+        combat.Data.Ticker++
         msg = msg + Math.floor(combat.Duration() / 1000) + "秒 "
         msg = msg + (combat.Data.Quest)
         msg = msg + "[" + Object.keys(combat.Data.Tags).join(",") + "]"

@@ -1,5 +1,7 @@
 $.Module(function (App) {
     let Xuemo = {}
+    Xuemo.All = 0
+    Xuemo.Success = 0
     Xuemo.Data = {
         Step: 0,
         "僵尸": false,
@@ -140,6 +142,7 @@ $.Module(function (App) {
         }
     )
     Xuemo.Entered = () => {
+        Xuemo.All++
         Note("进入副本，打探地图")
         Quest.Cooldown(120000)
         App.Core.Fuben.Last = $.Now()
@@ -543,23 +546,38 @@ $.Module(function (App) {
             App.NewKillCommand("", App.NewCombat("xuemo").WithCommand("kill ding yi").WithTags(`boss`)),
             $.Nobusy(),
             $.Do("get all;drop long sword;drop cloth;drop corpse;drop skeleton;i"),
-            $.Function(Xuemo.Leave)
+            $.Function(() => {
+                Xuemo.Success++
+                Xuemo.Leave()
+            })
         )
         $.Next()
     }
+    App.BindEvent("core.queststart", (e) => {
+        Xuemo.All = 0
+        Xuemo.Success = 0
+    })
+
     let Quest = App.Quests.NewQuest("xuemo")
     Quest.Name = "血魔副本"
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
     Quest.OnHUD = () => {
-        return null
+        return [
+            new App.HUD.UI.Word("血魔:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Xuemo.Success), 5, true),
+        ]
     }
     Quest.OnSummary = () => {
-        return null
+        return [
+            new App.HUD.UI.Word("血:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Xuemo.Success), 5, true),
+        ]
     }
     Quest.OnReport = () => {
-        return null
+        let rate = Xuemo.All > 0 ? (Xuemo.Success * 100 / Xuemo.All).toFixed(0) + "%" : "-"
+        return [`血魔-成功 ${Xuemo.Success}次 共计 ${Xuemo.All}次 成功率 ${rate}`]
     }
     Quest.Start = function (data) {
         Xuemo.Start()

@@ -112,6 +112,10 @@ $.Module(function (App) {
         if (submit) {
             return false
         }
+        let ready = App.Quests.GetReady()
+        if (ready && ready.RunningQuest && ready.RunningQuest.ID != Quest.ID) {
+            return false
+        }
         return true
     }
     let reQuest = /^([^：()\[\]]{2,5})对你道：“我早就看(.*)不顺眼，听说他最近在(.*)，你去做了他，带他的人头来交差！/
@@ -181,7 +185,7 @@ $.Module(function (App) {
         $.PushCommands(
             $.To(App.Params.LocMaster),
             $.Do("give head to " + App.Params.MasterID + ";drop head"),
-            $.Function(MQ.Prepare),
+            // $.Function(MQ.Prepare),
         )
         $.Next()
     }

@@ -2,10 +2,22 @@ $.Module(function (App) {
     let Qinling = {}
     Qinling.Data = {
         Finished: false,
+        All: 0,
+        Success: 0,
+        Gifts: {},
     }
+    let matcherDrop = /^当~~一声，一.(.+)从天而降，掉落在你面前。$/
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
+            task.AddTrigger(matcherDrop, (tri, result) => {
+                let gift = result[1]
+                if (!Qinling.Data.Gifts[gift]) {
+                    Qinling.Data.Gifts[gift] = 0
+                }
+                Qinling.Data.Gifts[gift]++
+                return true
+            })
             task.AddCatcher("core.fubenfail", (catcher, event) => {
                 if (Qinling.Data.Finished) {
                     event.Context.Set("callback", () => {
@@ -17,9 +29,7 @@ $.Module(function (App) {
             })
         })
     Qinling.Start = () => {
-        Qinling.Data = {
-            Finished: false,
-        }
+        Qinling.Data.Finished = false
         PlanQuest.Execute()
         Qinling.Enter()
     }
@@ -47,7 +57,7 @@ $.Module(function (App) {
     Qinling.Enter = () => {
         App.Checker.GetCheck("weaponduration").Force()
         $.PushCommands(
-            $.Prepare("commonWithStudy", { WeaponDurationMin: 80 }),
+            $.Prepare("", { WeaponDurationMin: 80 }),
             $.To("2819"),
             $.Plan(PlanEnter)
         )
@@ -55,6 +65,7 @@ $.Module(function (App) {
     }
 
     Qinling.Entered = () => {
+        Qinling.Data.All++
         Note("进入副本，打探地图")
         Quest.Cooldown(120000)
         App.Core.Fuben.Last = $.Now()
@@ -88,6 +99,10 @@ $.Module(function (App) {
     Qinling.KillQin = () => {
         $.PushCommands(
             $.Rest(),
+            $.Function(() => {
+                $.RaiseStage("prepare")
+                $.Next()
+            }),
             $.Path(["n"]),
             $.Function(() => {
                 if (App.Map.Room.Data.Objects.FindByName("秦始皇僵尸").First()) {
@@ -112,30 +127,53 @@ $.Module(function (App) {
                 $.Insert(
                     $.Path(["s"]),
                     $.Function(() => {
+                        Qinling.Data.Success++
                         Qinling.Data.Finished = true
                         App.Next()
                     }),
                     $.Path(["out"]),
-                    $.Prepare(),
+                    $.Prepare("commonWithStudy"),
                 )
                 App.Next()
             })
         )
         $.Next()
     }
+    App.BindEvent("core.queststart", (e) => {
+        Qinling.Data = {
+            Finished: false,
+            All: 0,
+            Success: 0,
+            Gifts: {},
+        }
+    })
+
     let Quest = App.Quests.NewQuest("qinling")
     Quest.Name = "秦岭副本"
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
     Quest.OnHUD = () => {
-        return null
+        return [
+            new App.HUD.UI.Word("秦陵:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
+        ]
+
     }
     Quest.OnSummary = () => {
-        return null
+        return [
+            new App.HUD.UI.Word("秦:"),
+            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
+        ]
+
     }
     Quest.OnReport = () => {
-        return null
+        let gift = []
+        for (var name in Qinling.Data.Gifts) {
+            gift.push(`${name}:${Qinling.Data.Gifts[name]}件`)
+        }
+        let rate = Qinling.Data.All > 0 ? (Qinling.Data.Success * 100 / Qinling.Data.All).toFixed(0) + "%" : "-"
+        return [`秦陵-成功 ${Qinling.Data.Success}次 共计 ${Qinling.Data.All}次 成功率 ${rate} 道具： ${gift.join(" , ")}`]
     }
     Quest.Start = function (data) {
         Qinling.Start()

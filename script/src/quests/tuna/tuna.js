@@ -17,10 +17,10 @@ $.Module(function (App) {
                         num = 10
                     }
                     $.PushCommands(
-                        $.To(App.Params.LocTuna),
+                        $.To(App.Params.LocDazuo),
                         $.Do(`tuna ${num}`),
                         $.Nobusy(),
-                        $.Do("hp"),
+                        $.Do("yun regenerate;hp"),
                         $.Sync(),
                     )
                 }
