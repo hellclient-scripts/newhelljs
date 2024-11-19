@@ -1798,6 +1798,52 @@ Timers = []
   OmitFromCommandHistory = false
 
 [[Aliases]]
+  ID = "d1g1u8tt3dcfa9737664j6"
+  Name = ""
+  Enabled = false
+  Match = "#goldfish"
+  Send = "#start goldfish"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
+  ID = "d1g2b76b8so0407247oh73"
+  Name = "tianjizhen"
+  Enabled = true
+  Match = "#tjz"
+  Send = "#start tjz||stop"
+  Script = ""
+  SendTo = 10
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
+[[Aliases]]
   ID = "d1fvmus00v3gj972ochkp5"
   Name = ""
   Enabled = true

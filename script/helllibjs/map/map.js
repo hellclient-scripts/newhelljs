@@ -286,6 +286,9 @@
                 this.MovePosition.StartNewTerm()
             }
         }
+        DiscardMove(){
+            this.Move = null
+        }
         Snap() {
             if (this.Move != null) {
                 let snap = new Snap()
@@ -501,17 +504,17 @@
         OnInitTags = DefaultOnInitTags
     }
     let DefaultVehicle = new Vehicle()
-    module.MutlipleStep = true
+    module.MultipleStep = true
     module.Fly = true
-    module.MutlipleStepSplit = function (paths) {
+    module.MultipleStepSplit = function (paths) {
         return paths
     }
     class Option {
         constructor() {
-            this.MutlipleStep = module.MutlipleStep
+            this.MultipleStep = module.MultipleStep
             this.Fly = module.Fly
         }
-        MutlipleStep = false
+        MultipleStep = false
         Fly = false
         Tags = {}
         ApplyTo(move, map) {

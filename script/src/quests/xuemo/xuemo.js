@@ -326,7 +326,7 @@ $.Module(function (App) {
         App.Next()
     }
     Xuemo.Wanted = (move, map, step) => {
-        move.Option.MutlipleStep = false
+        move.Option.MultipleStep = false
         move.OnArrive = function (move, map) {
             if (!Xuemo.Data.聚灵法阵 && App.Map.Room.Name == "聚灵法阵") {
                 Xuemo.Data.聚灵法阵 = App.Map.Room.ID

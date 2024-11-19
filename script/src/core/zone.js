@@ -90,7 +90,7 @@
     })
     App.Zone.Finder = function (move, map) {
         wanted = App.Zone.Wanted
-        move.Option.MutlipleStep = wanted.SingleStep != true
+        move.Option.MultipleStep = wanted.SingleStep != true
         move.OnRoom = function (move, map, step) {
             let item = wanted.Checker(wanted)
             if (item) {

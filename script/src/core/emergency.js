@@ -1,9 +1,16 @@
 (function (App) {
 
     App.Core.Emergency = {}
-    App.Core.Emergency.OnFaint = function () {
-        Note("被打晕了")
-        App.Reconnect(App.Params.ReloginDelay)
+    App.Core.Emergency.OnFaint = function (event) {
+        event.Context.Propose(function () {
+            App.Map.DiscardMove()
+            let cb = event.Context.Get("callback")
+            Note("被打晕了")
+            if (cb){
+                Note("醒来后继续。")
+            }
+            App.Reconnect(App.Params.ReloginDelay,cb)
+        })
     }
     App.BindEvent("core.faint", App.Core.Emergency.OnFaint)
     App.Core.Emergency.OnHealCombat = function () {

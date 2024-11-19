@@ -40,9 +40,12 @@
         }
         OnStepTimeout(move, map) {
             if (this.DFS != null) {
-                this.DFS = this.DFS.Skip().Next()
-                if (this.DFS != null) {
-                    move.Pending = [map.NewStep(this.DFS.Command)]
+                let level = this.DFS.Skip()
+                if (level != null) {
+                    this.DFS = level.Next()
+                    if (this.DFS != null) {
+                        move.Pending = [map.NewStep(this.DFS.Command)]
+                    }
                 }
                 move.Walk(map)
                 return false
@@ -73,7 +76,8 @@
         Path = null
         Retry(move, map) {
             this.Path = null
-            move.Walk(map)
+            this.Raw = null
+            map.CancelMove()
         }
         Next(move, map) {
             if (move.StartCommand) {
@@ -81,7 +85,7 @@
                 return [move.StartCommand]
             }
             if (this.Path == null) {
-                return cancelMove
+                this.Path = module.MultipleStepConverter.Convert(this.Raw, move, map)
             }
             if (this.Path.length) {
                 return this.Path.shift()
@@ -89,7 +93,7 @@
             return null
         }
         ApplyTo(move, map) {
-            this.Path = module.MutlipleStepConverter.Convert(this.Raw, move, map)
+
             move.Retry = this.Retry.bind(this)
             move.Next = this.Next.bind(this)
             move.Data.Movement = this
@@ -130,7 +134,7 @@
                 if (result == null) {
                     return cancelMove
                 }
-                this.Path = module.MutlipleStepConverter.Convert(result, move, map)
+                this.Path = module.MultipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
@@ -187,7 +191,7 @@
                         rooms.push(step.Target)
                     }
                 })
-                this.Path = result == null ? [[]] : module.MutlipleStepConverter.Convert(result, move, map)
+                this.Path = result == null ? [[]] : module.MultipleStepConverter.Convert(result, move, map)
                 this.Rooms = module.FilterRooms(result, this.Rooms)
                 return this.Next(move, map)
             }
@@ -250,7 +254,7 @@
                     return null
                 }
                 this.Rooms = module.Filter(result, this.Rooms)
-                this.Path = module.MutlipleStepConverter.Convert(result, move, map)
+                this.Path = module.MultipleStepConverter.Convert(result, move, map)
                 return this.Next(move, map)
             }
             return this.Locate.Next(move, map)
@@ -281,14 +285,14 @@
     let DefaultChecker = function (step, index, move, map) {
         return dfsModule.Backward[step.Command] != null
     }
-    class MutlipleStepConverter {
+    class MultipleStepConverter {
         constructor() { }
         Checker = DefaultChecker
         Convert(path, move, map) {
             let result = []
             let current = []
             path.forEach((step, index) => {
-                if (!move.Option.MutlipleStep) {
+                if (!move.Option.MultipleStep) {
                     result.push([step])
                     return
                 }
@@ -313,13 +317,13 @@
         }
     }
     module.SingleStep = function (move, map) {
-        move.Option.MutlipleStep = false
+        move.Option.MultipleStep = false
     }
     module.StartCommand = function (cmd) {
         return function (move, map) {
             move.StartCommand = cmd
         }
     }
-    module.MutlipleStepConverter = new MutlipleStepConverter()
+    module.MultipleStepConverter = new MultipleStepConverter()
     return module
 })

@@ -105,7 +105,7 @@
         Delay = 1000
         Stopped = true
         Parser = module.DefaultParser
-        RegisteredQuests(){
+        RegisteredQuests() {
             return this.#registered
         }
         Register = function (quest) {
@@ -182,9 +182,8 @@
             this.Loop()
         }
         Loop() {
-            this.Commands.PushCommands(
+            this.Commands.Append(
                 this.Commands.NewWaitCommand(this.Delay),
-                this.#nextcommand,
             )
             App.Next()
         }

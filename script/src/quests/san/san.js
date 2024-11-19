@@ -140,6 +140,7 @@ $.Module(function (App) {
     let matecherSaned = /^(.+)说道： 现在(.+)已经被充分的圣化了，需要浸入神物以进一步磨练。$/
     let matecherOk = /^(.+)轻轻抚过(.+)，两指点于其上，/
     let matcherNext = /^(.+)说道： 我已经为(.+)圣化过了，你需要去寻求他人帮助以继续圣化。$/
+    let matcherSelf = /^(.+)说道：\.\.\.你还是拿回去自己圣化吧\.\.\.$/
     let matcherFinished = /^(.+)说道： 现在(.+)的潜力已经充分挖掘了，只是需要最后一步融合。/
     let PlanShow = new App.Plan(
         App.Positions["Response"],
@@ -162,6 +163,12 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddTrigger(matcherSelf, (tri, result) => {
+                if (result[1] == name && !task.Data) {
+                    task.Data = "self"
+                }
+                return true
+            })
             task.AddTrigger(matcherNext, (tri, result) => {
                 if (result[1] == name && result[2] == San.Data.WeaponName) {
                     task.Data = "next"
@@ -174,9 +181,6 @@ $.Module(function (App) {
                 }
                 return true
             })
-
-
-
             App.Sync()
         },
         (result) => {
@@ -185,17 +189,21 @@ $.Module(function (App) {
                     San.Data.Helpers = []
                     San.GoImbue()
                     break
+                case "self":
+                    San.Data.Helpers = []
+                    San.Ready()
+                    break
                 case "ok":
                     San.Ready()
                     break
                 case "next":
                     San.Ready()
                     break
-                default:
-                    App.Fail()
-                    break
                 case "finished":
                     Note("san完了")
+                    break
+                default:
+                    App.Fail()
                     break
             }
         }

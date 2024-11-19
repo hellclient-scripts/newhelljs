@@ -1,7 +1,7 @@
 (function (App) {
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
-    App.Map.Movement.MutlipleStepConverter.Checker = function (step, index, move, map) {
+    App.Map.Movement.MultipleStepConverter.Checker = function (step, index, move, map) {
         return index != 0 && dfsModule.Backward[step.Command] != null
     }
     App.Map.Movement.DefaultLocateNext = (move, map, locate) => {
@@ -12,7 +12,7 @@
         }
         return locate.MoveNext(move, map)
     }
-    App.Map.Movement.CheckRoomCmd = "#l"
+    App.Map.Movement.CheckRoomCmd = ""
     App.Look = () => {
         App.Map.Room.Keep = true
         App.Send("l")
@@ -50,7 +50,8 @@
         return result
     }
     App.Move.NewPath = function (path, ...initers) {
-        return App.Map.NewRoute(new App.Map.Movement.Path(path.map(value => App.Map.NewStep(value))), ...initers)
+        let pathlist = path.map(value => typeof value == "string" ? App.Map.NewStep(value) : value)
+        return App.Map.NewRoute(new App.Map.Movement.Path(pathlist), ...initers)
     }
     App.Move.NewTo = function (target, ...initers) {
         if (typeof target == "string") {

@@ -14,9 +14,8 @@
         App.Core.Study.LianMode = 0
     }
     App.Core.Study.LearnMode = 0
-    App.Core.Study.LearnMax = 100
-    App.Core.Study.YanjiuMax = 100
-    App.Core.Study.LianMax = 50
+    App.Params.YanjiuMax = 100
+    App.Params.LianMax = 50
     App.Core.Study.Learn = []
     App.Core.Study.LianMode = 0
     App.Core.Study.Lian = []
@@ -91,7 +90,7 @@
                     if (!loc) {
                         loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
                     }
-                    var times = App.Core.Study.YanjiuMax
+                    var times = App.Params.YanjiuMax
                     if (times > App.Data.Player.HP["潜能"]) {
                         times = App.Data.Player.HP["潜能"]
                     }
@@ -115,13 +114,13 @@
                     if (!loc) {
                         loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
                     }
-                    var times = App.Core.Study.LianMax
+                    var times = App.Params.LianMax
                     var cmds = [`jifa ${this.From} ${this.SkillID}`, `lian ${this.From} ${times}`]
                     if (this.Before) { cmds.unshift(this.Before) }
                     if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(loc),
-                        $.Do("yun recover"),
+                        $.Do("yun recover;yun regenerate"),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
@@ -143,7 +142,7 @@
                         PrintSystem("未知的学习目标 " + from)
                         return
                     }
-                    var times = App.Core.Study.LearnMax
+                    var times = App.Params.LearnMax
                     if (times > App.Data.Player.HP["潜能"]) {
                         times = App.Data.Player.HP["潜能"]
                     }
@@ -195,7 +194,7 @@
         Check() {
             let skill = App.Data.Player.Skills[this.SkillID]
             if (skill) {
-                if (skill["受限经验"] && skill["等级"] >= App.Data.Player.HPM["当前等级"]) {
+                if (skill["受限经验"] && skill["等级"] >= (App.Data.Player.HPM["当前等级"] - 1)) {
                     return false
                 }
             }
@@ -232,8 +231,8 @@
                         }
                     default:
                         let tskill = App.Data.Player.Skills[data[0]]
-                        if (data[1]==null||isNaN(data1)){
-                            data[1]="0"
+                        if (data[1] == null || isNaN(data1)) {
+                            data[1] = "0"
                         }
                         if (tskill && !isNaN(data[1])) {
                             let level = data[1] ? data[1].trim() : "0"
@@ -485,25 +484,28 @@
         App.ReloadVariable()
     }
     App.Sender.RegisterAlias("#yanjiu", function (data) {
-        let skill = App.Core.Study.FilterSkill("yanjiu")
-        if (skill) {
-            let times = data - 0
-            if (isNaN(times) || times <= 0) {
-                times = 100
-            }
-            if (App.Data.Player.HP["潜能"] > times) {
-                var cmds = ["yanjiu " + skill.SkillID + " " + times]
-                if (skill.Before) { cmds.unshift(skill.Before) }
-                if (skill.After) { cmds.push(skill.After) }
-                App.Send(cmds.join("\n"))
-                App.Send("yun recover;yun regenerate;hp")
+        let minpot = GetVariable("min_pot")
+        if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
+            let skill = App.Core.Study.FilterSkill("yanjiu")
+            if (skill) {
+                let times = data - 0
+                if (isNaN(times) || times <= 0) {
+                    times = 100
+                }
+                if (App.Data.Player.HP["潜能"] > times) {
+                    var cmds = ["yanjiu " + skill.SkillID + " " + times]
+                    if (skill.Before) { cmds.unshift(skill.Before) }
+                    if (skill.After) { cmds.push(skill.After) }
+                    App.Send(cmds.join("\n"))
+                    App.Send("yun recover;yun regenerate;hp")
+                }
             }
         }
     })
     App.Sender.RegisterAlias("#lian", function () {
         let skill = App.Core.Study.FilterLian("lian")
         if (skill) {
-            var times = App.Core.Study.LianMax
+            var times = App.Params.LianMax
             var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
             if (skill.Before) { cmds.unshift(skill.Before) }
             if (skill.After) { cmds.push(skill.After) }
@@ -512,25 +514,31 @@
         }
     })
     App.Sender.RegisterAlias("#yanjiulian", function (data) {
-        let skill = App.Core.Study.FilterSkill("yanjiu")
-        let learned = false
-        if (skill) {
-            let times = data - 0
-            if (isNaN(times) || times <= 0) {
-                times = 100
-            }
-            if (App.Data.Player.HP["潜能"] > times) {
-                learned = true
-                var cmds = ["yanjiu " + skill.SkillID + " " + times]
-                if (skill.Before) { cmds.unshift(skill.Before) }
-                if (skill.After) { cmds.push(skill.After) }
-                App.Send(cmds.join("\n"))
+        let skill
+        let learned
+        let minpot = GetVariable("min_pot")
+        if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
+
+            skill = App.Core.Study.FilterSkill("yanjiu")
+            learned = false
+            if (skill) {
+                let times = data - 0
+                if (isNaN(times) || times <= 0) {
+                    times = 100
+                }
+                if (App.Data.Player.HP["潜能"] > times) {
+                    learned = true
+                    var cmds = ["yanjiu " + skill.SkillID + " " + times]
+                    if (skill.Before) { cmds.unshift(skill.Before) }
+                    if (skill.After) { cmds.push(skill.After) }
+                    App.Send(cmds.join("\n"))
+                }
             }
         }
         skill = App.Core.Study.FilterLian("lian")
         if (skill) {
             learned = true
-            var times = App.Core.Study.LianMax
+            var times = App.Params.LianMax
             var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
             if (skill.Before) { cmds.unshift(skill.Before) }
             if (skill.After) { cmds.push(skill.After) }
@@ -553,7 +561,7 @@
                     App.Commands.NewDoCommand("hp"),
                     App.NewSyncCommand(),
                 )
-                if (App.Map.Room.Data["NoFight"]) {
+                if (App.Map.Room.Data["NoFight"] || App.Map.Room.ID == App.Params.LocMaster) {
                     App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
                 }
                 App.Next()

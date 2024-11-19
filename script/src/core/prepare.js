@@ -216,7 +216,38 @@
         }
         return null
     }))
-
+    App.Proposals.Register("bond", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Data.Player.Score["存款"] > 80000) {
+            return function () {
+                App.Commands.PushCommands(
+                    $.To(App.Params.LocBank),
+                    $.Nobusy(),
+                    $.Do("qu 1000 cash"),
+                    $.Nobusy(),
+                    $.Do("bond 1000 cash;score"),
+                    $.Nobusy(),
+                )
+                App.Next()
+            }
+        }
+        return null
+    }))
+    App.Proposals.Register("refund", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Data.Player.Score["存款"] < 5000 && App.Data.Player.Score["债券"] > 0) {
+            return function () {
+                App.Commands.PushCommands(
+                    $.To(App.Params.LocBank),
+                    $.Nobusy(),
+                    $.Do("refund 1"),
+                    $.Nobusy(),
+                    $.Do("cun 1000 cash;score"),
+                    $.Nobusy(),
+                )
+                App.Next()
+            }
+        }
+        return null
+    }))
     let common = App.Proposals.NewProposalGroup(
         "eatyao",
         "cash",
@@ -234,6 +265,8 @@
         "dispel",
         "tuna",
         "assets",
+        "refund",
+        "bond",
         "item",
         "repair",
     )

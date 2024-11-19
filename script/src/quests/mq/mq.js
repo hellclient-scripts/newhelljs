@@ -232,7 +232,7 @@ $.Module(function (App) {
     }
     let matcherLetter = /.*(突然一位|忽听“嗖”的一声|你转身一看|你一回头|你正欲离开|只见你刚想离开|只听扑倏扑倏几声)(.*)(弟子急急忙忙地跑了上来，拍拍你的肩膀|一件暗器从你背后飞来|竟见到一只灰点信鸽飞至身旁，你赶紧|只见一位同门装束的弟子满头大汗地跑了过来|忽然发现不远处的地上一块石头上刻着些什么|一位同门装束的弟子追了上来|一只白鸽飞了过来，落在你肩头)/
     let matcherlq1 = /^“字谕弟子(.*)：(得闻恶贼|武林人士|得闻所谓大侠)(.*)(屡次和我派作对|打家劫舍|所为甚是讨厌)(.*)/
-    let matcherlq2 = /(.*)正是大好机会将他除去，你若愿意/
+    // let matcherlq2 = /(.*)正是大好机会将他除去，你若愿意/
     let matcherAccept = /^如果你愿意接受此任务，请在(.*)秒之内/
     let PlanWaitLetter = new App.Plan(
         App.Positions["Connect"],
@@ -255,15 +255,15 @@ $.Module(function (App) {
                 }
                 return true
             })
-            task.AddTrigger(matcherlq2, (tri, result) => {
-                if (mode == 2) {
-                    mode = 3
-                    location += result[1]
-                }
-                return true
-            })
+            // task.AddTrigger(matcherlq2, (tri, result) => {
+            //     if (mode == 2) {
+            //         mode = 3
+            //         location += result[1]
+            //     }
+            //     return true
+            // })
             task.AddTrigger(matcherAccept, (tri, result) => {
-                if (mode == 3) {
+                if (mode == 2) {
                     mode = 4
                     if (location.indexOf("西域") != -1 || location.indexOf("大理") != -1) {
                         return false

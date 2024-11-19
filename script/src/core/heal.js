@@ -78,7 +78,7 @@
                         App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                         App.NewSyncCommand(),
                     )
-                    if (App.Map.Room.Data["NoFight"]) {
+                    if (App.Map.Room.Data["NoFight"] || App.Map.Room.ID == App.Params.LocMaster) {
                         App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
                     }
                     App.Next()
@@ -91,7 +91,7 @@
         if (App.Data.Player.HP["气血百分比"] <= 20) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun dispel;" : "" + "eat jinchuang yao;yun recover;yun regenerate;hp;i"),
+                    App.Commands.NewDoCommand((App.Core.Dispel.Need ? "yun dispel;" : "") + "eat jinchuang yao;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
                 if (!App.Data.Item.List.FindByIDLower("jinchuang yao").First()) {
@@ -113,6 +113,9 @@
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
                 )
+                if (App.Map.Room.ID == App.Params.LocMaster) {
+                    App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
+                }
                 App.Next()
             }
         }
@@ -131,6 +134,9 @@
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
                 )
+                if (App.Map.Room.ID == App.Params.LocMaster) {
+                    App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
+                }
                 App.Next()
             }
         }
@@ -140,7 +146,7 @@
         if (App.Data.Player.HP["精气百分比"] <= 50) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun dispel;" : "" + "eat yangjing dan;yun recover;yun regenerate;hp;i"),
+                    App.Commands.NewDoCommand((App.Core.Dispel.Need ? "yun dispel;" : "") + "eat yangjing dan;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
                 )
                 if (!App.Data.Item.List.FindByIDLower("yangjing dan").First()) {
@@ -161,6 +167,9 @@
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
                 )
+                if (App.Map.Room.ID == App.Params.LocMaster) {
+                    App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
+                }
                 App.Next()
             }
         }
