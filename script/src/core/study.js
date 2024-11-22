@@ -120,7 +120,7 @@
                     if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(loc),
-                        $.Do("yun recover;yun regenerate"),
+                        $.Do("yun recover"),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
@@ -486,8 +486,8 @@
     App.Sender.RegisterAlias("#yanjiu", function (data) {
         let minpot = GetVariable("min_pot")
         if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
-            let skill = App.Core.Study.FilterSkill("yanjiu")
-            if (skill) {
+            let skill = App.Core.Study.FilterSkill()
+            if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
                 if (isNaN(times) || times <= 0) {
                     times = 100
@@ -515,13 +515,11 @@
     })
     App.Sender.RegisterAlias("#yanjiulian", function (data) {
         let skill
-        let learned
         let minpot = GetVariable("min_pot")
+        let learned = false
         if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
-
-            skill = App.Core.Study.FilterSkill("yanjiu")
-            learned = false
-            if (skill) {
+            skill = App.Core.Study.FilterSkill()
+            if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
                 if (isNaN(times) || times <= 0) {
                     times = 100

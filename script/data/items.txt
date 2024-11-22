@@ -4,7 +4,7 @@ long bow|long bow|长弓|buy|66|buy long bow from tie jiang|8
 long sword|long sword|长剑|buy|66|buy long sword from tie jiang|
 iron blade|iron blade|钢刀|buy|66|buy iron blade from tie jiang|
 arrow|Arrow|狼牙箭|buy|66|buy 30 狼牙箭 from tie jiang|
-gangbiao|gangbiao|钢镖|66|buy|buy 钢镖 from tie jiang|
+gangbiao|Gangbiao|钢镖|buy|66|buy 100 钢镖 from tie jiang|
 armor|armor|铁甲|buy|66|buy 铁甲 from tie jiang|
 tiegun|tiegun|铁棍|buy|66|buy 铁棍 from tie jiang|
 hammer|hammer|铁锤|buy|66|buy 铁锤 from tie jiang|

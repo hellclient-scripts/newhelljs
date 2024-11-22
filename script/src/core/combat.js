@@ -245,6 +245,7 @@
         return result
     }
     App.Core.Combat.Load = function () {
+        App.Core.Combat.Blocks = []
         App.Core.Combat.Actions = null
         let currentBlock = new Block()
         currentBlock.Conditions.push(App.Quests.Conditions.Always)

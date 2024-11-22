@@ -12,7 +12,7 @@
         }
         return locate.MoveNext(move, map)
     }
-    App.Map.Movement.CheckRoomCmd = ""
+    App.Map.Movement.CheckRoomCmd = "#l"
     App.Look = () => {
         App.Map.Room.Keep = true
         App.Send("l")

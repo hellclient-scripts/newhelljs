@@ -434,7 +434,8 @@ $.Module(function (App) {
         }
         if (path.length != 63) {
             PrintSystem(`计算错误,长度${path.length}不符合(${x1},${y1},${x2},${y2})`)
-            return []
+            App.Fail()
+            return
         }
         let result = []
         let cx = x1
@@ -520,7 +521,6 @@ $.Module(function (App) {
     }
     TJZ.FaintMode = 0
     TJZ.Target = null
-    let matcerGainInt = /^你获得了.+点潜能，1点先天悟性！$/
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -529,11 +529,11 @@ $.Module(function (App) {
                 Note("晕点")
                 return true
             })
-            task.AddTrigger(matcerGainInt), () => {
+            task.AddTrigger("四周景物突然变得模糊起来，你觉得头脑一阵晕眩......", () => {
                 TJZ.Finished = true
                 Note("成功过阵")
                 return true
-            }
+            })
             task.AddCatcher("core.faint", (catcher, event) => {
                 switch (TJZ.FaintMode) {
                     case 1:
