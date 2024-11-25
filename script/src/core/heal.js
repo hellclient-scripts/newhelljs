@@ -232,6 +232,9 @@
                     App.NewSyncCommand(),
                     App.Core.Heal.NewRestCommand(),
                 )
+            } else if (App.Data.Player.HP["气血百分比"] <= 20) {
+                App.Fail()
+                return
             } else if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow) {
                 App.Commands.PushCommands(
                     App.Commands.NewDoCommand("yun heal"),

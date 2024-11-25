@@ -182,7 +182,7 @@
             this.Loop()
         }
         Loop() {
-            this.Commands.Append(
+            this.Commands.PushCommands(
                 this.Commands.NewWaitCommand(this.Delay),
             )
             App.Next()

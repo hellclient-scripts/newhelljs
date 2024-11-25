@@ -49,6 +49,7 @@
         task.AddTrigger("此服务已经暂停。", function () {
             OmitOutput()
         }).WithName("sync")
+        task.AddTrigger("你终于抹掉了眼前的鲜血，能看见了。")
         App.Send("mail")
     }
     App.Sync = function (cb) {

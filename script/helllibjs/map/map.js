@@ -134,7 +134,6 @@
                 this.Room = new Room()
             }
             this.Room.Keep = false
-            this.Position.StartNewTerm()
             return this.Room
         }
         FlashTags() {
@@ -234,6 +233,7 @@
             return this.filterpath(path)
         }
         OnWalking() {
+            this.Position.StartNewTerm()
             if (this.Move != null) {
                 this.Move.OnWalking(this)
             }
@@ -286,7 +286,7 @@
                 this.MovePosition.StartNewTerm()
             }
         }
-        DiscardMove(){
+        DiscardMove() {
             this.Move = null
         }
         Snap() {

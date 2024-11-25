@@ -26,6 +26,9 @@
     let DefaultChecker = function (wanted) {
         return App.Map.Room.Data.Objects.FindByName(wanted.Target).First() || App.Map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
     }
+    let CheckerIDLower = function (wanted) {
+        return App.Map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
+    }
     class Wanted {
         constructor(target, zone) {
             this.Target = target
@@ -67,6 +70,9 @@
     }
     App.NewWanted = function (target, zone) {
         return new Wanted(target, zone)
+    }
+    App.NewIDLowerWanted = function (target, zone) {
+        return new Wanted(target, zone).WithChecker(CheckerIDLower)
     }
     App.Zone.Wanted = null
     App.UserQueue.UserQueue.RegisterCommand("#search", function (uq, data) {

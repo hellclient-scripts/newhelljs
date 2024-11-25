@@ -39,6 +39,9 @@ $.Module(function (App) {
     }
     Goldfish.Start = () => {
         PlanQuest.Execute()
+        Goldfish.Go()
+    }
+    Goldfish.Go = () => {
         $.PushCommands(
             $.Prepare("common", context),
             $.To(Goldfish.Data.Loc),
@@ -72,6 +75,10 @@ $.Module(function (App) {
     )
     Goldfish.Ready = () => {
         if (App.Data.Item.List.FindByIDLower("diao gan").First() == null) {
+            if (App.Data.Item.List.FindByIDLower("gold").Sum() < 10) {
+                Goldfish.Go()
+                return
+            }
             $.PushCommands(
                 $.Do("buy diao gan;i"),
                 $.Nobusy(),

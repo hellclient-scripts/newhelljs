@@ -56,9 +56,11 @@ $.PrepareMoney = App.NewPrepareMoneyCommand
 
 $.NewCombat = App.NewCombat
 
-$.NewWanted=App.NewWanted
+$.NewWanted = App.NewWanted
 
-$.Rest=App.Core.Heal.NewRestCommand
+$.NewIDLowerWanted = App.NewIDLowerWanted
 
-$.RaiseStage=App.Core.Stage.Raise
+$.Rest = App.Core.Heal.NewRestCommand
+
+$.RaiseStage = App.Core.Stage.Raise
 $.Now = function () { return (new Date()).getTime() }

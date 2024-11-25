@@ -17,7 +17,10 @@
     App.Include("src/quests/misc/stop.js")
     App.Include("src/quests/misc/fangqi.js")
     App.Include("src/quests/tjz/tjz.js")
+    App.Include("src/quests/tjss/tjss.js")
     App.Include("src/quests/xuemo/xuemo.js")
     App.Include("src/quests/qinling/qinling.js")
+    App.Include("src/quests/lgt/lgt.js")
+    App.Include("src/quests/baohu/baohu.js")
 
 })(App)

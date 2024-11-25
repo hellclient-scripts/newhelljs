@@ -600,6 +600,10 @@
     App.Sender.RegisterAlias("#jifa", function (data) {
         App.Send(GetVariable("jifa"))
     })
+    App.Sender.RegisterAlias("#jiqu", function (data) {
+        App.Send("yun regenerate")
+        App.Send(App.Random(App.Core.Study.Jiqu.Commands))
+    })
     App.UserQueue.UserQueue.RegisterCommand("#jifa", function (uq, data) {
         uq.Commands.Append(
             App.Commands.NewDoCommand(GetVariable("jifa")),

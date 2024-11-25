@@ -127,6 +127,7 @@
                         case "walkfail":
                             App.Move.OnWalkFail()
                             break
+                        default:
                     }
             }
         }
