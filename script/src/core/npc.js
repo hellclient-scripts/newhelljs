@@ -96,7 +96,12 @@
         }
     }
     App.Map.AppendTagsIniter((map) => {
-        map.SetTag(App.Params.IDPass, true)
+        if (App.Params.IDPass) {
+            App.Params.IDPass.split(",").forEach(val => {
+                map.SetTag(val.trim(), true)
+            })
+
+        }
     })
     App.Core.NPC.Kungfu = {}
     App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {

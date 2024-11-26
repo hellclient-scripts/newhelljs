@@ -279,7 +279,7 @@
     module.To = To
     module.Rooms = Rooms
     module.Ordered = Ordered
-    module.MaxStep = 5
+    module.MaxStep = 6
     module.Locate = Locate
 
     let DefaultChecker = function (step, index, move, map) {

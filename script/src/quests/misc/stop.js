@@ -1,6 +1,6 @@
 $.Module(function (App) {
-    let Quit = {}
-    Quit.Start = (data) => {
+    let Stop = {}
+    Stop.Start = (data) => {
         App.Stop()
         App.Next()
     }
@@ -10,7 +10,7 @@ $.Module(function (App) {
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Start = function (data) {
-        Quit.Start(data)
+        Stop.Start(data)
     }
     App.Quests.Register(Quest)
 

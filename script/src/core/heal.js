@@ -71,6 +71,9 @@
                 return function () {
                     let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * neimin - App.Data.Player.HP["当前内力"]).toFixed()
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
+                    if (App.Core.Dispel.Need) {
+                        num = (num / 2).toFixed()
+                    }
                     if (num < 10) { num = 10 }
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand("dazuo " + num),

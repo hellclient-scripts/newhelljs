@@ -223,6 +223,7 @@
                     this.Last = (new Date()).getTime()
                     if (this.NoRepeat) {
                         this.Enabled = false
+                        this.Finished = true
                     }
                     if (this.Callback == null) {
                         return false
@@ -242,12 +243,17 @@
             this.Name = name
             return this
         }
+        WithNoRepeat(norepeat) {
+            this.NoRepeat = norepeat
+            return this
+        }
         Stack = ""
         Last = 0
         Duration = 0
         Callback = null
         NoRepeat = false
         Enabled = true
+        Finished = false
     }
 
     class Term {
@@ -266,9 +272,13 @@
                 }
             })
             this.RemoveTasks(...finished)
+            let finishedTimers = []
             this.#timers.forEach(function (timer) {
-                timer.OnTime()
+                if (!timer.OnTime() && timer.Finished) {
+                    finishedTimers.push(timer)
+                }
             })
+            this.RemoveTimers(...finishedTimers)
         }
         OnEvent(event) {
             let finished = []
@@ -290,14 +300,24 @@
                 return
             }
             let result = []
-            let filter = {}
-
             this.#tasks.forEach(function (t) {
                 if (!t.Finished) {
                     result.push(t)
                 }
             })
             this.#tasks = result
+        }
+        RemoveTimers(...timers) {
+            if (timers.length == 0) {
+                return
+            }
+            let result = []
+            this.#timers.forEach(function (t) {
+                if (!t.Finished) {
+                    result.push(t)
+                }
+            })
+            this.#timers = result
         }
         BindTimer(timer) {
             this.#timers.push(timer)

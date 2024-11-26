@@ -29,6 +29,7 @@ $.Module(function (App) {
             }
             let result = answer.match(matcherProtect)
             if (result) {
+                Baohu.Data.Start = $.Now()
                 Baohu.Go(result[1])
                 return
             }
@@ -78,15 +79,25 @@ $.Module(function (App) {
                         id = "jueshi gaoshou"
                         break
                 }
-
                 $.PushCommands(
                     $.CounterAttack(`${GetVariable("id")}'s ${id}`, App.NewCombat("baohu").WithTags(`baohu-${result[2]}`)),
                     $.Function(Baohu.Finish),
                 )
                 $.Next()
             }).WithName("ok")
-            task.AddTimer(60000).WithName("timeout")
-            $.RaiseStage("prepare")
+            let wait = Baohu.Data.Start + 25000 - $.Now()
+            if (wait > 0) {
+                task.AddTimer(wait, (timer) => {
+                    Note("准备迎敌")
+                    App.Send("halt")
+                    $.RaiseStage("prepare")
+                    return true
+                }).WithNoRepeat(true)
+            }
+            task.AddTimer(60000, () => {
+                Note("等待超时")
+                return false
+            }).WithName("timeout")
             $.RaiseStage("wait")
         },
         (result) => {
@@ -125,9 +136,9 @@ $.Module(function (App) {
         App.Positions["Quest"],
         (task) => {
             task.AddTrigger(matcherSuccess, (tri, result) => {
+                Quest.Cooldown(60)
                 Baohu.Continuous = App.CNumber.ParseNumber(result[1])
                 Baohu.Count++
-
                 return true
             })
         },

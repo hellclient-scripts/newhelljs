@@ -32,6 +32,7 @@
     }
     App.BindEvent("core.onexit", App.Core.Room.OnExit)
     let matcherOnHeal = /^    (\S{2,8})正坐在地下(.+)。$/
+    let matcherOnYanlian = /^    (\S{2,8})正在演练招式。$/
     let matcherOnObj = /^    ((\S+) )?(\S*[「\(].+[\)」])?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
     var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
@@ -48,13 +49,24 @@
             })
             task.AddTrigger(matcherOnHeal, function (trigger, result, event) {
                 let item = new objectModule.Object(result[1], "", App.History.CurrentOutput).
-                    WithParam("动作", "result[2]")
+                    WithParam("动作", result[2])
+                App.Map.Room.Data.Objects.Append(item)
+                event.Context.Set("core.room.onobject", true)
+                return true
+            })
+            task.AddTrigger(matcherOnYanlian, function (trigger, result, event) {
+                let item = new objectModule.Object(result[1], "", App.History.CurrentOutput).
+                    WithParam("动作", "演练招式")
                 App.Map.Room.Data.Objects.Append(item)
                 event.Context.Set("core.room.onobject", true)
                 return true
             })
 
             task.AddCatcher("line", function (catcher, event) {
+                let output = event.Data.Output
+                if (output.length > 4 && output.startsWith("    ") && output[4] != " ") {
+                    return true
+                }
                 return event.Context.Get("core.room.onobject")
             })
         }, function (result) {

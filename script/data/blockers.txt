@@ -24,9 +24,9 @@
 衙役|ya yi|50000
 御前侍卫|shi wei|1000000
 宋兵|song bing|50000
-侍女|shi nu|1000000
-巴依|ba yi|1000000
+侍女|shi nu|400000
+巴依|ba yi|400000
 亲兵|qin bing|50000
-褚万里|chu wanli|1000000
+褚万里|chu wanli|400000
 空见|kong jian|5000000
 道一|daoyi chanshi|50000
