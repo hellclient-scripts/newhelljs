@@ -83,6 +83,7 @@
                 App.Move.RetryStep = true
                 return true
             })
+            task.AddCatcher("core.movereset").WithName("movereset")
             task.AddCatcher("core.wrongway").WithName("wrongway")
             task.AddCatcher("core.walkbusy").WithName("walkbusy")
             task.AddCatcher("core.walkresend").WithName("walkresend")
@@ -100,6 +101,10 @@
                 default:
                     switch (result.Name) {
                         case "timeout":
+                            break
+                        case "movereset":
+                            App.Map.Room.ID = ""
+                            App.Map.Retry()
                             break
                         case "wrongway":
                             if (App.Move.RetryStep) {
@@ -122,7 +127,7 @@
                             App.Move.OnBlocker(result.Data)
                             break
                         case "needrest":
-                            App.Move.NeedReset()
+                            App.Move.NeedRest()
                             break
                         case "walkfail":
                             App.Move.OnWalkFail()
@@ -132,7 +137,7 @@
             }
         }
     )
-    App.Move.NeedReset = function () {
+    App.Move.NeedRest = function () {
         let snap = App.Map.Snap()
         App.Commands.Insert(
             App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),

@@ -122,6 +122,13 @@
                         )
                     }
                     break
+                case "#use":
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand("use " + result.Asset.Item.IDLower),
+                        App.Commands.NewDoCommand("i;donate"),
+                        App.NewSyncCommand(),
+                    )
+                    break
                 default:
                     App.Fatal("assets", "未知的处理指令" + result.Command)
                     return

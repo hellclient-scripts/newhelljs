@@ -455,4 +455,19 @@
         )
         $.Next()
     }
+    let checkerDonate = App.Checker.Register("donate", "donate", 30 * 60 * 1000)
+    App.Core.OnDonate = function (event) {
+        checkerDonate.Reset()
+        event.Context.Propose(function () {
+            App.Data.Player.Donate = event.Data.Wildcards[0] - 0
+        })
+    }
+    App.BindEvent("core.donate", App.Core.OnDonate)
+    App.Core.OnDonate0 = function (event) {
+        checkerDonate.Reset()
+        event.Context.Propose(function () {
+            App.Data.Player.Donate = 0
+        })
+    }
+    App.BindEvent("core.donate0", App.Core.OnDonate0)
 })(App)

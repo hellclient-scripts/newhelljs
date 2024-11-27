@@ -118,8 +118,9 @@ $.Module(function (App) {
                 $.Next()
             }),
             $.Wait(2000),
-            $.Do("halt"),
-            $.Prepare(),
+            $.Do("halt;i"),
+            $.Sync(),
+            $.Prepare("commonWithExp"),
         )
         $.Next()
     }
@@ -151,7 +152,7 @@ $.Module(function (App) {
         Baohu.Data = {}
         PlanQuest.Execute()
         $.PushCommands(
-            $.Prepare(),
+            $.Prepare("", { GoldKeep: 10 }),
             $.To("174"),
             $.Ask("wang jiantong", "保护人质"),
             $.Function(Baohu.Check)

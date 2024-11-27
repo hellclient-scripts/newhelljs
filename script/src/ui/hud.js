@@ -36,7 +36,9 @@
         let learn = new App.Word(App.Quests.Stopped ? "未开" : (canlearn ? "在学" : "学完")).WithColor("BrightWhite").WithBackground((App.Quests.Stopped || canlearn) ? "BrightGreen" : "BrightRed")
         let gongLabel = new App.Word(" 门贡:").WithColor("BrightWhite")
         let gong = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Score["门贡"] || 0), 6, true).WithColor("white")
-        return App.Word.Join(App.HUD.Space, expLabel, exp, potLabel, pot, App.HUD.Space, learn, App.HUD.Space, banklabel, bank, bondlabel, bond, gongLabel, gong)
+        let donateLabel = new App.Word(" 集点:").WithColor("BrightWhite")
+        let donate = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Donate || 0), 6, true).WithColor("white")
+        return App.Word.Join(App.HUD.Space, expLabel, exp, potLabel, pot, App.HUD.Space, learn, App.HUD.Space, banklabel, bank, bondlabel, bond, gongLabel, gong, donateLabel, donate)
     }
     App.HUD.Line3 = () => {
         let dup = {}
@@ -70,25 +72,26 @@
         return App.Word.Join(App.HUD.Space, label, value)
     }
     App.HUD.SummaryLine1 = () => {
-        let banklabel = new App.Word("存:").WithColor("BrightYellow")
-        let bank = new App.Word(App.Data.Player.Score["存款"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["存款"]) : "-", 5, true).WithColor("white")
+        let banklabel = new App.Word(" 存:").WithColor("BrightYellow")
+        let bank = new App.Word(App.Data.Player.Score["存款"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["存款"]) : "-", 4, true).WithColor("white")
         let bondlabel = new App.Word(" 债:").WithColor("BrightYellow")
-        let bond = new App.Word(App.Data.Player.Score["债券"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["债券"]) : "-", 5, true).WithColor("white")
-        let expLabel = new App.Word(" 经:").WithColor("BrightWhite")
-        let exp = new App.Word(App.Data.Player.HP["经验"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["经验"]) : "-", 5, true).WithColor("white")
+        let bond = new App.Word(App.Data.Player.Score["债券"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["债券"]) : "-", 4, true).WithColor("white")
+        let expLabel = new App.Word("经:").WithColor("BrightWhite")
+        let exp = new App.Word(App.Data.Player.HP["经验"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["经验"]) : "-", 4, true).WithColor("white")
         let potLabel = new App.Word(" 潜:").WithColor("BrightWhite")
-        let pot = new App.Word(App.Data.Player.HP["潜能"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["潜能"]) : "-", 5, true).WithColor("white")
+        let pot = new App.Word(App.Data.Player.HP["潜能"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["潜能"]) : "-", 4, true).WithColor("white")
         let gongLabel = new App.Word(" 贡:").WithColor("BrightWhite")
-        let gong = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Score["门贡"] || 0), 5, true).WithColor("white")
-
-        let canlearn = (App.Core.Study.FilterSkill() != null)
-        let learn = new App.Word(App.Quests.Stopped ? "停" : (canlearn ? "学" : "满")).WithColor("BrightWhite").WithBackground((App.Quests.Stopped || canlearn) ? "BrightGreen" : "BrightRed")
-        return App.Word.Join(expLabel, exp, potLabel, pot, App.HUD.Space, learn, App.HUD.Space, banklabel, bank, bondlabel, bond, gongLabel, gong)
+        let gong = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Score["门贡"] || 0), 4, true).WithColor("white")
+        let donateLabel = new App.Word(" 集:").WithColor("BrightWhite")
+        let donate = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Donate || 0), 4, true).WithColor("white")
+        return App.Word.Join(expLabel, exp, potLabel, pot, banklabel, bank, bondlabel, bond, gongLabel, gong, donateLabel, donate)
     }
     App.HUD.SummaryLine2 = () => {
         let dup = {}
-        let result = []
         let count = 0
+        let canlearn = (App.Core.Study.FilterSkill() != null)
+        let learn = new App.Word(App.Quests.Stopped ? "停" : (canlearn ? "学" : "满")).WithColor("BrightWhite").WithBackground((App.Quests.Stopped || canlearn) ? "BrightGreen" : "BrightRed")
+        let result = [learn, App.HUD.Space]
         App.Quests.Queue.forEach(rq => {
             if (!dup[rq.ID] && count < 3) {
                 dup[rq.ID] = true
@@ -103,11 +106,10 @@
                 }
             }
         });
-        if (result.length) {
-            result.unshift(App.HUD.Space)
+        if (result.length > 2) {
             return App.HUD.UI.Word.Join(...result)
         } else {
-            return App.HUD.UI.Word.Join(App.HUD.Space, new App.HUD.UI.Word("无任务信息"))
+            return App.HUD.UI.Word.Join(result[0], App.HUD.Space, new App.HUD.UI.Word("无任务信息"))
         }
     }
     App.HUD.Update()

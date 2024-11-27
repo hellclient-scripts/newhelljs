@@ -1,4 +1,5 @@
 wielded>#carry any
+#use id=xun zhang
 #store id=magic water,renshen wan,shangfa ling,fushou gao,xuantie lin,feicui lan,iuzhuan jindan,guigu book,tian jing,xun zhang,jiuzhuan jindan
 #store id=chipped agate,chipped crystal,crystal,agate,diamond,chipped diamond,jade,chipped jade,chipped magic stone
 #sell name=金块,金条,金锭,小金元宝,大金元宝,玄冰寒铁,乌金丝,银轮
