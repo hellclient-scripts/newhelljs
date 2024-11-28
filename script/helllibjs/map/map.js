@@ -13,6 +13,7 @@
         Exits = []
         Data = {}
         Keep = false//设为true，不更新room,一般用于look更新当前房间信息
+        Keeping = false
         WithName(name) {
             this.Name = name
             return this
@@ -129,9 +130,20 @@
             }
             return result
         }
-        EnterNewRoom() {
-            if (!this.Room.Keep) {
-                this.Room = new Room()
+        NewRoom() {
+            return new Room()
+        }
+        EnterNewRoom(room) {
+            if (!room) {
+                room = new Room()
+            }
+            let oroom = this.Room
+            this.Room = room
+            if (oroom.Keep) {
+                if (oroom.ID) {
+                    this.Room.ID = oroom.ID
+                }
+                this.Room.Keeping = true
             }
             this.Room.Keep = false
             return this.Room
@@ -233,7 +245,9 @@
             return this.filterpath(path)
         }
         OnWalking() {
-            this.Position.StartNewTerm()
+            if (!this.Room.Keeping) {
+                this.Position.StartNewTerm()
+            }
             if (this.Move != null) {
                 this.Move.OnWalking(this)
             }

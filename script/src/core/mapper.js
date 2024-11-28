@@ -174,7 +174,7 @@
         },
         (result) => {
             if (result.Data != null) {
-                App.Map.Room.ID = result.Data
+                App.Core.Room.Current.ID = result.Data
             }
         }
     )

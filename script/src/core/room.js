@@ -3,6 +3,7 @@
     let mapModule = App.RequireModule("helllibjs/map/map.js")
 
     App.Core.Room = {}
+    App.Core.Room.Current = null
     App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
@@ -15,14 +16,15 @@
         }
     })
     App.Core.Room.OnName = function (event) {
-        App.Map.EnterNewRoom().
+        App.Core.Room.Current = App.Map.NewRoom().
             WithName(App.History.Current).
             WithNameRaw(App.History.CurrentOutput)
-        initRoom()
     }
     App.BindEvent("core.roomname", App.Core.Room.OnName)
     reExit = /[a-z]+/g
     App.Core.Room.OnExit = function (event) {
+        App.Map.EnterNewRoom(App.Core.Room.Current)
+        initRoom()
         event.Context.Propose(function () {
             let result = [...event.Data.Wildcards[1].matchAll(reExit)].map(data => data[0]).sort()
             App.Map.Room.WithExits(result)

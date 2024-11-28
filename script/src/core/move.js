@@ -8,7 +8,6 @@
         //避免被关在房间里
         if (App.Map.Room.Exits.length == 0) {
             App.Send("open door;open gate")
-            App.Look()
         }
         return locate.MoveNext(move, map)
     }
