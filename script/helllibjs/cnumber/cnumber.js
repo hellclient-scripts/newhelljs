@@ -47,7 +47,7 @@
                         if (lastunit != 0 && m >= lastunit) {
                             return -1
                         }
-                        if (lastnumber == 0) {
+                        if (lastnumber <= 0) {
                             lastnumber = 1
                         }
                         result = result + lastnumber * m
@@ -58,7 +58,7 @@
                     case "亿":
                         var m = multi[char]
                         if (lastnumber > 0) {
-                            result=result + lastnumber
+                            result = result + lastnumber
                         }
                         result = result * m
                         lastunit = 0
@@ -76,7 +76,7 @@
                 }
             }
             if (lastnumber > 0) {
-                result=result + lastnumber
+                result = result + lastnumber
             }
             return result
 

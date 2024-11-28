@@ -133,13 +133,15 @@ $.Module(function (App) {
         Note("找不到NPC,尝试等待")
         PlanProtect.Execute()
     }
+    //汪剑通对你说道:你已经连续完成了二百十六次任务。
     let matcherSuccess = /^汪剑通对你说道:你已经连续完成了(.+)次任务。$/
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             task.AddTrigger(matcherSuccess, (tri, result) => {
-                Quest.Cooldown(60)
+                Quest.Cooldown(60000)
                 Baohu.Continuous = App.CNumber.ParseNumber(result[1])
+                Note(Baohu.Continuous)
                 Baohu.Count++
                 return true
             })
