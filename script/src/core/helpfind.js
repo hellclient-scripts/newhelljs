@@ -8,6 +8,10 @@
         return world.WorldAddress() + ":" + world.WorldPort()
     }
     App.Core.HelpFind.onBroadcast = (msg, global) => {
+        if (!global) {
+            App.RaiseEvent(new App.Event("core.localBroadcast", msg))
+            return
+        }
         var data = SplitN(msg, " ", 3)
         if (data.length < 2) {
             return

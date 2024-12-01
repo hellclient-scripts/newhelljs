@@ -125,12 +125,12 @@
             return this.Queue == null || this.Queue.length == 0
         }
         StartRunningQuests(quests) {
+            this.OnStart(this)
             if (quests.length) {
                 this.Stopped = false
                 this.Queue = quests
                 this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             }
-            this.OnStart(this)
             this.Commands.Next()
         }
         Restart() {

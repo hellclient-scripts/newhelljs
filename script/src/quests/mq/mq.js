@@ -16,9 +16,11 @@ $.Module(function (App) {
         Info = []
         Farlist = null
         Head = false
+        Loc = null
         Flee() {
             this.First = false
             this.Fled = true
+            this.Loc = null
             this.Info = [...Cities[this.Zone].Info]
         }
         SetZone(zone) {
@@ -353,7 +355,10 @@ $.Module(function (App) {
                 MQ.Data.NPC.Farlist = MQ.Data.NPC.Farlist.slice(0, -2)
             } else if (exp < 700000) {
                 MQ.Data.NPC.Farlist = MQ.Data.NPC.Farlist.slice(0, -1)
+            } else {
+                MQ.Data.NPC.Farlist.unshift(MQ.Data.NPC.Farlist.pop())
             }
+            MQ.Data.NPC.Loc = null
             MQ.Data.NPC.NextFar()
             MQ.Ready()
             return

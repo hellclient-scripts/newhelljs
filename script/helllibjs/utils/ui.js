@@ -38,18 +38,18 @@
         }
         return str
     }
-    module.FormatTime = (time) => {
+    module.FormatTime = (time, short) => {
         if (time > 432000000) {
-            return Math.floor(time / 86400000) + "天"
+            return Math.floor(time / 86400000) + (short ? "d" : "天")
         }
         if (time > 18000000) {
-            return Math.floor(time / 3600000) + "小时"
+            return Math.floor(time / 3600000) + (short ? "h" : "小时")
         }
         if (time > 300000) {
-            return Math.floor(time / 60000) + "分钟"
+            return Math.floor(time / 60000) + (short ? "m" : "分钟")
         }
         if (time > 1000) {
-            return Math.floor(time / 1000) + "秒"
+            return Math.floor(time / 1000) + (short ? "s" : "秒")
         }
         return "0"
     }

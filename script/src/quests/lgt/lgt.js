@@ -166,14 +166,14 @@ $.Module(function (App) {
     Quest.Intro = ""
     Quest.Help = ""
     Quest.OnHUD = () => {
-        let last = LGT.Last ? App.HUD.UI.FormatTime($.Now() - LGT.Last) : "-"
+        let last = LGT.Last ? App.HUD.UI.FormatTime($.Now() - LGT.Last, true) : "-"
         return [
             new App.HUD.UI.Word("上次爬塔:"),
             new App.HUD.UI.Word(last, 5, true),
         ]
     }
     Quest.OnSummary = () => {
-        let last = LGT.Last ? App.HUD.UI.FormatTime($.Now() - LGT.Last) : "-"
+        let last = LGT.Last ? App.HUD.UI.FormatTime($.Now() - LGT.Last, true) : "-"
         return [
             new App.HUD.UI.Word("塔:"),
             new App.HUD.UI.Word(last, 5, true),
