@@ -91,6 +91,9 @@
         return null
     }))
     App.Proposals.Register("jinchuanyao", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Core.Dispel.Need && App.Data.Player.HP["经验"] > 100000) {
+            return null
+        }
         if (App.Data.Player.HP["气血百分比"] <= 20) {
             return function () {
                 App.Commands.PushCommands(
@@ -116,7 +119,7 @@
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
                 )
-                if (App.Map.Room.ID == App.Params.LocMaster) {
+                if (App.Map.Room.ID == App.Params.LocMaster || App.Core.Dispel.Need) {
                     App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
                 }
                 App.Next()
@@ -146,6 +149,9 @@
         return null
     }))
     App.Proposals.Register("yangjingdan", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Core.Dispel.Need && App.Data.Player.HP["经验"] > 100000) {
+            return null
+        }
         if (App.Data.Player.HP["精气百分比"] <= 50) {
             return function () {
                 App.Commands.PushCommands(

@@ -42,6 +42,7 @@ $.Module(function (App) {
                 if (LGT.Data.Ready == 0) {
                     LGT.Data.Ready = 1
                 } else {
+                    App.Commands.Drop()
                     LGT.Check()
                 }
                 return true

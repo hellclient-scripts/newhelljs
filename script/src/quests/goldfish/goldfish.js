@@ -66,6 +66,7 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger("你收起钓竿，看样子是不想再钓了。")
+            task.AddTrigger("你现在不忙。")
             task.AddTrigger("看来是拉杆(draw)拉晚了，白白的赔了一个鱼饵！")
             App.Send("fish")
         },

@@ -162,8 +162,8 @@
             this.Queues.push(queue)
             this.#enter()
         }
-        Discard(){
-            this.Queues=[]
+        Discard() {
+            this.Queues = []
         }
         Next() {
             let queue = this.CurrentQueue()
@@ -208,6 +208,12 @@
                 }
                 this.#pop()
                 this.Next()
+            }
+        }
+        Drop() {
+            let queue = this.CurrentQueue()
+            if (queue) {
+                this.#pop()
             }
         }
         NewQueue(readycmd) {

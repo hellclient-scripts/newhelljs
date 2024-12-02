@@ -272,8 +272,8 @@
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)
-    App.Proposals.Register("commonWithStudy", App.Proposals.NewProposalGroup("common", "jiqu", "study"))
-    App.Proposals.Register("commonWithExp", App.Proposals.NewProposalGroup("commonWithStudy", "exp"))
+    App.Proposals.Register("commonWithStudy", App.Proposals.NewProposalGroup("common", "study", "jiqu"))
+    App.Proposals.Register("commonWithExp", App.Proposals.NewProposalGroup("common", "exp", "study", "jiqu"))
     App.UserQueue.UserQueue.RegisterCommand("#prepare", function (uq, data) {
         uq.Commands.Append(
             App.NewPrepareCommand(data),
