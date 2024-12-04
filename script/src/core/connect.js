@@ -96,7 +96,7 @@
         if (App.Core.Connect.CanLogin()) {
             if (App.Core.Connect.Next == null) {
                 Note("" + (App.Params.ReloginDelay / 1000).toFixed() + "秒后尝试重连")
-                App.Reconnect(App.Params.ReloginDelay)
+                App.Reconnect(App.Params.ReloginDelay, App.Core.Connect.Callback)
             }
         }
     })
