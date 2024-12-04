@@ -87,6 +87,10 @@
                 OmitOutput()
                 return !App.Core.Combat.CanStop()
             })
+            task.AddCatcher("core.combatstop", () => {
+                return !App.Core.Combat.CanStop()
+            })
+
             task.AddCatcher("disconnected").WithName("Disconnect")
             if (App.Combat.Data.Plan) {
                 App.Combat.Data.Plan.Execute()

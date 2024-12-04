@@ -460,6 +460,7 @@ $.Module(function (App) {
                     MQ.Data.NPC.Died = true
                     MQ.OnNpcDie()
                     App.Send("cut head from corpse;get head")
+                    App.RaiseEvent(new App.Event("core.combatstop"))
                 }
                 return true
             })
