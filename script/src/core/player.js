@@ -145,6 +145,7 @@
     var matcherScoreBond = /^│债券：(\S+)\s*│威望：(\d+)\s*│$/
     var matcherScoreYueli = /^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
     var matcherScoreMenzhong = /^│住宅：(\S+)\s+│门贡：(\d+)\s*点\s*│$/
+    var matcherScoreBreakup = /^│武学宗师：(\S)\s*任督二脉：(\S)\s*│杀害玩家：.*│$/
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
@@ -169,7 +170,11 @@
             task.AddTrigger(matcherScoreMenzhong, (tri, result) => {
                 App.Data.Player.Score["住宅"] = result[1]
                 App.Data.Player.Score["门贡"] = result[2] - 0
-
+                return true
+            })
+            task.AddTrigger(matcherScoreBreakup, (tri, result) => {
+                App.Data.Player.Score["宗师"] = (result[1] != "x")
+                App.Data.Player.Score["任督"] = (result[2] != "x")
                 return true
             })
             task.AddTimer(5000)

@@ -20,6 +20,10 @@ $.Sync = App.NewSyncCommand
 
 $.Nobusy = App.NewNobusyCommand
 
+$.Noblind=App.NewNoblindCommand
+
+$.NewCommand=App.Commands.NewCommand
+
 $.Push = App.Commands.Push.bind(App.Commands)
 
 $.PushCommands = App.Commands.PushCommands.bind(App.Commands)

@@ -37,6 +37,43 @@
 
         App.Send("bai")
     }
+    let checkblind = function (delay, offset, cb) {
+        let noblind = false
+        delay = delay - 0
+        if (isNaN(delay) || delay <= 0) {
+            delay = 1000
+        }
+        offset = offset - 0
+        if (isNaN(offset)) {
+            offset = 0
+        }
+        let task = App.Positions["Connect"].AddTask(function (result) {
+            if (result.Name == "sync") {
+                App.Positions["Response"].StartNewTerm()
+                if (cb) {
+                    cb()
+                }
+            }
+        })
+        var timer = task.AddTimer(delay, function () {
+            App.Send(`ask ${App.Data.Player.Score.ID} about blind`)
+            return true
+        }).Reset(offset)
+        task.AddTrigger("你自己自言自语。", function () {
+            if (!noblind) {
+                noblind = true
+                timer.Enable(false)
+                App.Send("mail")
+            }
+            return true
+        })
+        task.AddTrigger("此服务已经暂停。", function () {
+            OmitOutput()
+        }).WithName("sync")
+
+        App.Send(`ask ${App.Data.Player.Score.ID} about blind`)
+    }
+
     let sync = function (cb) {
         let task = App.Positions["Connect"].AddTask(function (result) {
             if (result.Name == "sync") {
@@ -49,7 +86,6 @@
         task.AddTrigger("此服务已经暂停。", function () {
             OmitOutput()
         }).WithName("sync")
-        task.AddTrigger("你终于抹掉了眼前的鲜血，能看见了。")
         App.Send("mail")
     }
     App.Sync = function (cb) {
@@ -64,6 +100,15 @@
     })
     App.NewNobusyCommand = function (delay, offset) {
         return App.Commands.NewCommand("nobusy", { Delay: delay, Offset: offset })
+    }
+    App.CheckBlind=checkblind
+    App.Commands.RegisterExecutor("noblind", function (commands, running) {
+        running.OnStart = function (arg) {
+            checkblind(running.Command.Data.Delay, running.Command.Data.Offset, function () { App.Next() })
+        }
+    })
+    App.NewNoblindCommand = function (delay, offset) {
+        return App.Commands.NewCommand("noblind", { Delay: delay, Offset: offset })
     }
     App.UserQueue.UserQueue.RegisterCommand("#nobusy", function (uq, data) {
         uq.Commands.Append(

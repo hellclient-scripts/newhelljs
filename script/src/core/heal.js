@@ -92,6 +92,7 @@
     }))
     App.Proposals.Register("jinchuanyao", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Core.Dispel.Need && App.Data.Player.HP["经验"] > 100000) {
+            //防止在药铺卡到晕不去解毒大米位置
             return null
         }
         if (App.Data.Player.HP["气血百分比"] <= 20) {
@@ -114,7 +115,7 @@
         if (App.Data.Player.HP["气血百分比"] <= healBelow && jifaForce > 20) {
             return function () {
                 App.Commands.PushCommands(
-                    App.Commands.NewDoCommand("yun heal"),
+                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun heal;yun dispel" : "yun heal"),//避免因为中毒不吃药卡住
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
@@ -167,11 +168,11 @@
         return null
     }))
     App.Proposals.Register("inspire", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Data.Player.HP["精气百分比"] <= App.Params.InspireBelow) {
+        if (App.Data.Player.Score["任督"] && App.Data.Player.HP["精气百分比"] <= App.Params.InspireBelow) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),
-                    App.Commands.NewDoCommand("yun inspire"),
+                    App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun heal;yun inspire" : "yun inspire"),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
@@ -247,6 +248,17 @@
             } else if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow) {
                 App.Commands.PushCommands(
                     App.Commands.NewDoCommand("yun heal"),
+                    App.NewNobusyCommand(),
+                    App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
+                    App.NewSyncCommand(),
+                    App.Core.Heal.NewRestCommand(),
+                )
+            } else if (App.Data.Player.HP["精气百分比"] <= 34) {
+                App.Fail()
+                return
+            } else if (App.Data.Player.Score["任督"] && App.Data.Player.HP["精气百分比"] <= App.Params.InspireBelow) {
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand("yun inspire"),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),

@@ -123,11 +123,20 @@ $.Module(function (App) {
         $.Next()
     }
     LGT.Wait = () => {
-        if (LGT.Data.Ready == 0) {
+        if (App.Map.Room.Data.Objects.FindByName("灵感塔囚徒").First()) {
+            Note("等待进入下一层")
             LGT.Data.Ready = 1
         } else {
             LGT.Check()
         }
+    }
+    LGT.AfterRest = () => {
+        $.PushCommands(
+            $.Do("#l"),
+            $.Sync(),
+            $.Function(LGT.Wait),
+        )
+        $.Next()
     }
     LGT.Kill = () => {
         let tags = []
@@ -140,9 +149,10 @@ $.Module(function (App) {
                 App.Core.Weapon.PickWeapon()
                 $.Next()
             }),
+            $.Noblind(),
             $.Rest(),
-            $.Function(LGT.Wait),
-        ).WithFailCommand($.Function(LGT.Wait))
+            $.Function(LGT.AfterRest),
+        ).WithFailCommand($.Function(LGT.AfterRest))
         $.Next()
     }
     LGT.Start = function () {

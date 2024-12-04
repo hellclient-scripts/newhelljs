@@ -22,7 +22,7 @@
     App.NamedParams.AddNumber("LearnMax", 100).WithName("学习最大次数").WithDesc("每次学习的最大次数")
     App.NamedParams.AddNumber("YanjiuMax", 100).WithName("研究最大次数").WithDesc("每次研究的最大次数")
     App.NamedParams.AddNumber("LianMax", 50).WithName("练习次数").WithDesc("每次练技能的最大次数")
-    // App.NamedParams.AddNumber("InspireBleow", 75).WithName("精气下限").WithDesc("低于这个值会疗伤")
+    App.NamedParams.AddNumber("InspireBleow", 85).WithName("精气下限").WithDesc("低于这个值会疗精")
     App.NamedParams.AddNumber("WeaponDurationMin", 40).WithName("武器最小耐久").WithDesc("武器耐久低于这个值会去修理")
     App.NamedParams.AddNumber("NumDazuo", 0).WithName("打坐数值").WithDesc("每次打坐时的打坐数量，为0会自动判断")
     App.NamedParams.AddNumber("NumTuna", 0).WithName("吐纳数值").WithDesc("每次吐纳时的吐纳数量，为0会自动判断")

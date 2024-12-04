@@ -553,7 +553,7 @@
             return function () {
                 App.Commands.PushCommands(
                     App.NewNobusyCommand(),
-                    App.Commands.NewDoCommand("yun regenerate"),
+                    App.Commands.NewDoCommand("yun regenerate;yun recover"),
                     App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("hp"),
