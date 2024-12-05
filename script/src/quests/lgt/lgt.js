@@ -47,6 +47,11 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddTrigger("你暂时还不能到上一层去！", (tri, result) => {
+                LGT.Data.Ready = 1
+                App.Commands.Drop()
+                return true
+            })
             task.AddTrigger("你听到无数天魔在耳边吟唱嘶吼，莫大的压力使你开始神智迷糊了...", (tri, result) => {
                 // LGT.Check()
                 return true
