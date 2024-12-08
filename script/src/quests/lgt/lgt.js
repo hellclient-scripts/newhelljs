@@ -13,6 +13,7 @@ $.Module(function (App) {
         Entry: [],
     }
     LGT.Connect = () => {
+        App.Commands.Drop()
         PlanQuest.Execute()
         $.PushCommands(
             $.Function(LGT.Kill),
@@ -97,6 +98,18 @@ $.Module(function (App) {
             }
         }
     )
+    let matcherKnockFinish = /$你在灵感西塔上成功敲钟之后，/
+    let PlanKnock = new App.Plan(
+        App.Map.Position,
+        (task) => {
+            Note("等待结算")
+            task.AddTrigger(matcherKnockFinish)
+            App.Send("knock zhong;i")
+        },
+        (result) => {
+            App.Next()
+        }
+    )
     LGT.Check = () => {
         if (LGT.Data.灵符 >= 2) {
             LGT.Next()
@@ -105,10 +118,7 @@ $.Module(function (App) {
             App.Checker.GetCheck("i").Force()
             $.PushCommands(
                 $.Nobusy(),
-                $.Do("knock zhong;i"),
-                $.Sync(),
-                $.Wait(3000),
-                $.Nobusy(),
+                $.Plan(PlanKnock),
                 $.Prepare(),
             )
             $.Next()
@@ -132,6 +142,7 @@ $.Module(function (App) {
             Note("等待进入下一层")
             LGT.Data.Ready = 1
         } else {
+            Note("无需等待，准备进入下一层")
             LGT.Check()
         }
     }
@@ -155,9 +166,15 @@ $.Module(function (App) {
                 $.Next()
             }),
             $.Noblind(),
-            $.Rest(),
-            $.Function(LGT.AfterRest),
-        ).WithFailCommand($.Function(LGT.AfterRest))
+            $.Function(() => {
+                $.PushCommands(
+                    $.Rest(),
+                    $.Function(LGT.AfterRest),
+
+                ).WithFailCommand($.Function(LGT.AfterRest))
+                $.Next()
+            })
+        )
         $.Next()
     }
     LGT.Start = function () {

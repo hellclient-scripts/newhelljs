@@ -27,7 +27,8 @@
         })
         if (App.Core.Connect.CanLogin()) {
             App.Core.Connect.Login()
-            App.Core.Connect.Next = null
+            App.Core.Connect.Next = (new Date()).getTime() + 10000
+            // App.Core.Connect.Next = null
         }
     }
     App.BindEvent("core.login", App.Core.Connect.OnLogin)

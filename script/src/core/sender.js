@@ -1,6 +1,9 @@
 (function (App) {
     let senderModule = App.RequireModule("helllibjs/sender/sender.js")
     App.Sender = new senderModule.Sender()
+    App.Sender.GetterEcho = () => {
+        return App.Params.Echo == "t"
+    }
     let re = /[;\n]/g
     let re2 = /[！·。]/g
     let linkre = /、/g
@@ -39,15 +42,15 @@
     App.Send = function (cmd, Grouped) {
         App.Sender.Send(cmd, Grouped)
     }
-    App.LoadSender=function(){
-        let numcmds=GetVariable("num_cmds")
-        if (!isNaN(numcmds)){
-            numcmds=numcmds-0
-            if (numcmds<=0){numcmds=App.Params.DefaultNumCmds}
-        }    
+    App.LoadSender = function () {
+        let numcmds = GetVariable("num_cmds")
+        if (!isNaN(numcmds)) {
+            numcmds = numcmds - 0
+            if (numcmds <= 0) { numcmds = App.Params.DefaultNumCmds }
+        }
         Metronome.settick(1100)
         Metronome.setinterval(50)
-        Metronome.setbeats(numcmds/2)   
+        Metronome.setbeats(numcmds / 2)
     }
     App.LoadSender()
 })(App)

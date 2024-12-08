@@ -168,7 +168,7 @@
         return null
     }))
     App.Proposals.Register("inspire", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Data.Player.Score["任督"] && App.Data.Player.HP["精气百分比"] <= App.Params.InspireBelow) {
+        if (App.Data.Player.Score["任督"] && (App.Data.Player.HP["精气百分比"] <= App.Params.InspireBelow)) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),

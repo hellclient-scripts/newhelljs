@@ -22,7 +22,7 @@
     App.NamedParams.AddNumber("LearnMax", 100).WithName("学习最大次数").WithDesc("每次学习的最大次数")
     App.NamedParams.AddNumber("YanjiuMax", 100).WithName("研究最大次数").WithDesc("每次研究的最大次数")
     App.NamedParams.AddNumber("LianMax", 50).WithName("练习次数").WithDesc("每次练技能的最大次数")
-    App.NamedParams.AddNumber("InspireBleow", 85).WithName("精气下限").WithDesc("低于这个值会疗精")
+    App.NamedParams.AddNumber("InspireBelow", 85).WithName("精气下限").WithDesc("低于这个值会疗精")
     App.NamedParams.AddNumber("WeaponDurationMin", 40).WithName("武器最小耐久").WithDesc("武器耐久低于这个值会去修理")
     App.NamedParams.AddNumber("NumDazuo", 0).WithName("打坐数值").WithDesc("每次打坐时的打坐数量，为0会自动判断")
     App.NamedParams.AddNumber("NumTuna", 0).WithName("吐纳数值").WithDesc("每次吐纳时的吐纳数量，为0会自动判断")
@@ -36,5 +36,6 @@
     App.NamedParams.AddNumber("CoinKeep", 0).WithName("最小铜钱数").WithDesc("身上保持的最少铜钱的数量")
     App.NamedParams.AddNumber("CashMax", 200).WithName("最大银票数").WithDesc("超过这个数量会去银行存银票")
     App.NamedParams.AddNumber("CashKeep", 30).WithName("最小银票数").WithDesc("预期身上银票的合理数量")
+    App.NamedParams.AddString("Echo", "t").WithName("指令回显").WithDesc("设为f关闭回显")
 
 })()
