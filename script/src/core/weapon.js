@@ -107,7 +107,7 @@
     App.Core.Weapon.CheckDuration = function () {
         PlanDuation.Execute()
     }
-    let checkerDuration = App.Checker.Register("weaponduration", App.Core.Weapon.CheckDuration, 5 * 60 * 1000)
+    let checkerDuration = App.Checker.Register("weaponduration", App.Core.Weapon.CheckDuration, 3 * 60 * 1000)
     App.Core.Weapon.PickWeapon = function () {
         if (App.Core.Weapon.Wield.length) {
             App.Send("get " + App.Core.Weapon.Wield[0].ID)
