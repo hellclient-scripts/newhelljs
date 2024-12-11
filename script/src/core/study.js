@@ -571,6 +571,9 @@
         if (App.Core.Study.HitMinPot()) {
             return null
         }
+        if (App.Core.Dispel.Need) {
+            return null
+        }
         let maxpot = GetVariable("max_pot") - 0
         if (!isNaN(maxpot) && maxpot > 0 && App.Data.Player.HP["潜能"] >= maxpot) {
             let skill = App.Core.Study.FilterSkill()

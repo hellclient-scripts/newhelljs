@@ -25,7 +25,7 @@
             Disconnect()
             return
         }
-        if (App.Core.Dispel.Need && App.Data.Player.Jifa["force"] && App.Data.Player.Jifa["force"].Level > 100) {
+        if (App.Core.Dispel.Need && App.Data.Player.Jifa["force"] && App.Data.Player.Jifa["force"].Level > 100 && App.Data.Player.HP["内力上限"] >= 300) {
             return function () {
                 App.Commands.PushCommands(
                     App.Move.NewToCommand(App.Params.LocDazuo),

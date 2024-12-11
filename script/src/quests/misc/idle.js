@@ -2,7 +2,14 @@ $.Module(function (App) {
     let Idle = {}
     Idle.Start = (data) => {
         $.PushCommands(
-            $.To(data)
+            $.Prepare(),
+            $.Function(() => {
+                if (App.Map.Room.ID != data.trim()) {
+                    $.Insert($.To(data))
+                }
+                $.Next()
+            }),
+            $.Wait(1000),
         )
         App.Next()
     }
@@ -15,12 +22,9 @@ $.Module(function (App) {
         if (!data) {
             data = "26"
         }
-        if (App.Map.Room.ID != data.trim()) {
-            return () => {
-                Quest.Start(data)
-            }
+        return () => {
+            Quest.Start(data)
         }
-        return null
     }
 
     Quest.Start = function (data) {

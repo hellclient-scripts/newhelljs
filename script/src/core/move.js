@@ -161,6 +161,9 @@
     App.BindEvent("core.roomentry", function (event) {
         event.Context.ProposeLater(function () {
             App.Map.OnWalking()
+            if (App.Params.ShowRoomID.trim() == "t") {
+                Note(`R:${App.Map.Room.ID}`)
+            }
         })
     })
     mapModule.DefaultOnFinish = function (move, map) {

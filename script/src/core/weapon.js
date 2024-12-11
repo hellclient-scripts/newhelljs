@@ -7,6 +7,7 @@
     App.Core.Weapon.Touch = ""
     App.Core.Weapon.Last = 0
     App.Core.Weapon.Duration = {}
+    App.Core.Weapon.NoSummon = false
     class Repair {
         constructor(action) {
             action.ParseNumber()
@@ -111,6 +112,7 @@
     App.Core.Weapon.PickWeapon = function () {
         if (App.Core.Weapon.Wield.length) {
             App.Send("get " + App.Core.Weapon.Wield[0].ID)
+            App.Send(App.Core.Weapon.OnCommand())
         }
     }
     App.Core.Weapon.Print = function () {
@@ -235,6 +237,9 @@
     App.Sender.RegisterAlias("#unwield", function (data) {
         App.Send(App.Core.Weapon.UnwieldAllCommand(data))
     })
+    App.Sender.RegisterAlias("#pickwp", function (data) {
+        App.Core.Weapon.PickWeapon()
+    })
 
     App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let dur = context.WeaponDurationMin || App.Params.WeaponDurationMin
@@ -256,8 +261,21 @@
                             App.NewNobusyCommand(),
                         )
                         App.Next()
-
                     }
+                }
+            }
+        }
+        return null
+    }))
+    App.Proposals.Register("summon", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Core.Weapon.Wield.length && App.Core.Weapon.Wield[0].ID.indexOf(" ") == -1 && !App.Core.Weapon.NoSummon) {
+            if (App.Data.Item.List.FindByIDLower(App.Core.Weapon.Wield[0].ID).First() == null) {
+                return () => {
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand(`summon ${App.Core.Weapon.Wield[0].ID};i`),
+                        App.NewNobusyCommand(),
+                    )
+                    App.Next()
                 }
             }
         }
@@ -272,6 +290,11 @@
     })
     App.BindEvent("core.disarmed", (e) => {
         App.Core.Weapon.PickWeapon()
-        App.Send(App.Core.Weapon.OnCommand())
+    })
+    App.BindEvent("core.onhurt", (e) => {
+        App.Core.Combat.Pend("#pickwp")
+    })
+    App.BindEvent("core.summonfail", () => {
+        App.Core.Weapon.NoSummon = true
     })
 })(App)

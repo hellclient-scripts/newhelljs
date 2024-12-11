@@ -113,6 +113,7 @@
         })
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
     let checkCombatCmd = "come"
+    App.Core.Combat.Pending = {}
     App.Core.Combat.Perform = function () {
         if (App.Combat.Data.HitAndRun) {
             if (App.Combat.Data.Ticker > 1) {
@@ -120,6 +121,10 @@
             }
             return
         }
+        Object.keys(App.Core.Combat.Pending).forEach((c) => {
+            App.Send(c)
+        })
+        App.Core.Combat.Pending = {}
         App.Core.Combat.FilterActions("#send", "#wpon", "wpoff").forEach(action => {
             switch (action.Command) {
                 case "#send":
@@ -188,10 +193,14 @@
             }
         }
     }
+    App.Core.Combat.Pend = (cmd) => {
+        App.Core.Combat.Pending[cmd] = true
+    }
     App.Core.Combat.DoCombat = function (id, data) {
         App.Combat.Target = id
         App.Combat.Data = data
         App.Core.Combat.Actions = null
+        App.Core.Combat.Pending = {}
         pickActions()
         App.Core.Combat.FilterActions("#before").forEach(action => {
             App.Send(App.Core.Combat.ReplaceCommand(action.Data))

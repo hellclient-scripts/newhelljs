@@ -269,6 +269,7 @@
         "bond",
         "item",
         "repair",
+        "summon",
     )
     App.Proposals.Register("", common)
     App.Proposals.Register("common", common)

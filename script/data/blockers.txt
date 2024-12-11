@@ -19,13 +19,13 @@
 虚通|xu tong|50000
 虚明|xu ming|50000
 劳德诺|lao denuo|2500000
-李力世|li lishi|400000
+李力世|li lishi|100000
 官兵|guan bing|50000
 衙役|ya yi|50000
-御前侍卫|shi wei|1000000
+御前侍卫|shi wei|100000
 宋兵|song bing|50000
-侍女|shi nu|400000
-巴依|ba yi|400000
+侍女|shi nu|100000
+巴依|ba yi|100000
 亲兵|qin bing|50000
 褚万里|chu wanli|400000
 空见|kong jian|5000000

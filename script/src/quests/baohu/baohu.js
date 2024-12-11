@@ -1,5 +1,6 @@
 $.Module(function (App) {
     let Baohu = {}
+    Baohu.Reconnect = false
     Baohu.Count = 0
     Baohu.Continuous = 0
     Baohu.NPCs = {}
@@ -59,13 +60,40 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    Baohu.Connect = () => {
+        App.Commands.Drop()
+        PlanQuest.Execute()
+        $.PushCommands(
+            $.Function(App.Core.Emergency.CheckDeath),
+            $.Do("hp"),
+            $.Nobusy(),
+            $.Rest(),
+            $.Kill(`${GetVariable("id")}'s ${Baohu.Data.ID}`, App.NewCombat("baohu").WithTags(`baohu-${Baohu.Data.Type}`)),
+            $.Function(Baohu.Finish),
+        )
+        $.Next()
+    }
+    let matcherHalt = /^你(身行向后一跃，跳出战圈不打了。|现在停不下来。)$/
+
+    let PlanCombat = new App.Plan(
+        App.Positions["Combat"],
+        (task) => {
+            task.AddTrigger(matcherHalt, (tri, result) => {
+                if (Baohu.Reconnect) {
+                    App.Reconnect(0, Baohu.Connect)
+                    return
+                }
+                return true
+            })
+        }
+    )
     let matcherKill = /^你对(.+)的(黑衣人|邪派高手|绝世高手)喝道:大胆狂徒,竟敢在这撒野！！/
     let PlanProtect = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             task.AddTrigger(matcherKill, (tri, result) => {
                 if (result[1] != App.Data.Player.Score.名字) {
-                    return 1;
+                    return true;
                 }
                 App.Send("halt")
                 let id
@@ -80,18 +108,21 @@ $.Module(function (App) {
                         id = "jueshi gaoshou"
                         break
                 }
+                Baohu.Data.ID = id
+                Baohu.Data.Type = result[2]
                 $.PushCommands(
-                    $.CounterAttack(`${GetVariable("id")}'s ${id}`, App.NewCombat("baohu").WithTags(`baohu-${result[2]}`)),
+                    $.CounterAttack(`${GetVariable("id")}'s ${id}`, App.NewCombat("baohu").WithTags(`baohu-${result[2]}`).WithPlan(PlanCombat)),
                     $.Function(Baohu.Finish),
                 )
                 $.Next()
             }).WithName("ok")
-            let wait = Baohu.Data.Start + 25000 - $.Now()
+            let wait = Baohu.Data.Start + 28000 - $.Now()
             if (wait > 0) {
                 task.AddTimer(wait, (timer) => {
                     Note("准备迎敌")
                     App.Send("halt")
                     $.RaiseStage("prepare")
+                    $.RaiseStage("baohu-ready")
                     return true
                 }).WithNoRepeat(true)
             }
@@ -163,7 +194,7 @@ $.Module(function (App) {
     }
     let Quest = App.Quests.NewQuest("baohu")
     Quest.Name = "保护任务"
-    Quest.Desc = ""
+    Quest.Desc = "可以加参数 recon,每次kill时重新连线"
     Quest.Intro = ""
     Quest.Help = ""
     Quest.OnHUD = () => {
@@ -183,7 +214,8 @@ $.Module(function (App) {
     }
 
     Quest.Start = function (data) {
-        Baohu.Start(data)
+        Baohu.Reconnect = data.trim() == "recon"
+        Baohu.Start()
     }
     App.Quests.Register(Quest)
     App.Quests.Baohu = Baohu

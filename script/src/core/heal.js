@@ -69,7 +69,10 @@
                     }
                 }
                 return function () {
-                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * neimin - App.Data.Player.HP["当前内力"]).toFixed()
+                    if (neimin < 50) {
+                        neimin = 50
+                    }
+                    let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * neimin / 100 - App.Data.Player.HP["当前内力"]).toFixed()
                     if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                     if (App.Core.Dispel.Need) {
                         num = (num / 2).toFixed()
@@ -77,6 +80,7 @@
                     if (num < 10) { num = 10 }
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand("dazuo " + num),
+                        App.Commands.NewWaitCommand(1000),
                         App.NewNobusyCommand(),
                         App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                         App.NewSyncCommand(),
@@ -131,7 +135,7 @@
     App.Proposals.Register("tuna", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
             return function () {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin - App.Data.Player.HP["当前精力"]).toFixed()
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin / 100 - App.Data.Player.HP["当前精力"]).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -153,7 +157,7 @@
         if (App.Core.Dispel.Need && App.Data.Player.HP["经验"] > 100000) {
             return null
         }
-        if (App.Data.Player.HP["精气百分比"] <= 50) {
+        if (App.Data.Player.HP["精气百分比"] <= 50 || (App.Data.Player.HP["精气百分比"] < 100 && App.Data.Player.HP["精气上限"] < 100)) {
             return function () {
                 App.Commands.PushCommands(
                     App.Commands.NewDoCommand((App.Core.Dispel.Need ? "yun dispel;" : "") + "eat yangjing dan;yun recover;yun regenerate;hp;i"),
@@ -232,7 +236,7 @@
                     App.Next()
                     return
                 }
-                let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * App.Params.NeiliMin - App.Data.Player.HP["当前内力"]).toFixed()
+                let num = App.Params.NumDazuo > 0 ? App.Params.NumDazuo : (App.Data.Player.HP["内力上限"] * App.Params.NeiliMin / 100 - App.Data.Player.HP["当前内力"]).toFixed()
                 if (num >= App.Data.Player.HP["当前气血"]) { num = App.Data.Player.HP["当前气血"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -264,14 +268,13 @@
                     App.NewSyncCommand(),
                     App.Core.Heal.NewRestCommand(),
                 )
-            } else if (App.Core.Dispel.Need) {
-                return function () {
-                    App.Commands.PushCommands(
-                        App.Commands.NewDoCommand("yun dispel;hp"),
-                        App.NewNobusyCommand(),
-                        App.Core.Heal.NewRestCommand(),
-                    )
-                }
+            } else if (App.Core.Dispel.Need && App.Data.Player.HP["内力上限"] >= 300) {
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand("yun dispel;hp"),
+                    App.Commands.NewWaitCommand(1000),
+                    App.NewNobusyCommand(),
+                    App.Core.Heal.NewRestCommand(),
+                )
             }
             App.Next()
         }

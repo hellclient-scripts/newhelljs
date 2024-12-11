@@ -36,6 +36,7 @@
     App.NamedParams.AddNumber("CoinKeep", 0).WithName("最小铜钱数").WithDesc("身上保持的最少铜钱的数量")
     App.NamedParams.AddNumber("CashMax", 200).WithName("最大银票数").WithDesc("超过这个数量会去银行存银票")
     App.NamedParams.AddNumber("CashKeep", 30).WithName("最小银票数").WithDesc("预期身上银票的合理数量")
+    App.NamedParams.AddString("ShowRoomID", "").WithName("显示房间ID").WithDesc("设为t打开")
     App.NamedParams.AddString("Echo", "t").WithName("指令回显").WithDesc("设为f关闭回显")
 
 })()
