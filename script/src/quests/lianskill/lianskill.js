@@ -2,7 +2,14 @@ $.Module(function (App) {
     let Lian = {}
     Lian.NeedJifa = false
     Lian.Start = () => {
-        if (!App.Quests.Stopped) {
+        let changequest = false
+        let ready = App.Quests.GetReady()
+        if (ready && ready.RunningQuest && ready.RunningQuest.ID != Quest.ID) {
+            changequest = true
+        }
+
+        if (!App.Quests.Stopped && !changequest) {
+
             let skill = App.Core.Study.FilterLian()
             if (skill) {
                 let context = {}

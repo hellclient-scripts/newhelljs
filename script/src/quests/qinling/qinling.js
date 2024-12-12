@@ -1,7 +1,10 @@
 $.Module(function (App) {
     let Qinling = {}
     Qinling.Data = {
+        HitAndRun: true,
         Finished: false,
+        Start: null,
+        Cost: 0,
         All: 0,
         Success: 0,
         Gifts: {},
@@ -66,6 +69,8 @@ $.Module(function (App) {
 
     Qinling.Entered = () => {
         Qinling.Data.All++
+        Qinling.Data.Start = $.Now()
+
         Note("进入副本，打探地图")
         Quest.Cooldown(120000)
         App.Core.Fuben.Last = $.Now()
@@ -98,6 +103,10 @@ $.Module(function (App) {
     }
     Qinling.KillQin = () => {
         $.PushCommands(
+            $.Function(() => {
+                $.RaiseStage("qinbefore")
+                $.Next()
+            }),
             $.Rest(),
             $.Function(() => {
                 $.RaiseStage("prepare")
@@ -107,7 +116,13 @@ $.Module(function (App) {
             $.Function(() => {
                 if (App.Map.Room.Data.Objects.FindByName("秦始皇僵尸").First()) {
                     $.Insert(
-                        App.NewKillCommand("qin shihuang", App.NewCombat("qinling").WithHitAndRun("s")),
+                        App.NewKillCommand("qin shihuang", App.NewCombat("qinling").WithHitAndRun(Qinling.Data.HitAndRun ? "s" : "").WithKillInGroup(true)),
+                        $.Function(() => {
+                            if (!Qinling.Data.HitAndRun) {
+                                $.Insert($.Path(["s"]),)
+                            }
+                            $.Next()
+                        }),
                         $.Function(Qinling.KillQin)
                     )
                     $.Next()
@@ -118,6 +133,7 @@ $.Module(function (App) {
                         case "skeleton fighter":
                         case "corpse":
                         case "skeleton":
+                        case "long sword":
                             break
                         default:
                             App.Send(`get ${item.IDLower}`)
@@ -128,6 +144,7 @@ $.Module(function (App) {
                     $.Path(["s"]),
                     $.Function(() => {
                         Qinling.Data.Success++
+                        Qinling.Data.Cost = Qinling.Data.Cost + $.Now() - Qinling.Data.Start
                         Qinling.Data.Finished = true
                         App.Next()
                     }),
@@ -141,7 +158,11 @@ $.Module(function (App) {
     }
     App.BindEvent("core.queststart", (e) => {
         Qinling.Data = {
+            HitAndRun: true,
             Finished: false,
+            Start: null,
+            Cost: 0,
+            HitAndRun: App.QuestParams["qinlingflee"] == 0,
             All: 0,
             Success: 0,
             Gifts: {},
@@ -173,7 +194,8 @@ $.Module(function (App) {
             gift.push(`${name}:${Qinling.Data.Gifts[name]}件`)
         }
         let rate = Qinling.Data.All > 0 ? (Qinling.Data.Success * 100 / Qinling.Data.All).toFixed(0) + "%" : "-"
-        return [`秦陵-成功 ${Qinling.Data.Success}次 共计 ${Qinling.Data.All}次 成功率 ${rate} 道具： ${gift.join(" , ")}`]
+        let cost = Qinling.Data.Success > 0 ? (Qinling.Data.Cost / Qinling.Data.Success / 1000).toFixed() + "秒" : "-"
+        return [`秦陵-成功 ${Qinling.Data.Success}次 共计 ${Qinling.Data.All}次 成功率 ${rate} 平均耗时 ${cost} 道具： ${gift.join(" , ")}`]
     }
     Quest.Start = function (data) {
         Qinling.Start()

@@ -279,8 +279,32 @@
                 }
             }
         }
+        if (App.Core.Weapon.Touch && App.Data.Item.List.FindByIDLower(App.Core.Weapon.Touch).First() == null) {
+            return () => {
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand(`summon ${App.Core.Weapon.Wield[0].ID};i`),
+                    App.NewNobusyCommand(),
+                )
+                App.Next()
+            }
+        }
         return null
     }))
+    App.Proposals.Register("dropwp", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (App.Core.Weapon.Wield.length && App.Core.Weapon.Wield[0].ID.indexOf(" ") != -1) {
+            if (App.Data.Item.List.FindByIDLower(App.Core.Weapon.Wield[0].ID).Sum() > 1) {
+                return () => {
+                    App.Commands.PushCommands(
+                        App.Commands.NewDoCommand(`${App.Core.Weapon.OffCommand()};drop ${App.Core.Weapon.Wield[0].ID};i`),
+                        App.NewNobusyCommand(),
+                    )
+                    App.Next()
+                }
+            }
+        }
+        return null
+    }))
+
     App.Engine.SetFilter("core.needweapon", function (event) {
         if (App.Map.Room.ID) {
             App.Core.Stage.Raise("wpon-" + App.Map.Room.ID)

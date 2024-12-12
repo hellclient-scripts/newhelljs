@@ -248,7 +248,7 @@
         let skills = []
         for (var id in App.Data.Player.Skills) {
             let skill = App.Data.Player.Skills[id]
-            if (skill["基本"] != skill.ID && skill["受限经验"] && !nolian[skill["基本"]]) {
+            if (skill["基本"] != skill.ID && (skill["受限经验"] || skill["音乐技能"]) && !nolian[skill["基本"]]) {
                 skills.push(skill)
             }
         }
@@ -259,7 +259,14 @@
             return a["基本"] < b["基本"] ? -1 : 1
         })
         skills.forEach((skill) => {
-            let cmd = `${skill.ID}||lian|${skill["基本"]}|||`
+            let before = ""
+            let jifa = skill["基本"]
+            if (skill["武器"]) {
+                before = "#wpon"
+            } else if (skill["空手"]) {
+                before = "#wpoff"
+            }
+            let cmd = `${skill.ID}||lian|${jifa}||${before}|`
             list.append(cmd, cmd)
         })
         list.publish("App.UI.Assist.LianOnAction")

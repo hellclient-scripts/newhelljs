@@ -120,7 +120,7 @@
                     if (this.After) { cmds.push(this.After) }
                     $.PushCommands(
                         $.To(loc),
-                        $.Do("yun recover"),
+                        $.Do("yun recover;yun regenerate"),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
@@ -337,23 +337,30 @@
     }
     App.Core.Study.DoLearn = (context) => {
         if (!App.Core.Study.HitMinPot()) {
-
-            if (App.Data.Player.HP["潜能"] >= App.Core.Study.LastPot) {
-                App.Core.Study.LearndTimes++
-            } else {
-                App.Core.Study.LearndTimes = 0
-            }
-            App.Core.Study.LastPot = App.Data.Player.HP["潜能"]
-            if (App.Core.Study.LearndTimes < 4) {
-                if (App.Core.Study.CurrentSkill.Check()) {
-                    $.PushCommands(
-                        $.Function(() => { App.Core.Study.CurrentSkill.Execute() }),
-                        $.Prepare("common", context),
-                        $.Function(() => { App.Core.Study.DoLearn(context) }),
-                    )
+            if (App.Core.Study.CurrentSkill == null) {
+                let skill = App.Core.Study.FilterSkill()
+                if (skill) {
+                    App.Core.Study.CurrentSkill = skill
                 }
-            } else {
-                App.Core.Study.CurrentSkill.Cooldown(120000)
+            }
+            if (App.Core.Study.CurrentSkill) {
+                if (App.Data.Player.HP["潜能"] >= App.Core.Study.LastPot) {
+                    App.Core.Study.LearndTimes++
+                } else {
+                    App.Core.Study.LearndTimes = 0
+                }
+                App.Core.Study.LastPot = App.Data.Player.HP["潜能"]
+                if (App.Core.Study.LearndTimes < 4) {
+                    if (App.Core.Study.CurrentSkill.Check()) {
+                        $.PushCommands(
+                            $.Function(() => { App.Core.Study.CurrentSkill.Execute() }),
+                            $.Prepare("common", context),
+                            $.Function(() => { App.Core.Study.DoLearn(context) }),
+                        )
+                    }
+                } else {
+                    App.Core.Study.CurrentSkill.Cooldown(120000)
+                }
             }
         }
         App.Next()
@@ -509,6 +516,10 @@
             var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
             if (skill.Before) { cmds.unshift(skill.Before) }
             if (skill.After) { cmds.push(skill.After) }
+            let jifacmd = App.Core.Study.GetJifaCommand(skill.From)
+            if (jifacmd) {
+                cmds.push(jifacmd)
+            }
             App.Send(cmds.join("\n"))
             App.Send("yun recover;yun regenerate;hp")
         }
@@ -540,6 +551,10 @@
             var cmds = [`jifa ${skill.From} ${skill.SkillID}`, `lian ${skill.From} ${times}`]
             if (skill.Before) { cmds.unshift(skill.Before) }
             if (skill.After) { cmds.push(skill.After) }
+            let jifacmd = App.Core.Study.GetJifaCommand(skill.From)
+            if (jifacmd) {
+                cmds.push(jifacmd)
+            }
             App.Send(cmds.join("\n"))
         }
         if (learned) {
@@ -600,6 +615,9 @@
         )
         uq.Commands.Next()
     })
+    App.BindEvent("core.skillimproved", function () {
+        App.Core.Study.CurrentSkill = null
+    })
     App.Sender.RegisterAlias("#jifa", function (data) {
         App.Send(GetVariable("jifa"))
     })
@@ -614,4 +632,14 @@
         )
         uq.Commands.Next()
     })
+    App.Core.Study.GetJifaCommand = (base) => {
+        let cmd = ""
+        GetVariable("jifa").split("\n").forEach((line) => {
+            line = line.trim()
+            if (line.startsWith(`jifa ${base}`) || line.startsWith(`enable ${base}`)) {
+                cmd = line
+            }
+        })
+        return cmd
+    }
 })(App)

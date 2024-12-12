@@ -269,6 +269,7 @@
         "bond",
         "item",
         "repair",
+        "dropwp",
         "summon",
     )
     App.Proposals.Register("", common)

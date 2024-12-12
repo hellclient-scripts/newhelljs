@@ -17,7 +17,32 @@
         "whip": true,
         "dagger": true,
         "throwing": true,
+        "axe": true,
         "poison": true,
+    }
+    let unarmedskill = {
+        "unarmed": true,
+        "cuff": true,
+        "strike": true,
+        "finger": true,
+        "hand": true,
+        "claw": true,
+    }
+    let weaponskill = {
+        "sword": true,
+        "blade": true,
+        "staff": true,
+        "hammer": true,
+        "club": true,
+        "whip": true,
+        "dagger": true,
+        "throwing": true,
+        "axe": true,
+    }
+    let music = {
+        "chuixiao-jifa": true,
+        "guzheng-jifa": true,
+        "tanqin-jifa": true,
     }
     App.Data.Player = {
         NoForce: true,
@@ -250,7 +275,10 @@
                 } else {
                     skill["基本"] = ""
                 }
-                skill["受限经验"] = martial[skill["基本"]] == true
+                skill["受限经验"] = (martial[skill["基本"]] == true)
+                skill["音乐技能"] = (music[skill["基本"]] == true)
+                skill["空手"] = (unarmedskill[skill["基本"]] == true)
+                skill["武器"] = (weaponskill[skill["基本"]] == true)
                 App.Data.Player.Skills[skill.ID] = skill
                 return true
             })

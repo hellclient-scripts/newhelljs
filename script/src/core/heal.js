@@ -203,7 +203,7 @@
                 )
             }
             else if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin - App.Data.Player.HP["当前精力"]).toFixed()
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin / 100 - App.Data.Player.HP["当前精力"]).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
