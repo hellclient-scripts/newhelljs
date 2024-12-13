@@ -50,6 +50,13 @@ $.Module(function (App) {
             })
             task.AddTrigger("你暂时还不能到上一层去！", (tri, result) => {
                 LGT.Data.Ready = 1
+                App.Map.DiscardMove()
+                App.Commands.Drop()
+                return true
+            })
+            task.AddTrigger("你还是解决目前的敌人吧", (tri, result) => {
+                LGT.Data.Ready = 1
+                App.Map.DiscardMove()
                 App.Commands.Drop()
                 return true
             })
@@ -220,6 +227,7 @@ $.Module(function (App) {
     // Quest.GetReady = function (q, data) {
     //     return
     // }
+    Quest.Group = "lgt"
     Quest.Start = function (data) {
         LGT.Start(data)
     }

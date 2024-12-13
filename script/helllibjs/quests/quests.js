@@ -28,11 +28,13 @@
         return result
     }
     class Ready {
-        constructor(rq, execute) {
+        constructor(rq, execute, quest) {
             this.RunningQuest = rq
             this.Execute = execute
+            this.Quest = quest
         }
         RunningQuest = null
+        Quest = null
         Execute = null
     }
     let DefaultOnHUD = () => {
@@ -55,6 +57,9 @@
     let DefaultOnStop = (quests) => {
 
     }
+    let DefaultReadyCreator = (r, exec, q) => {
+        return new Ready(r, exec, q)
+    }
     class Quest {
         constructor(id) {
             this.ID = id
@@ -71,6 +76,7 @@
         Desc = ""
         Intro = ""
         Help = ""
+        Group = ""
         Start = null
         GetReady = DefaultGetReady
         OnHUD = DefaultOnHUD
@@ -104,6 +110,7 @@
         Queue = []
         Delay = 1000
         Stopped = true
+        ReadyCreator = DefaultReadyCreator
         Parser = module.DefaultParser
         RegisteredQuests() {
             return this.#registered
@@ -147,7 +154,7 @@
                 if (q && !q.InCooldown() && r.Checker()) {
                     let exe = q.GetReady(q, r.Data)
                     if (exe) {
-                        return new Ready(r, exe)
+                        return this.ReadyCreator(r, exe, q)
                     }
                 }
             }
@@ -198,5 +205,6 @@
     module.RunningQuest = RunningQuest
     module.Quest = Quest
     module.Quests = Quests
+    module.Ready = Ready
     return module
 })

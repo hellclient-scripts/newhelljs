@@ -301,7 +301,10 @@
             }
         }
         DiscardMove() {
-            this.Move = null
+            if (this.Move) {
+                this.Move = null
+                this.MovePosition.StartNewTerm()
+            }
         }
         Snap() {
             if (this.Move != null) {

@@ -2306,6 +2306,29 @@ Timers = []
   OmitFromOutput = false
   OmitFromCommandHistory = false
 
+[[Aliases]]
+  ID = "d1g458r6q9p6vf73btn1qt"
+  Name = "send"
+  Enabled = true
+  Match = "#.+"
+  Send = ""
+  Script = "App.OnSendAlias"
+  SendTo = 0
+  Sequence = 999
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Group = ""
+  IgnoreCase = false
+  KeepEvaluating = false
+  Menu = false
+  OmitFromLog = false
+  Variable = ""
+  ReverseSpeedwalk = false
+  OmitFromOutput = false
+  OmitFromCommandHistory = false
+
 [[RequiredParams]]
   Name = "id"
   Desc = "用户的id"
@@ -2369,7 +2392,7 @@ Timers = []
 [[RequiredParams]]
   Name = "jifa"
   Desc = "激发指令(选填，实时生效)"
-  Intro = "用于设置jifa和bei的指令\n用于练习结束后，或者通过#jifa指令手动调用。\n确保使用正确的武功做任务"
+  Intro = "用于设置jifa和bei的指令\n用于练习结束后，或者通过#jifa指令手动调用。\n确保使用正确的武功做任务\n#lian和#yanjiu指令会根据这个变量的设置，在练习后激活正确的技能"
 
 [[RequiredParams]]
   Name = "lian"

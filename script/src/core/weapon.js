@@ -32,6 +32,12 @@
         OffCommand() {
             return (this.Command == "#wield" ? "unwield " : "remove ") + this.ID
         }
+        SummonCommand() {
+            return `summon ${this.ID}`
+        }
+        HideCommand() {
+            return `hide ${this.ID}`
+        }
     }
     let reDruation = /^耐 久 值 :\s*(\d+)\/\d+\s*$/
     let reLevel = /^(.+)的等级：(\d+)\/(\d+)$/
@@ -155,6 +161,14 @@
         let weapon = App.Core.Weapon.GetWeapon(name)
         return weapon ? weapon.OffCommand() : ""
     }
+    App.Core.Weapon.SummonCommand = function (name) {
+        let weapon = App.Core.Weapon.GetWeapon(name)
+        return weapon ? weapon.SummonCommand() : ""
+    }
+    App.Core.Weapon.HideCommand = function (name) {
+        let weapon = App.Core.Weapon.GetWeapon(name)
+        return weapon ? weapon.HideCommand() : ""
+    }
     App.Core.Weapon.UnwieldAllCommand = function () {
         let result = []
         App.Core.Weapon.Wield.forEach(weapon => {
@@ -240,7 +254,12 @@
     App.Sender.RegisterAlias("#pickwp", function (data) {
         App.Core.Weapon.PickWeapon()
     })
-
+    App.Sender.RegisterAlias("#summon", function (data) {
+        App.Send(App.Core.Weapon.SummonCommand(data))
+    })
+    App.Sender.RegisterAlias("#hide", function (data) {
+        App.Send(App.Core.Weapon.HideCommand(data))
+    })
     App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let dur = context.WeaponDurationMin || App.Params.WeaponDurationMin
         for (var index in App.Core.Weapon.Duration) {

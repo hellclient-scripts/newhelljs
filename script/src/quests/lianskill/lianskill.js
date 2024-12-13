@@ -68,5 +68,6 @@ $.Module(function (App) {
     Quest.Start = function () {
         Lian.Start()
     }
+    Quest.Group="lianskill"
     App.Quests.Register(Quest)
 })

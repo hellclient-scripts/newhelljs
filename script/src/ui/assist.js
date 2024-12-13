@@ -209,7 +209,7 @@
     App.UI.Assist.QuestParamsShow = () => {
         var list = Userinput.newlist("任务参数设置", "请选择你要设置的任务参数,搜索=显示已设置参数", true)
         App.QuestNamedParams.Params.forEach((p) => {
-            let val = App.Core.Params.QuestData[p.ID] ? "=" + App.Core.Params.QuestData[p.ID] : "未设置，默认" + App.Params[p.ID]
+            let val = App.Core.Params.QuestData[p.ID] ? "=" + App.Core.Params.QuestData[p.ID] : "未设置，默认" + App.QuestParams[p.ID]
             list.append(p.ID, `${p.Name}-#${p.ID}(${val}) ${p.Desc}:`)
         })
         list.publish("App.UI.Assist.QuestParamsOnView")
@@ -260,13 +260,16 @@
         })
         skills.forEach((skill) => {
             let before = ""
+            let limit = ""
             let jifa = skill["基本"]
             if (skill["武器"]) {
                 before = "#wpon"
             } else if (skill["空手"]) {
+                limit = skill["基本"]
+                jifa = "parry"
                 before = "#wpoff"
             }
-            let cmd = `${skill.ID}||lian|${jifa}||${before}|`
+            let cmd = `${skill.ID}|${limit}|lian|${jifa}||${before}|`
             list.append(cmd, cmd)
         })
         list.publish("App.UI.Assist.LianOnAction")

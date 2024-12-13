@@ -102,13 +102,10 @@ $.Module(function (App) {
         if (MQ.Data.NPC.Head == false) {
             return true
         }
-        if (App.QuestParams["mqletter"] == 0) {
+        if (App.QuestParams["mqletter"] == 2) {
             return false
         }
         let context = {
-            NeiliMin: 15,
-            JiquMax: 0,
-            HealBelow: 50,
         }
         let submit = App.Proposals.Submit("commonWithExp", context)
         if (submit) {
@@ -116,6 +113,9 @@ $.Module(function (App) {
         }
         let ready = App.Quests.GetReady()
         if (ready && ready.RunningQuest && ready.RunningQuest.ID != Quest.ID) {
+            return false
+        }
+        if (App.Core.Study.Jiqu.Max > 0 && App.Data.Player.HP["体会"] < App.QuestParams["mqlettertihui"]) {
             return false
         }
         return true
@@ -301,16 +301,8 @@ $.Module(function (App) {
     )
     MQ.WaitLetter = () => {
         Note("接信")
-        if (App.Data.Player.HP["气血百分比"] < App.Params.HealBelow) {
-            App.Send("yun heal")
-        } else if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
+        if (App.Data.Player.HP["经验"] > 100000 && App.Core.Study.Jiqu.Max && App.Core.Study.Jiqu.Max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > App.Core.Study.Jiqu.Max && App.Data.Player.HP["精气百分比"] > 70) {
             App.Send(App.Random(App.Core.Study.Jiqu.Commands))
-        } else if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
-            let num = App.Data.Player.HP["当前气血"]
-            if (num < 10) {
-                num = 10
-            }
-            App.Send(`dazuo ${num}`)
         }
         $.RaiseStage("wait")
         PlanWaitLetter.Execute()
@@ -413,7 +405,6 @@ $.Module(function (App) {
         App.Core.HelpFind.HelpFind(MQ.Data.NPC.Name)
         let zone = MQ.Data.NPC.First ? Cities[MQ.Data.NPC.Zone].Path1 : Cities[MQ.Data.NPC.Zone].Path;
         MQ.Data.NPC.First = false
-        App.Core.Stage.ChangeStance("mq")
         let wanted = $.NewWanted(MQ.Data.NPC.Name, zone).
             WithChecker(Checker).WithOrdered(true).WithID(MQ.Data.NPC.ID)
         App.Send("yun recover;yun regenerage")
@@ -677,6 +668,7 @@ $.Module(function (App) {
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.Group="mq"
     Quest.OnHUD = () => {
         return [
             new App.HUD.UI.Word("任务效率:"),

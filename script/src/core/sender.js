@@ -42,6 +42,10 @@
     App.Send = function (cmd, Grouped) {
         App.Sender.Send(cmd, Grouped)
     }
+    App.OnSendAlias = function (n, l, w) {
+        App.Send(l)
+    }
+
     App.LoadSender = function () {
         let numcmds = GetVariable("num_cmds")
         if (!isNaN(numcmds)) {

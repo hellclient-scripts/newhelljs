@@ -247,7 +247,6 @@ $.Module(function (App) {
         App.Core.HelpFind.HelpFind(Assisting.Data.NPC.Name)
         let zone = Assisting.Data.NPC.First ? Cities[Assisting.Data.NPC.Zone].Path1 : Cities[Assisting.Data.NPC.Zone].Path;
         Assisting.Data.NPC.First = false
-        App.Core.Stage.ChangeStance("mq")
         let wanted = $.NewWanted(Assisting.Data.NPC.Name, zone).
             WithChecker(Checker).WithOrdered(true).WithID(Assisting.Data.NPC.ID)
         App.Send("yun recover;yun regenerage")
@@ -406,6 +405,7 @@ $.Module(function (App) {
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.Group = "mq"
     Quest.Start = function (data) {
         if (!App.Params.MasterID) {
             PrintSystem("掌门ID " + App.Params.MasterID + " 无效")

@@ -174,6 +174,7 @@ $.Module(function (App) {
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.Group = "qinling"
     Quest.OnHUD = () => {
         return [
             new App.HUD.UI.Word("秦陵:"),

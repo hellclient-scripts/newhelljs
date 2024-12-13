@@ -197,6 +197,7 @@ $.Module(function (App) {
     Quest.Desc = "可以加参数 recon,每次kill时重新连线"
     Quest.Intro = ""
     Quest.Help = ""
+    Quest.Group = "baohu"
     Quest.OnHUD = () => {
         return [
             new App.HUD.UI.Word("保护:"),

@@ -38,7 +38,15 @@
     }
     App.Quests.OnStop = () => {
         App.Core.Quest.Current = ""
+        App.Core.Stage.ChangeStance("")
         App.RaiseEvent(new App.Event("core.queststop"))
+    }
+    App.Quests.ReadyCreator = (r, exec, q) => {
+        return new questsModule.Ready(r, () => {
+            App.Core.Stage.ChangeStance(q.Group)
+            exec()
+        }, q)
+
     }
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("maxexp", function (data, target) {
         return App.Data.Player.HP["经验"] <= (data - 0)
