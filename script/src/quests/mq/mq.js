@@ -105,7 +105,9 @@ $.Module(function (App) {
         if (App.QuestParams["mqletter"] == 2) {
             return false
         }
-        let context = {
+        let context = {}
+        if (App.Core.Weapon.Touch) {
+            context.NeiliMin = -100
         }
         let submit = App.Proposals.Submit("commonWithExp", context)
         if (submit) {
@@ -214,11 +216,16 @@ $.Module(function (App) {
         $.Next()
     }
     let Checker = function (wanted) {
-        let result = App.Map.Room.Data.Objects.FindByName(wanted.Target).Items
+        let result = App.Map.Room.Data.Objects.FindByLabel(wanted.Target).Items
         for (var obj of result) {
             if (obj.ID.indexOf(" ") > 0) {
-                if (MQ.Data.NPC && MQ.Data.NPC.Zone) {
-                    MQ.Data.NPC.SetZone(MQ.Data.NPC.Zone)
+                if (MQ.Data.NPC) {
+                    if (App.Map.Room.ID) {
+                        MQ.Data.NPC.Loc = App.Map.Room.ID
+                    }
+                    if (MQ.Data.NPC.Zone) {
+                        MQ.Data.NPC.SetZone(MQ.Data.NPC.Zone)
+                    }
                 }
                 return obj
             }
@@ -377,7 +384,7 @@ $.Module(function (App) {
         App.Next()
     }
     MQ.KillLoc = () => {
-        if (App.Zone.Wanted.ID) {
+        if (!MQ.Data.NPC.ID && App.Zone.Wanted.ID) {
             MQ.Data.NPC.ID = App.Zone.Wanted.ID
         }
 
@@ -550,7 +557,14 @@ $.Module(function (App) {
         let id = event.Data.ID
         let loc = event.Data.Loc
         if (MQ.Data.NPC && MQ.Data.NPC.Name == name) {
-            if (!incity(loc, "很远")) {
+            let city = ""
+            for (var key in Cities) {
+                if (incity(loc, key)) {
+                    city = key;
+                    break
+                }
+            }
+            if (city == "") {
                 return
             }
             if (!MQ.Data.NPC.ID && id) {
@@ -560,6 +574,7 @@ $.Module(function (App) {
                 Note("接到线报:" + name + "|" + id + "|" + loc)
                 MQ.Data.helpded++
                 MQ.Data.NPC.Loc = loc
+                MQ.Data.NPC.SetZone(city)
             }
             if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {
                 App.Zone.Wanted.Loc = loc
@@ -668,7 +683,7 @@ $.Module(function (App) {
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
-    Quest.Group="mq"
+    Quest.Group = "mq"
     Quest.OnHUD = () => {
         return [
             new App.HUD.UI.Word("任务效率:"),

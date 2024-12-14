@@ -21,7 +21,7 @@
     let matcherFail = /^(这个地方不能讲话。|这里没有这个人。|.+对着.+自言自语....|你自己自言自语。|你现在的精神不太好，没法和别人套瓷。)$/
     let PlanOnAsk = new App.Plan(App.Positions.Connect,
         function (task) {
-            App.Sync(function () {task.Cancel("sync") })
+            App.Sync(function () { task.Cancel("sync") })
             task.AddTrigger(matcherAsk, function (result) {
                 if (App.Data.Ask.Mode == 0) {
                     App.Data.Name = result[1]
@@ -73,7 +73,9 @@
             }
             if (App.Data.Ask.Result == "retry") {
                 App.Commands.Insert(
+                    $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                     App.Commands.NewWaitCommand(1000),
+                    $.Do("halt"),
                     App.Commands.NewFunctionCommand(function () {
                         App.Ask(App.Data.Ask.ID, App.Data.Ask.Question, App.Data.Ask.Length)
                     }),
@@ -96,11 +98,11 @@
         PlanOnAsk.Execute()
     }
     App.NewAskCommand = function (id, question, length) {
-        return App.Commands.NewCommand("ask", { ID: id, Question: question,Length:length })
+        return App.Commands.NewCommand("ask", { ID: id, Question: question, Length: length })
     }
     App.Commands.RegisterExecutor("ask", function (commands, running) {
         running.OnStart = function (arg) {
-            App.Ask(running.Command.Data.ID,running.Command.Data.Question,running.Command.Data.question)
+            App.Ask(running.Command.Data.ID, running.Command.Data.Question, running.Command.Data.question)
         }
     })
 })(App)

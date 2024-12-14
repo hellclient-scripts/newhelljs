@@ -101,8 +101,10 @@
             }
             let unit = reresult[0]
             let name = label.slice(reresult.index + unit.length)
-
-            return new Result(count, unit, name)
+            if (name) {//npc名可能正好是量词，比如万片
+                return new Result(count, unit, name)
+            }
+            return label
         }
     }
     module.CNumber = CNumber

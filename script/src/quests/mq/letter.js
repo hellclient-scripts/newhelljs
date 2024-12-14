@@ -109,11 +109,16 @@ $.Module(function (App) {
         $.Next()
     }
     let Checker = function (wanted) {
-        let result = App.Map.Room.Data.Objects.FindByName(wanted.Target).Items
+        let result = App.Map.Room.Data.Objects.FindByLabel(wanted.Target).Items
         for (var obj of result) {
             if (obj.ID.indexOf(" ") > 0) {
-                if (Letter.Data.NPC && Letter.Data.NPC.Zone) {
-                    Letter.Data.NPC.SetZone(Letter.Data.NPC.Zone)
+                if (Letter.Data.NPC) {
+                    if (App.Map.Room.ID) {
+                        Letter.Data.NPC.Loc = App.Map.Room.ID
+                    }
+                    if (Letter.Data.NPC.Zone) {
+                        Letter.Data.NPC.SetZone(Letter.Data.NPC.Zone)
+                    }
                 }
                 return obj
             }
@@ -237,20 +242,28 @@ $.Module(function (App) {
         let id = event.Data.ID
         let loc = event.Data.Loc
         if (Letter.Data.NPC && Letter.Data.NPC.Name == name) {
-            if (!incity(loc, "很远")) {
+            let city = ""
+            for (var key in Cities) {
+                if (incity(loc, key)) {
+                    city = key;
+                    break
+                }
+            }
+            if (city == "") {
                 return
             }
             if (!Letter.Data.NPC.ID && id) {
                 Letter.Data.NPC.ID = id.toLowerCase()
             }
-            if (!Letter.Data.NPC.Loc) {
+            if (!Letter.Data.NPC.Loc && !Letter.Data.NPC.Died) {
+                Note("接到线报:" + name + "|" + id + "|" + loc)
                 Letter.Data.helpded++
                 Letter.Data.NPC.Loc = loc
+                Letter.Data.NPC.SetZone(city)
             }
             if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {
                 App.Zone.Wanted.Loc = loc
             }
-            Note("接到线报:" + name + "|" + id + "|" + loc)
             Letter.Data.NPC.Farlist = null
         }
     })
@@ -354,7 +367,7 @@ $.Module(function (App) {
     Quest.Name = "送信任务"
     Quest.Desc = ""
     Quest.Intro = ""
-    Quest.Group="mq"
+    Quest.Group = "mq"
     Quest.Help = ""
     Quest.Start = function (data) {
         if (!App.Params.MasterID) {

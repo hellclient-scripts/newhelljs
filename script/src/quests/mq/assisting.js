@@ -152,11 +152,16 @@ $.Module(function (App) {
 
 
     let Checker = function (wanted) {
-        let result = App.Map.Room.Data.Objects.FindByName(wanted.Target).Items
+        let result = App.Map.Room.Data.Objects.FindByLabel(wanted.Target).Items
         for (var obj of result) {
             if (obj.ID.indexOf(" ") > 0) {
-                if (Assisting.Data.NPC && Assisting.Data.NPC.Zone) {
-                    Assisting.Data.NPC.SetZone(Assisting.Data.NPC.Zone)
+                if (Assisting.Data.NPC) {
+                    if (App.Map.Room.ID) {
+                        Assisting.Data.NPC.Loc = App.Map.Room.ID
+                    }
+                    if (Assisting.Data.NPC.Zone) {
+                        Assisting.Data.NPC.SetZone(Assisting.Data.NPC.Zone)
+                    }
                 }
                 return obj
             }
@@ -376,13 +381,19 @@ $.Module(function (App) {
         Assisting.CheckYou()
     }
 
-
     App.BindEvent("core.helpfind.onfound", (event) => {
         let name = event.Data.Name
         let id = event.Data.ID
         let loc = event.Data.Loc
         if (Assisting.Data.NPC && Assisting.Data.NPC.Name == name) {
-            if (!incity(loc, "很远", Cities)) {
+            let city = ""
+            for (var key in Cities) {
+                if (incity(loc, key, Cities)) {
+                    city = key;
+                    break
+                }
+            }
+            if (city == "") {
                 return
             }
             if (!Assisting.Data.NPC.ID && id) {
@@ -392,6 +403,7 @@ $.Module(function (App) {
                 Note("接到线报:" + name + "|" + id + "|" + loc)
                 Assisting.Data.helpded++
                 Assisting.Data.NPC.Loc = loc
+                Assisting.Data.NPC.SetZone(city)
             }
             if (App.Zone.Wanted && App.Zone.Wanted.Target == name) {
                 App.Zone.Wanted.Loc = loc
@@ -399,7 +411,6 @@ $.Module(function (App) {
             Assisting.Data.NPC.Farlist = null
         }
     })
-
     let Quest = App.Quests.NewQuest("assisting")
     Quest.Name = "师门任务(协助)"
     Quest.Desc = ""

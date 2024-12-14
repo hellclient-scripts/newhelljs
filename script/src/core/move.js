@@ -151,7 +151,9 @@
 
     }
     App.Move.OnWalkFail = function (name) {
+        $.RaiseStage("wait")
         App.Map.Position.Wait(1000, 0, () => {
+            App.Send("halt")
             App.Core.Blocker.BlockStepRetry()
         })
     }
