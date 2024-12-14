@@ -46,6 +46,10 @@
         Duration() {
             return (new Date()).getTime() - this.StartAt
         }
+        Discard() {
+            this.Combating = false
+            this.Position.Discard()
+        }
     }
     module.Combat = Combat
     return module

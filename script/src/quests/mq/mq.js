@@ -117,10 +117,10 @@ $.Module(function (App) {
         if (ready && ready.RunningQuest && ready.RunningQuest.ID != Quest.ID) {
             return false
         }
-        if (App.Core.Study.Jiqu.Max > 0 && App.Data.Player.HP["体会"] < App.QuestParams["mqlettertihui"]) {
-            return false
+        if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"] * 2) {
+            return true
         }
-        return true
+        return App.QuestParams["mqletter"] == 1
     }
     let reQuest = /^([^：()\[\]]{2,5})对你道：“我早就看(.*)不顺眼，听说他最近在(.*)，你去做了他，带他的人头来交差！/
     let reQuest2 = /^([^：()\[\]]{2,5})对你道：“(.*)(这个败类打家劫舍，无恶不作，听说他最近在|这个所谓大侠屡次和我派作对，听说他最近在)/
@@ -238,6 +238,28 @@ $.Module(function (App) {
             })
         }
         return null
+    }
+    let Next = function (map, move, wanted) {
+        if (App.QuestParams["mqnopause"] == 0) {
+            if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"]) {
+                if (Metronome.GetSpace() <= 2) {
+                    Note("走的太快，汲取一下")
+                    let snap = App.Map.Snap()
+                    $.Insert(
+                        $.Do("#jiqu"),
+                        $.Wait(1000),
+                        $.Do("halt"),
+                        $.Function(() => {
+                            App.Map.Rollback(snap)
+                            App.Zone.DefaultNext(map, move, wanted)
+                        })
+                    )
+                    $.Next()
+                    return
+                }
+            }
+        }
+        App.Zone.DefaultNext(map, move, wanted)
     }
     let matcherLetter = /.*(突然一位|忽听“嗖”的一声|你转身一看|你一回头|你正欲离开|只见你刚想离开|只听扑倏扑倏几声)(.*)(弟子急急忙忙地跑了上来，拍拍你的肩膀|一件暗器从你背后飞来|竟见到一只灰点信鸽飞至身旁，你赶紧|只见一位同门装束的弟子满头大汗地跑了过来|忽然发现不远处的地上一块石头上刻着些什么|一位同门装束的弟子追了上来|一只白鸽飞了过来，落在你肩头)/
     let matcherlq1 = /^“字谕弟子(.*)：(得闻恶贼|武林人士|得闻所谓大侠)(.*)(屡次和我派作对|打家劫舍|所为甚是讨厌)(.*)/
@@ -413,11 +435,26 @@ $.Module(function (App) {
         let zone = MQ.Data.NPC.First ? Cities[MQ.Data.NPC.Zone].Path1 : Cities[MQ.Data.NPC.Zone].Path;
         MQ.Data.NPC.First = false
         let wanted = $.NewWanted(MQ.Data.NPC.Name, zone).
-            WithChecker(Checker).WithOrdered(true).WithID(MQ.Data.NPC.ID)
+            WithChecker(Checker).WithNext(Next).WithOrdered(true).WithID(MQ.Data.NPC.ID)
         App.Send("yun recover;yun regenerage")
         $.RaiseStage("prepare")
         $.PushCommands(
             $.Prepare(),
+            $.Function(() => {
+                if (!MQ.Data.NPC.First && MQ.Data.NPC.Zone != "西域") {
+                    if (App.QuestParams["mqnopause"] == 0) {
+                        if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"]) {
+                            Note("遍历之前，汲取一下")
+                            $.Insert(
+                                $.Do("#jiqu"),
+                                $.Wait(1000),
+                                $.Do("halt"),
+                            )
+                        }
+                    }
+                }
+                App.Next()
+            }),
             $.To(Cities[MQ.Data.NPC.Zone].Loc),
             $.Function(() => {
                 if (MQ.Data.NPC.Loc) {

@@ -6,10 +6,10 @@
             App.Map.DiscardMove()
             let cb = event.Context.Get("callback")
             Note("被打晕了")
-            if (cb){
+            if (cb) {
                 Note("醒来后继续。")
             }
-            App.Reconnect(App.Params.ReloginDelay,cb)
+            App.Reconnect(App.Params.ReloginDelay, cb)
         })
     }
     App.BindEvent("core.faint", App.Core.Emergency.OnFaint)
@@ -21,6 +21,8 @@
         for (var key in App.Positions) {
             App.Positions[key].Discard()
         }
+        App.Map.Room.ID = ""
+        App.Combat.Discard()
         App.Commands.Discard()
         if (!App.Quests.IsStopped()) {
             App.Commands.Append(

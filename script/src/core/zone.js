@@ -29,6 +29,9 @@
     let CheckerIDLower = function (wanted) {
         return App.Map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
     }
+    App.Zone.DefaultNext = function (map, move, wanted) {
+        move.Walk(map)
+    }
     class Wanted {
         constructor(target, zone) {
             this.Target = target
@@ -42,6 +45,7 @@
         OnFound = null
         SingleStep = false
         Ordered = true
+        Next = App.Zone.DefaultNext
         WithID(id) {
             this.ID = id
             return this
@@ -64,6 +68,10 @@
         }
         WithOrdered(o) {
             this.Ordered = o
+            return this
+        }
+        WithNext(next) {
+            this.Next = next
             return this
         }
         Checker = DefaultChecker
@@ -113,7 +121,7 @@
                 App.Map.FinishMove()
                 return
             }
-            move.Walk(map)
+            wanted.Next(map, move, wanted)
         }
     }
     App.Zone.Search = function (wanted) {
