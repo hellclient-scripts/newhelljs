@@ -441,7 +441,7 @@ $.Module(function (App) {
         $.PushCommands(
             $.Prepare(),
             $.Function(() => {
-                if (!MQ.Data.NPC.First && MQ.Data.NPC.Zone != "西域") {
+                if (MQ.Data.NPC.Times > 0 && MQ.Data.NPC.Zone != "西域") {
                     if (App.QuestParams["mqnopause"] == 0) {
                         if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"]) {
                             Note("遍历之前，汲取一下")
