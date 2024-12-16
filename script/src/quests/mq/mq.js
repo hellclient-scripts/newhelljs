@@ -55,8 +55,40 @@ $.Module(function (App) {
         current: null,
         eff: 0,
     }
+    MQ.NeedJiqu = (letter) => {
+        if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0) {
+            if (!letter && MQ.HelpRate() < 50) {
+                return false
+            }
+            let tihui = App.QuestParams["mqtihui"]
+            let lettertihui = App.QuestParams["mqtihui"] * 3
+            let lettertihuimax = (App.Core.Study.Jiqu.Max + App.QuestParams["mqtihui"]) / 2
+            if (lettertihui > lettertihuimax) {
+                lettertihui = lettertihuimax.toFixed()
+            }
+            return App.Data.Player.HP["体会"] >= (letter ? lettertihui : tihui)
+        }
+        return false
+
+    }
+    MQ.HelpRate = () => {
+        return MQ.Data.kills > 3 ? (MQ.Data.helpded * 100 / MQ.Data.kills) : 0
+    }
     MQ.OnNpcDie = function () {
         $.RaiseStage("npcdie")
+    }
+    MQ.LastPause = 0
+    MQ.Pause = () => {
+        $.Insert(
+            $.Do("#jiqu"),
+            $.Wait(1000),
+            $.Function(() => {
+                MQ.LastPause = $.Now()
+                App.Send("halt")
+                $.Next()
+            })
+        )
+        $.Next()
     }
     MQ.OnNpcFaint = function () {
         $.RaiseStage("npcfaint")
@@ -117,7 +149,7 @@ $.Module(function (App) {
         if (ready && ready.RunningQuest && ready.RunningQuest.ID != Quest.ID) {
             return false
         }
-        if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"] * 2) {
+        if (MQ.NeedJiqu(true)) {
             return true
         }
         return App.QuestParams["mqletter"] == 1
@@ -241,14 +273,12 @@ $.Module(function (App) {
     }
     let Next = function (map, move, wanted) {
         if (App.QuestParams["mqnopause"] == 0) {
-            if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"]) {
-                if (Metronome.GetSpace() <= 2) {
+            if (MQ.NeedJiqu()) {
+                if (Metronome.GetSpace() <= 2 && ($.Now() - MQ.LastPause > App.Params.SenderTimer)) {
                     Note("走的太快，汲取一下")
                     let snap = App.Map.Snap()
                     $.Insert(
-                        $.Do("#jiqu"),
-                        $.Wait(1000),
-                        $.Do("halt"),
+                        $.Function(MQ.Pause),
                         $.Function(() => {
                             App.Map.Rollback(snap)
                             App.Zone.DefaultNext(map, move, wanted)
@@ -410,7 +440,7 @@ $.Module(function (App) {
             MQ.Data.NPC.ID = App.Zone.Wanted.ID
         }
 
-        if (App.Map.Room.Data.Objects.FindByName(MQ.Data.NPC.Name).First()) {
+        if (App.Map.Room.Data.Objects.FindByLabel(MQ.Data.NPC.Name).First()) {
             $.Insert(
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat).WithKillInGroup(MQ.Data.NPC.NotKilled)),
                 $.Function(() => {
@@ -436,27 +466,26 @@ $.Module(function (App) {
         MQ.Data.NPC.First = false
         let wanted = $.NewWanted(MQ.Data.NPC.Name, zone).
             WithChecker(Checker).WithNext(Next).WithOrdered(true).WithID(MQ.Data.NPC.ID)
-        App.Send("yun recover;yun regenerage")
-        $.RaiseStage("prepare")
         $.PushCommands(
-            $.Prepare(),
             $.Function(() => {
                 if (MQ.Data.NPC.Times > 0 && MQ.Data.NPC.Zone != "西域") {
                     if (App.QuestParams["mqnopause"] == 0) {
-                        if (App.Core.Study.Jiqu.Max > 0 && App.QuestParams["mqtihui"] > 0 && App.Data.Player.HP["体会"] >= App.QuestParams["mqtihui"]) {
+                        if (MQ.NeedJiqu()) {
                             Note("遍历之前，汲取一下")
+                            $.RaiseStage("mqpause")
                             $.Insert(
-                                $.Do("#jiqu"),
-                                $.Wait(1000),
-                                $.Do("halt"),
+                                $.Function(MQ.Pause),
                             )
                         }
                     }
                 }
                 App.Next()
             }),
+            $.Prepare(),
             $.To(Cities[MQ.Data.NPC.Zone].Loc),
             $.Function(() => {
+                App.Send("yun recover;yun regenerage")
+                $.RaiseStage("prepare")
                 if (MQ.Data.NPC.Loc) {
                     App.Zone.SearchRooms(MQ.Data.NPC.Loc, wanted)
                 } else {
@@ -735,7 +764,8 @@ $.Module(function (App) {
     }
     Quest.OnReport = () => {
         let eff = MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) + "个/小时" : "-"
-        let rate = MQ.Data.kills > 3 ? (MQ.Data.helpded * 100 / MQ.Data.kills).toFixed(0) + "%" : "-"
+        let num = MQ.HelpRate()
+        let rate = num ? num.toFixed(0) + "%" : "-"
         return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
     }
     let matcherHead = /^你捡起一颗(.+)的人头。$/

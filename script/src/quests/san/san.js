@@ -68,7 +68,7 @@ $.Module(function (App) {
         San.Prepare()
     }
     San.CheckNeili = () => {
-        if (App.Data.Player.HPM["内力上限"] - App.Data.Player.HP["内力上限"] > 180) {
+        if (App.Data.Player.HPM["内力上限"] - App.Data.Player.HP["内力上限"] > 180 || (App.Data.Player.HPM["内力上限"] > 8000 && App.Data.Player.HP["内力上限"] < 8000)) {
             $.PushCommands(
                 $.Function(() => { San.FetchItem("magic water") }),
                 $.Function(App.Core.EatLu),

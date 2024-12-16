@@ -267,7 +267,7 @@
             } else if (skill["空手"]) {
                 limit = skill["基本"]
                 jifa = "parry"
-                before = "#wpoff"
+                before = "#unwield"
             }
             let cmd = `${skill.ID}|${limit}|lian|${jifa}||${before}|`
             list.append(cmd, cmd)

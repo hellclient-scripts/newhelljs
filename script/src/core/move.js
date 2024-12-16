@@ -232,4 +232,7 @@
         App.Commands.Execute(App.Move.NewOrderedCommand(rooms))
         App.Next()
     }
+    App.Move.Load = () => {
+        App.Map.Movement.MaxStep = App.Params.NumStep
+    }
 })(App)

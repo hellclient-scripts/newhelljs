@@ -43,7 +43,7 @@
                 return function () {
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand(`touch ${App.Core.Weapon.Touch};yun recover;yun regenerate;hp`),
-                        App.NewSyncCommand(),
+                        App.NewNobusyCommand(),
                     )
                     App.Next()
                 }
@@ -133,9 +133,9 @@
         return null
     }))
     App.Proposals.Register("tuna", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
+        if (App.Data.Player.HP["当前精力"] < App.Params.NumJingliMin && App.Data.Player.HP["精力上限"] > 2 * App.Params.NumJingliMin) {
             return function () {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin / 100 - App.Data.Player.HP["当前精力"]).toFixed()
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"])/2).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -202,8 +202,8 @@
                     App.NewSyncCommand(),
                 )
             }
-            else if ((App.Data.Player.HP["当前精力"] * 100 / App.Data.Player.HP["精力上限"]) <= App.Params.JingliMin) {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : (App.Data.Player.HP["精力上限"] * App.Params.JingliMin / 100 - App.Data.Player.HP["当前精力"]).toFixed()
+            else if (App.Data.Player.HP["当前精力"] < App.Params.NumJingliMin && App.Data.Player.HP["精力上限"] > 2 * App.Params.NumJingliMin) {
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"])/2).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -218,7 +218,7 @@
                 if (App.Core.Weapon.Touch) {
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand(`touch ${App.Core.Weapon.Touch};yun recover;yun regenerate;hp`),
-                        App.NewSyncCommand(),
+                        App.NewNobusyCommand(),
                         App.Core.Heal.NewRestCommand(),
                     )
                     App.Next()

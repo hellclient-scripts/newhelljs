@@ -20,8 +20,8 @@ weapon变量中设置武器和修理
 #wear strikeb
 ```
 方式设置
-第一位的武器时最重要的，遇到很多情况后会通过#wpon和#wpoff直接在机器里调用。
-第二位开始的武器可以通过#wpon 2和#wpoff 2等设置
+第一位的武器时最重要的，遇到很多情况后会通过#wpon和#unwield直接在机器里调用。
+第二位开始的武器可以通过#wpon 2和#unwield 2等设置
 也可以通过
 ```
 #wield.mysword sworda
@@ -67,7 +67,7 @@ yun recover
 shot $1 with arrow
 ```
 
-其中$1指战斗目标,$wpon和$wpoff指主武器的装备和接触指令(直接使用#wpon和#wpoff由于机制会使得同一心跳发送失效)
+其中$1指战斗目标,$wpon和$unwield指主武器的装备和接触指令(直接使用#wpon和#unwield由于机制会使得同一心跳发送失效)
 
 目前暂时是这样。
 
@@ -102,7 +102,7 @@ command变量是指令设置
 
 一般来说，最常用的设置是战斗准备，比如
 ```
-#prepare special power;yun ziqi;#wpoff;yong cuff.leidong
+#prepare special power;yun ziqi;#unwield;yong cuff.leidong
 ```
 
 ## 学习设置
@@ -147,24 +147,24 @@ zuoyou-hubo|250|xue
 ## 练习指令
 练习指令和学习指令的格式一样，如
 ```
-diyang-chufan|80|lian|strike||#wpoff|
-feilong-zaitian|80|lian|strike||#wpoff|
-hongjian-yulu|80|lian|strike||#wpoff|
-huoyue-zaiyuan|80|lian|strike||#wpoff|
-jianlong-zaitian|80|lian|strike||#wpoff|
-kanglong-youhui|80|lian|strike||#wpoff|
-lishe-dachuan|80|lian|strike||#wpoff|
-longzhan-yuye|80|lian|strike||#wpoff|
-lvshuang-bingzhi|80|lian|strike||#wpoff|
-miyun-buyu|80|lian|strike||#wpoff|
-qianlong-wuyong|80|lian|strike||#wpoff|
-shenlong-baiwei|80|lian|strike||#wpoff|
-shicheng-liulong|80|lian|strike||#wpoff|
-shuanglong-qushui|80|lian|strike||#wpoff|
-sunze-youfu|80|lian|strike||#wpoff|
-turu-qilai|80|lian|strike||#wpoff|
-yuyue-yuyuan|80|lian|strike||#wpoff|
-zhenjing-baili|80|lian|strike||#wpoff|
+diyang-chufan|80|lian|strike||#unwield|
+feilong-zaitian|80|lian|strike||#unwield|
+hongjian-yulu|80|lian|strike||#unwield|
+huoyue-zaiyuan|80|lian|strike||#unwield|
+jianlong-zaitian|80|lian|strike||#unwield|
+kanglong-youhui|80|lian|strike||#unwield|
+lishe-dachuan|80|lian|strike||#unwield|
+longzhan-yuye|80|lian|strike||#unwield|
+lvshuang-bingzhi|80|lian|strike||#unwield|
+miyun-buyu|80|lian|strike||#unwield|
+qianlong-wuyong|80|lian|strike||#unwield|
+shenlong-baiwei|80|lian|strike||#unwield|
+shicheng-liulong|80|lian|strike||#unwield|
+shuanglong-qushui|80|lian|strike||#unwield|
+sunze-youfu|80|lian|strike||#unwield|
+turu-qilai|80|lian|strike||#unwield|
+yuyue-yuyuan|80|lian|strike||#unwield|
+zhenjing-baili|80|lian|strike||#unwield|
 ```
 需要在设置了jifa变量后，通过lianskill任务来练习
 

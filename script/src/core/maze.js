@@ -13,16 +13,19 @@
         }
     ).WithWalk(
         function (maze, move, map) {
+
             let cmd = App.Move.Filterdir(maze.Data.Step.Command)
+            maze.Data.Count = maze.Data.Count + 1
+            if (maze.Data.Count % 8 == 0) {
+                App.Eat(true)
+            }
             if (cmd == "sw") {
-                if (maze.Data.Count < 9) {
+                if (maze.Data.Count < 10) {
                     cmd = "sw"
                 } else {
                     cmd = "ne"
                 }
-                maze.Data.Count = maze.Data.Count + 1
             }
-            App.Eat(true)
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
     ))
@@ -59,7 +62,6 @@
                 }
             }
             maze.Data.Count = maze.Data.Count + 1
-            App.Eat(true)
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
     ))
@@ -95,18 +97,27 @@
         }
     ).WithWalk(
         function (maze, move, map) {
-            App.PushCommands(
-                App.Core.Heal.NewRestCommand(),
-                App.Commands.NewFunctionCommand(() => {
-                    let cmd = App.Move.Filterdir(maze.Data.Step.Command)
-                    if (cmd == "w") {
-                        if (Math.floor(Math.random() * 5) == 1) cmd = "s";
-                    }
-                    App.Eat(true)
-                    App.Send("yun recover;yun regenerate;hp")
-                    map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
-                })
-            )
+            let cmd = App.Move.Filterdir(maze.Data.Step.Command)
+            if (cmd == "w") {
+                if (Math.floor(Math.random() * 5) == 1) cmd = "s";
+            }
+            maze.Data.Count = maze.Data.Count + 1
+            if (maze.Data.Count % 5 == 0) {
+                App.PushCommands(
+                    App.Core.Heal.NewRestCommand(),
+                    App.Commands.NewFunctionCommand(() => {
+                        App.Eat(true)
+                        App.Send("yun recover;yun regenerate;hp")
+                        map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
+                    })
+                )
+            } else {
+                App.PushCommands(
+                    App.Commands.NewFunctionCommand(() => {
+                        map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
+                    })
+                )
+            }
             App.Next()
         }
     ))

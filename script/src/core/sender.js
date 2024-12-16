@@ -47,14 +47,9 @@
     }
 
     App.LoadSender = function () {
-        let numcmds = GetVariable("num_cmds")
-        if (!isNaN(numcmds)) {
-            numcmds = numcmds - 0
-            if (numcmds <= 0) { numcmds = App.Params.DefaultNumCmds }
-        }
-        Metronome.settick(1100)
+        Metronome.settick(App.Params.SenderTimer)
         Metronome.setinterval(50)
-        Metronome.setbeats(numcmds / 2)
+        Metronome.setbeats(App.Params.NumCmds / 2)
     }
     App.LoadSender()
 })(App)
