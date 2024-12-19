@@ -294,8 +294,8 @@ $.Module(function (App) {
             task.AddTrigger(matcherDie, (tri, result) => {
                 if (Assisted.Data.NPC && Assisted.Data.NPC.Name == result[1]) {
                     Assisted.Data.NPC.Died = true
-                    Assisted.OnNpcDie()
                     App.Send("cut head from corpse;get head")
+                    Assisted.OnNpcDie()
                 }
                 return true
             })

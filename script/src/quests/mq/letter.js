@@ -135,7 +135,7 @@ $.Module(function (App) {
     Letter.GiveReceipt = () => {
         $.PushCommands(
             $.To(App.Params.LocMaster),
-            $.Do("give receipt to " + App.Params.MasterID + ";drop receipt;hp;score"),
+            $.Do("give receipt to " + App.Params.MasterID + ";drop receipt;drop letter;hp;score"),
         )
         $.Next()
     }
@@ -159,7 +159,7 @@ $.Module(function (App) {
         Letter.Prepare()
     }
     Letter.KillNear = () => {
-        if (App.Map.Room.ID && !Letter.Data.NPC.Fled && !Letter.Data.NPC.Died) {
+        if (App.Map.Room.ID && !Letter.Data.NPC.Fled && !Letter.Data.NPC.Gived) {
             Letter.Data.NPC.Loc = null
             let rooms = App.Mapper.ExpandRooms(App.Map.Room.ID, 2)
             App.Zone.Wanted = $.NewWanted(Letter.Data.NPC.Name, Letter.Data.NPC.Name.Zone).WithChecker(Checker).WithID(Letter.Data.NPC.ID)
@@ -174,11 +174,11 @@ $.Module(function (App) {
         if (App.Zone.Wanted.ID) {
             Letter.Data.NPC.ID = App.Zone.Wanted.ID
         }
-        if (App.Map.Room.Data.Objects.FindByName(Letter.Data.NPC.Name).First()) {
+        if (App.Map.Room.Data.Objects.FindByLabel(Letter.Data.NPC.Name).First()) {
             $.Insert(
                 $.Plan(PlanGive),
                 $.Function(() => {
-                    if (!(Letter.Data.NPC.Died || Letter.Data.NPC.Fled)) {
+                    if (!(Letter.Data.NPC.Gived || Letter.Data.NPC.Fled)) {
                         $.Append($.Function(Letter.KillNear))
                     }
                     App.Next()
@@ -255,7 +255,7 @@ $.Module(function (App) {
             if (!Letter.Data.NPC.ID && id) {
                 Letter.Data.NPC.ID = id.toLowerCase()
             }
-            if (!Letter.Data.NPC.Loc && !Letter.Data.NPC.Died) {
+            if (!Letter.Data.NPC.Loc && !Letter.Data.NPC.Gived) {
                 Note("接到线报:" + name + "|" + id + "|" + loc)
                 Letter.Data.helpded++
                 Letter.Data.NPC.Loc = loc

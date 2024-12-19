@@ -137,6 +137,7 @@ $.Module(function (App) {
             $.Function(() => {
                 App.Send("yun recover;yun regenerage")
                 $.RaiseStage("prepare")
+                $.Sync()
                 $.Next()
             }),
             $.Path(["u"]),

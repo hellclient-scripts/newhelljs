@@ -91,6 +91,7 @@
     })
     App.BindEvent("disconnected", function (event) {
         Metronome.Discard(true)
+        App.Combat.Discard()
         for (var key in App.Positions) {
             App.Positions[key].Discard()
         }
@@ -111,6 +112,7 @@
             task.AddTrigger(matcherReenter).WithName("reenter")
             task.AddTrigger(matcherTooFast).WithName("toofast")
             task.AddTrigger(matcherTooFast2).WithName("toofast2")
+            task.AddTimer(5000).WithName("timeout")
         },
         function (result) {
             switch (result.Type) {
@@ -129,6 +131,12 @@
                                 Note("10秒后重试")
                             }
                             break
+                    }
+                    break
+                case "timer":
+                    if (App.Core.Connect.Callback) {
+                        App.Core.Connect.Next = (new Date()).getTime() + 10000
+                        Note("10秒后重试")
                     }
                     break
             }

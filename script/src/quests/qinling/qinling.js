@@ -107,11 +107,13 @@ $.Module(function (App) {
                 $.RaiseStage("qinbefore")
                 $.Next()
             }),
+            $.Sync(),
             $.Rest(),
             $.Function(() => {
                 $.RaiseStage("prepare")
                 $.Next()
             }),
+            $.Sync(),
             $.Path(["n"]),
             $.Function(() => {
                 if (App.Map.Room.Data.Objects.FindByName("秦始皇僵尸").First()) {

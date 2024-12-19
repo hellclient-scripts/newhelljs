@@ -3,7 +3,7 @@ $.Module(function (App) {
     Quit.Start = (data) => {
         let loc = data.trim()
         if (!loc) {
-            loc = 26
+            loc = "26"
         }
         $.PushCommands(
             $.To(loc),

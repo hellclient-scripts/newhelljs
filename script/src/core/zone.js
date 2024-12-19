@@ -59,7 +59,7 @@
             return this
         }
         WithSingleStep(s) {
-            this.SingleStep = s
+            this.SingleStep = App.Params.NumStep <= 1
             return this
         }
         WithChecker(c) {

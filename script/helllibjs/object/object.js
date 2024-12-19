@@ -67,6 +67,9 @@
         Append(item) {
             this.Items.push(item)
         }
+        Clear() {
+            this.Items = []
+        }
         FindByID(id) {
             let result = new List()
             this.Items.forEach(item => {

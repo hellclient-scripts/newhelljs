@@ -7,6 +7,7 @@ $.Module(function (App) {
     preparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#carry name=铁甲,铁锤,竹棒,竹剑,普通匕首,钢刀,长剑,木刀,飞蝗石,铁莲子,铁棍"),
     ]
+    preparedata["GoldKeep"] = 4
     let destoryPreparedata = {}
     destoryPreparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#sell name=铁甲,铁锤,竹棒,竹剑,普通匕首,钢刀,长剑,木刀,铁棍"),

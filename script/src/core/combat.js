@@ -112,7 +112,7 @@
             App.Combat.Stop(App.Core.Combat.Fail ? "fail" : "")
         })
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
-    App.Combat.Interval=600
+    App.Combat.Interval = 600
     let checkCombatCmd = "come"
     App.Core.Combat.Pending = {}
     App.Core.Combat.Perform = function () {

@@ -208,8 +208,11 @@ $.Module(function (App) {
             task.AddTimer(3000)
             App.Send("give head to " + App.Params.MasterID + ";drop head")
             $.RaiseStage("mqbefore")
-            App.Send("quest " + App.Params.MasterID)
-            App.Send("quest")
+            App.Sync(()=>{
+                App.Send("quest " + App.Params.MasterID)
+                App.Send("quest")
+            })
+
         },
         (result) => {
             if (result != "cancel") {
@@ -441,6 +444,7 @@ $.Module(function (App) {
         }
 
         if (App.Map.Room.Data.Objects.FindByLabel(MQ.Data.NPC.Name).First()) {
+            App.Map.Room.Data.Objects.Clear()
             $.Insert(
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat).WithKillInGroup(MQ.Data.NPC.NotKilled)),
                 $.Function(() => {
@@ -486,11 +490,17 @@ $.Module(function (App) {
             $.Function(() => {
                 App.Send("yun recover;yun regenerage")
                 $.RaiseStage("prepare")
-                if (MQ.Data.NPC.Loc) {
-                    App.Zone.SearchRooms(MQ.Data.NPC.Loc, wanted)
-                } else {
-                    App.Zone.Search(wanted)
-                }
+                $.PushCommands(
+                    $.Sync(),
+                    $.Function(() => {
+                        if (MQ.Data.NPC.Loc) {
+                            App.Zone.SearchRooms(MQ.Data.NPC.Loc, wanted)
+                        } else {
+                            App.Zone.Search(wanted)
+                        }
+                    })
+                )
+                $.Next()
             }),
             $.Function(MQ.KillLoc),
             $.Function(() => {
@@ -522,8 +532,8 @@ $.Module(function (App) {
             task.AddTrigger(matcherDie, (tri, result) => {
                 if (MQ.Data.NPC && MQ.Data.NPC.Name == result[1]) {
                     MQ.Data.NPC.Died = true
-                    MQ.OnNpcDie()
                     App.Send("cut head from corpse;get head")
+                    MQ.OnNpcDie()
                     App.RaiseEvent(new App.Event("core.combatstop"))
                 }
                 return true

@@ -35,9 +35,9 @@
     App.NamedParams.AddNumber("CoinKeep", 0).WithName("最小铜钱数").WithDesc("身上保持的最少铜钱的数量")
     App.NamedParams.AddNumber("CashMax", 200).WithName("最大银票数").WithDesc("超过这个数量会去银行存银票")
     App.NamedParams.AddNumber("CashKeep", 30).WithName("最小银票数").WithDesc("预期身上银票的合理数量")
-    App.NamedParams.AddNumber("NumCmds", 46).WithName("每心跳指令数").WithDesc("每隔心跳的指令数，游戏设定没修改的化正常不用调整")
-    App.NamedParams.AddNumber("SenderTimer", 1300).WithName("发送间隔").WithDesc("发送指令的间隔，一般是一个比1000稍大的数，如果发现容易被雷P晕可以适当调大这个值")
-    App.NamedParams.AddNumber("NumStep", 6).WithName("多步行走步数").WithDesc("多步行走时的最大步数")
+    App.NamedParams.AddNumber("NumCmds", 46).WithName("每心跳指令数").WithDesc("每个心跳的指令数，游戏设定没修改的话一般不用调整")
+    App.NamedParams.AddNumber("SenderTimer", 2200).WithName("发送间隔").WithDesc("发送指令的间隔")
+    App.NamedParams.AddNumber("NumStep", 0).WithName("多步行走步数").WithDesc("多步行走时的最大步数,小于等于1强制单步")
 
     App.NamedParams.AddString("ShowRoomID", "").WithName("显示房间ID").WithDesc("设为t打开")
     App.NamedParams.AddString("Echo", "t").WithName("指令回显").WithDesc("设为f关闭回显")

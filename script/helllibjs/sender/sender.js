@@ -18,12 +18,16 @@
             let result=this.Parser(cmd,Grouped)
             if (result){
                 result.forEach(cmds => {
-                    if (cmds.length==1){
-                        if (this.TryAlias(this,cmds[0])){
+                    let data=[]
+                    cmds.forEach((cmd)=>{
+                        data.push(cmd)
+                    })
+                    if (data.length==1){
+                        if (this.TryAlias(this,data[0])){
                             return
                         }
                     }
-                    Metronome.push(cmds,true,this.GetterEcho())
+                    Metronome.push(data,true,this.GetterEcho())
                 });
             }
         }

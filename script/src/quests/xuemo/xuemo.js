@@ -238,6 +238,7 @@ $.Module(function (App) {
             $.Sync(),
             $.Function(() => {
                 $.RaiseStage("prepare")
+                $.Sync(),
                 App.Map.Rollback(snap)
                 switch (Xuemo.Data.Step) {
                     case 1:
@@ -417,6 +418,7 @@ $.Module(function (App) {
 
     Xuemo.Search = () => {
         $.RaiseStage("prepare")
+        $.Sync(),
         $.PushCommands(
             $.Rooms(App.Core.Fuben.Current.Rooms, Xuemo.Wanted),
             $.To("2978"),

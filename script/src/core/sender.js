@@ -49,7 +49,7 @@
     App.LoadSender = function () {
         Metronome.settick(App.Params.SenderTimer)
         Metronome.setinterval(50)
-        Metronome.setbeats(App.Params.NumCmds / 2)
+        Metronome.setbeats(App.Params.NumCmds)
     }
     App.LoadSender()
 })(App)
