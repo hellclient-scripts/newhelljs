@@ -277,7 +277,7 @@ $.Module(function (App) {
     let Next = function (map, move, wanted) {
         if (App.QuestParams["mqnopause"] == 0) {
             if (MQ.NeedJiqu()) {
-                if (Metronome.GetSpace() <= 2 && ($.Now() - MQ.LastPause > App.Params.SenderTimer)) {
+                if (Metronome.GetSpace() <= 4 && ($.Now() - MQ.LastPause > 1000)) {
                     Note("走的太快，汲取一下")
                     let snap = App.Map.Snap()
                     $.Insert(
