@@ -8,15 +8,21 @@
             Note("被打晕了")
             if (cb) {
                 Note("醒来后继续。")
+            } else {
+                App.Log(event.Data.Output)
             }
             App.Reconnect(App.Params.ReloginDelay, cb)
         })
     }
+
     App.BindEvent("core.faint", App.Core.Emergency.OnFaint)
     App.Core.Emergency.OnHealCombat = function () {
         Note("治疗被人打了")
         App.Reconnect()
     }
+    App.BindEvent("core.idlequit", (event) => {
+        App.Log(event.Data.Output)
+    })
     App.Core.Emergency.Reset = () => {
         for (var key in App.Positions) {
             App.Positions[key].Discard()

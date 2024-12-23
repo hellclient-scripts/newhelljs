@@ -7,6 +7,7 @@
     App.Positions = {}
     App.Include("src/core/utils.js")
     App.Include("src/core/fatal.js")
+    App.Include("src/core/log.js")
     App.Include("src/core/init.js")
     App.Include("src/core/committee.js")
     App.Include("src/core/commands.js")

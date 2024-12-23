@@ -135,7 +135,7 @@
     App.Proposals.Register("tuna", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Data.Player.HP["当前精力"] < App.Params.NumJingliMin && App.Data.Player.HP["精力上限"] > 2 * App.Params.NumJingliMin) {
             return function () {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"])/2).toFixed()
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"]) / 2).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -203,7 +203,7 @@
                 )
             }
             else if (App.Data.Player.HP["当前精力"] < App.Params.NumJingliMin && App.Data.Player.HP["精力上限"] > 2 * App.Params.NumJingliMin) {
-                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"])/2).toFixed()
+                let num = App.Params.NumTuna > 0 ? App.Params.NumTuna : ((App.Data.Player.HP["精力上限"] - App.Data.Player.HP["当前精力"]) / 2).toFixed()
                 if (num >= App.Data.Player.HP["当前精气"]) { num = App.Data.Player.HP["当前精气"] }
                 if (num < 10) { num = 10 }
                 App.Commands.PushCommands(
@@ -213,6 +213,11 @@
                     App.NewSyncCommand(),
                     App.Core.Heal.NewRestCommand(),
 
+                )
+            } else if (App.Core.Weapon.Touch && App.Data.Item.List.FindByIDLower(App.Core.Weapon.Touch).First() == null) {
+                App.Commands.PushCommands(
+                    App.Commands.NewDoCommand(`summon ${App.Core.Weapon.Wield[0].ID};i`),
+                    App.NewNobusyCommand(),
                 )
             } else if ((App.Data.Player.HP["当前内力"] * 100 / App.Data.Player.HP["内力上限"]) <= App.Params.NeiliMin) {
                 if (App.Core.Weapon.Touch) {

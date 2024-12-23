@@ -21,7 +21,6 @@
         list.append("advance", "高级设置")
         list.append("help", "使用帮助")
         list.publish("App.UI.Assist.OnClick")
-
     }
     App.UI.Assist.OnClick = (name, id, code, data) => {
         switch (data) {

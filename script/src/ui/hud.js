@@ -1,7 +1,7 @@
 (function (App) {
     let uiModule = App.RequireModule("helllibjs/utils/ui.js")
 
-    SetHUDSize(4)
+    SetHUDSize(7)
     App.HUD = {}
     App.HUD.UI = uiModule
     App.Word = App.HUD.UI.Word
@@ -10,9 +10,10 @@
         let line2 = App.HUD.Line2()
         let line3 = App.HUD.Line3()
         let line4 = App.HUD.Line4()
+        let linelog = App.HUD.LineLog()
         let summaryline1 = App.HUD.SummaryLine1()
         let summaryline2 = App.HUD.SummaryLine2()
-        UpdateHUD(0, JSON.stringify([line1, line2, line3, line4]))
+        UpdateHUD(0, JSON.stringify([line1, line2, line3, line4, ...linelog]))
         SetSummary(JSON.stringify([summaryline1, summaryline2]))
     }
     App.HUD.Space = new App.Word(" ")
@@ -71,6 +72,15 @@
         let value = new App.Word(uiModule.Cut(App.Core.Quest.Current ? App.Core.Quest.Current.replaceAll("\n", "||") : "无任务", 140))
         return App.Word.Join(App.HUD.Space, label, value)
     }
+    App.HUD.LineLog = () => {
+        let log = App.Core.Log.Load(3)
+        let result = []
+        for (var i = 0; i < 3; i++) {
+            result[i] = App.Word.Join(new App.Word(log[i] ? log[i] : "暂无日志"))
+        }
+        return result
+    }
+
     App.HUD.SummaryLine1 = () => {
         let banklabel = new App.Word(" 存:").WithColor("BrightYellow")
         let bank = new App.Word(App.Data.Player.Score["存款"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.Score["存款"]) : "-", 4, true).WithColor("white")
@@ -121,7 +131,26 @@
             App.HUD.Update()
         }
     })
+
+    App.HUD.Show = () => {
+        var list = Userinput.newlist("信息", "请选择你要查看的信息", false)
+        list.append("log", "完整日志")
+        list.publish("App.HUD.OnClisk")
+    }
+    App.HUD.OnClisk = (name, id, code, data) => {
+        switch (data) {
+            case "log":
+                App.HUD.LogShow()
+                break
+        }
+    }
+    App.HUD.LogShow = () => {
+        let log = App.Core.Log.Load()
+        Userinput.Note("", "日志", log.join("\n"))
+    }
+    App.BindEvent("hudclick", App.HUD.Show)
     App.BindEvent("core.queststart", App.HUD.Update)
     App.BindEvent("core.queststop", App.HUD.Update)
+    App.BindEvent("core.onlog", App.HUD.Update)
     App.BindEvent("onfocus", App.HUD.Update)
 })(App)

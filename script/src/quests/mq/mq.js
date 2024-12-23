@@ -237,6 +237,7 @@ $.Module(function (App) {
                 if (MQ.Data.NoMaster) {
                     Quest.Cooldown(3000000)
                     Note("师傅没了，任务冷却5分钟")
+                    App.Log("师傅没了")
                 } else if (MQ.Data.NPC) {
                     $.Insert($.Function(MQ.Ready))
                 } else {
@@ -776,7 +777,7 @@ $.Module(function (App) {
         let eff = MQ.Data.kills > 3 ? MQ.Data.eff.toFixed(0) + "个/小时" : "-"
         let num = MQ.HelpRate()
         let rate = num ? num.toFixed(0) + "%" : "-"
-        return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 线报率:${rate} 连续任务:${MQ.Data.current || 0}`]
+        return [`MQ-总数:${MQ.Data.kills} 效率:${eff} 线报率:${rate} 当前任务:${MQ.Data.current || 0}`]
     }
     let matcherHead = /^你捡起一颗(.+)的人头。$/
     let matcherreward = /^通过这次锻炼，你获得了/

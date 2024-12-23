@@ -9,7 +9,7 @@ OnBroadcast = "onBroadcast"
 OnFocus = "onFocus"
 OnLoseFocus = ""
 OnKeyUp = ""
-OnHUDClick = ""
+OnHUDClick = "onHudClick"
 OnResponse = "onResponse"
 OnAssist = "onAssist"
 OnBuffer = ""
@@ -705,7 +705,7 @@ Timers = []
   ID = "d1fvs0p6fg7om9720kp6pb"
   Name = "core.walkrest"
   Enabled = true
-  Match = "你太累了，还是休息一会儿吧"
+  Match = "^(你太累了，还是休息一会儿吧|你太累了，再也走不动了。)$"
   Send = ""
   ColourChangeType = 0
   Colour = 0
@@ -718,7 +718,7 @@ Timers = []
   ExpandVariables = false
   Temporary = false
   OneShot = false
-  Regexp = false
+  Regexp = true
   Repeat = false
   MultiLine = false
   LinesToMatch = 0
@@ -1662,6 +1662,68 @@ Timers = []
   Italic = false
   Variable = ""
 
+[[Triggers]]
+  ID = "d1g4tv4ob116fg73v6sksf"
+  Name = "core.onslash"
+  Enabled = true
+  Match = "天空忽然传来了几声冷笑，霎时间乌云密布！一道闪电从天而降！"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.onslash\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = false
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
+[[Triggers]]
+  ID = "d1g4u3i9cr609p73v6snul"
+  Name = "core.idlequit"
+  Enabled = true
+  Match = "^对不起，您已经发呆超过 .* 分钟了，请下次再来。$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.LineEvent(\"core.idlequit\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = false
+  LinesToMatch = 0
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
+
 [[Aliases]]
   ID = "d1fufevcofgvaa73s6n5s7"
   Name = "App.Core.Connect.OnAliasLogin"
@@ -2398,11 +2460,6 @@ Timers = []
   Name = "lian"
   Desc = "练习指令(选填)"
   Intro = "一行一个练习内容\n格式同学习指令\n技能ID|学习限制|类型|基本功夫|位置|开始指令|结束指令\n可以通过助理按钮初始化，再调整"
-
-[[RequiredParams]]
-  Name = "num_cmds"
-  Desc = "每心跳指令数(选填)"
-  Intro = "应该是2的倍数，留空默认"
 
 [[RequiredParams]]
   Name = "house"

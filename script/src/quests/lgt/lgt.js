@@ -190,7 +190,7 @@ $.Module(function (App) {
         LGT.Go()
     }
     LGT.Go = function () {
-        LGT.Data.Entry = ["wu", "nu", "eu", "su", "u"]
+        LGT.Data.Entry = ["wu", "nu", "eu", "su"]
         LGT.Data.Level = 0
         LGT.Data.灵符 = 0
         $.PushCommands(

@@ -95,6 +95,7 @@ $.Module(function (App) {
                 if (Letter.Data.NoMaster) {
                     Quest.Cooldown(3000000)
                     Note("师傅没了，任务冷却5分钟")
+                    App.Log("师傅没了")
                 } else if (Letter.Data.NPC) {
                     $.Insert($.Function(Letter.Ready))
                 } else {

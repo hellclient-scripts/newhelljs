@@ -52,4 +52,8 @@
         Metronome.setbeats(App.Params.NumCmds)
     }
     App.LoadSender()
+
+    App.BindEvent("core.onslash", (event) => {
+        App.Log(event.Data.Output)
+    })
 })(App)

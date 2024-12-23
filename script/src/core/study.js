@@ -112,7 +112,7 @@
                 case "lian":
                     var loc = this.Loc
                     if (!loc) {
-                        loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
+                        loc = App.Params.LocDazuo
                     }
                     var times = App.Params.LianMax
                     var cmds = [`jifa ${this.From} ${this.SkillID}`, `lian ${this.From} ${times}`]
@@ -395,11 +395,11 @@
         }
 
         if (App.Core.Study.Jiqu.Commands.length == 0) {
-            if (App.Data.Player.Score["门派"] == "华山剑宗" || App.Data.Player.Score["门派"] == "华山派") {
-                App.Core.Study.Jiqu.Commands = ["jiqu", "#unwield;#wpon;jiqu sword-cognize"]
-            } else {
+            // if (App.Data.Player.Score["门派"] == "华山剑宗" || App.Data.Player.Score["门派"] == "华山派") {
+            //     App.Core.Study.Jiqu.Commands = ["jiqu", "#unwield;#wpon;jiqu sword-cognize"]
+            // } else {
                 App.Core.Study.Jiqu.Commands = ["jiqu"]
-            }
+            // }
         }
 
         App.LoadVariable("study").forEach(line => {

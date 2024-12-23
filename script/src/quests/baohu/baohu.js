@@ -35,6 +35,7 @@ $.Module(function (App) {
                 return
             }
             if (answer == `汪剑通说道：${App.Data.Player.Score.名字}，你上一次的任务还没完成!`) {
+                App.Log(answer)
                 Baohu.Fail()
                 return
             }
@@ -137,6 +138,7 @@ $.Module(function (App) {
                 return
             }
             App.Send("halt")
+            App.Log(`保护NPC${Baohu.Data.NPC.ID}失败`)
             Baohu.Fail()
         }
     )

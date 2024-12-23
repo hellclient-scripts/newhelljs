@@ -17,10 +17,13 @@ var onDisconnected = function () {
 var onAssist = function () {
     App.RaiseEvent(new App.Event("assist").WithType("system"))
 }
-
+var onHudClick=function(){
+    App.RaiseEvent(new App.Event("hudclick").WithType("system"))
+}
 var onBroadcast = function (msg, global, channel) {
     App.Core.HelpFind.onBroadcast(msg, global)
 }
+
 var onResponse = function (type, id, data) {
 
 }
