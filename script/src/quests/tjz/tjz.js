@@ -383,17 +383,17 @@ $.Module(function (App) {
         TJZ.BackCommand = []
         TJZ.BackPosition = 0
         First()
-        do {
+        while (blocks[TJZ.CurrentBlock][TJZ.Left ? "Right" : "Left"] != TJZ.FinishBlock) {
             if (!Back()) {
                 return []
             }
-        } while (blocks[TJZ.CurrentBlock][TJZ.Left ? "Right" : "Left"] != TJZ.FinishBlock)
+        } 
         Turn()
-        do {
+        while (TJZ.CurrentBlock != blockStart) {
             if (!Forward()) {
                 return [];
             }
-        } while (TJZ.CurrentBlock != blockStart)
+        } 
         BackFirst()
         if (blockStart != TJZ.FinishBlock) {
             while (TJZ.CurrentBlock != TJZ.FinishBlock) {
@@ -430,6 +430,7 @@ $.Module(function (App) {
     TJZ.GetPath = (x1, y1, x2, y2) => {
         let path = TJZ.WalkAll(x1, y1, x2, y2, true)
         if (path.length != 63) {
+            //左右反转
             path = TJZ.WalkAll(x1, y1, x2, y2, false)
         }
         if (path.length != 63) {

@@ -57,4 +57,9 @@
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("pot", function (data, target) {
         return App.Data.Player.HP["潜能"] >= (data - 0)
     }))
+    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("quest", function (data, target) {
+        let rq = App.Quests.Running
+        return rq && rq.ID == data
+    }))
+
 })(App)            

@@ -107,6 +107,7 @@ $.Module(function (App) {
                 $.RaiseStage("qinbefore")
                 $.Next()
             }),
+            $.Do("i"),
             $.Sync(),
             $.Rest(),
             $.Function(() => {

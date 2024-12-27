@@ -208,7 +208,7 @@ $.Module(function (App) {
             task.AddTimer(3000)
             App.Send("give head to " + App.Params.MasterID + ";drop head")
             $.RaiseStage("mqbefore")
-            App.Sync(()=>{
+            App.Sync(() => {
                 App.Send("quest " + App.Params.MasterID)
                 App.Send("quest")
             })
@@ -278,7 +278,7 @@ $.Module(function (App) {
     let Next = function (map, move, wanted) {
         if (App.QuestParams["mqnopause"] == 0) {
             if (MQ.NeedJiqu()) {
-                if (Metronome.GetSpace() <= 4 && ($.Now() - MQ.LastPause > 1000)) {
+                if (Metronome.GetSpace() <= 3 && ($.Now() - MQ.LastPause > 1000)) {
                     Note("走的太快，汲取一下")
                     let snap = App.Map.Snap()
                     $.Insert(
@@ -517,6 +517,10 @@ $.Module(function (App) {
         planQuest.Execute()
         $.PushCommands(
             $.Function(App.Core.Emergency.CheckDeath),
+            $.Function(() => {
+                App.Core.Weapon.PickWeapon()
+                $.Next()
+            }),
             $.Function(MQ.KillLoc)
         )
         $.Next()

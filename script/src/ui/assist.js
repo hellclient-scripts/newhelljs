@@ -267,6 +267,8 @@
                 limit = skill["基本"]
                 jifa = "parry"
                 before = "#unwield"
+            } else if (skill["音乐技能"]) {
+                before = "yun regenerate"
             }
             let cmd = `${skill.ID}|${limit}|lian|${jifa}||${before}|`
             list.append(cmd, cmd)

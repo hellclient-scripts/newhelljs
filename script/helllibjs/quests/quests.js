@@ -103,6 +103,7 @@
         }
         OnStart = DefaultOnStart
         OnStop = DefaultOnStop
+        Running = null
         #nextcommand = null
         Position = null
         Commands = null
@@ -164,6 +165,7 @@
             if (ready) {
                 this.Commands.PushCommands(
                     this.Commands.NewFunctionCommand(() => {
+                        this.Running = ready.RunningQuest
                         ready.Execute()
                     }),
                     this.Commands.NewFunctionCommand(() => {
@@ -176,6 +178,7 @@
         Next() {
             if (this.Stopped) {
                 this.Queue = []
+                this.Running=null
                 this.OnStop(this)
                 this.Commands.Next()
                 return

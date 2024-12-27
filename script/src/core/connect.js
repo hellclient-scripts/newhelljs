@@ -56,6 +56,10 @@
         App.Commands.Discard()
         App.Commands.PushCommands(
             App.Commands.NewFunctionCommand(App.Core.Emergency.CheckDeath),
+            App.Commands.NewFunctionCommand(() => {
+                App.Core.Weapon.PickWeapon()
+                App.Next()
+            }),
             App.NewPrepareCommand(""),
         )
         if (!App.Quests.IsStopped()) {

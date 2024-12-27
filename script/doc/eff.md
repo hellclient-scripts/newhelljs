@@ -10,8 +10,10 @@ Hellclient的发送直接能保证在连续的X毫秒内指令不会超过X个�
 
 具体的设置位置在助理按钮的系统参数中
 
-* NumCmds 每心跳指令数，略小于50
-* SenderTimer 心跳时长，单位毫秒，略大于2000
+* NumCmds 每心跳指令数，减少这个值可以减少网络波动的同时正好发送大量指令导致的被劈
+* SenderTimer 心跳时长，增加这个值可以对冲网络波动或者服务器卡顿
+
+理论上说，极限情况是SenderTimer为2000,NumCmds为50。实际操作中，为了指令发送更平稳，可以以SenderTimer为1000,NumCmds为基准
 
 如果想提速，就把NumCmds提大，把SenderTimer降低
 
