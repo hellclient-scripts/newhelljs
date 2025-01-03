@@ -19,6 +19,7 @@
     App.Include("src/quests/misc/stop.js")
     App.Include("src/quests/misc/fangqi.js")
     App.Include("src/quests/misc/idle.js")
+    App.Include("src/quests/misc/execute.js")
     App.Include("src/quests/tjz/tjz.js")
     App.Include("src/quests/tjss/tjss.js")
     App.Include("src/quests/xuemo/xuemo.js")

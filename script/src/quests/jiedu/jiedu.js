@@ -74,7 +74,7 @@ $.Module(function (App) {
     }
     let Quest = App.Quests.NewQuest("jiedu")
     Quest.Name = "解毒大米"
-    Quest.Desc = "在loc_dazuo解毒的大米"
+    Quest.Desc = "在LocDazuo解毒的大米"
     Quest.Intro = ""
     Quest.Help = ""
 

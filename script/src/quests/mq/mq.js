@@ -206,6 +206,7 @@ $.Module(function (App) {
             task.AddTrigger(reNoQuest)
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
+            $.RaiseStage("mqgivehead")
             App.Send("give head to " + App.Params.MasterID + ";drop head")
             $.RaiseStage("mqbefore")
             App.Sync(() => {
@@ -223,6 +224,10 @@ $.Module(function (App) {
     MQ.GiveHead = () => {
         $.PushCommands(
             $.To(App.Params.LocMaster),
+            $.Function(() => {
+                $.RaiseStage("mqgivehead")
+                $.Next()
+            }),
             $.Do("give head to " + App.Params.MasterID + ";drop head"),
             // $.Function(MQ.Prepare),
         )

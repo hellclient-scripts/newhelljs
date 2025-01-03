@@ -3,7 +3,6 @@
     let LastTry = 0
     let rooms = []
     let rides = []
-    let paths = []
     let load = function (file, target) {
         let lines = ReadLines(file)
         lines.forEach(line => {
@@ -32,16 +31,6 @@
     rooms.forEach(room => {
         bindroom(room)
     })
-
-    // rides.forEach(line => {
-    //     paths.push(App.RoomsH.ParsePath("-1", line))
-    // })
-    // rooms.forEach(room => {
-    //     paths.forEach(path => {
-    //         path.From = room
-    //         path.AddToMapper()
-    //     })
-    // })
     ridable = function () {
         var cmd = GetVariable("cmd_ride") || ""
         cmd = cmd.trim()

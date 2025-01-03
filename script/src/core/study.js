@@ -398,7 +398,7 @@
             // if (App.Data.Player.Score["门派"] == "华山剑宗" || App.Data.Player.Score["门派"] == "华山派") {
             //     App.Core.Study.Jiqu.Commands = ["jiqu", "#unwield;#wpon;jiqu sword-cognize"]
             // } else {
-                App.Core.Study.Jiqu.Commands = ["jiqu"]
+            App.Core.Study.Jiqu.Commands = ["jiqu"]
             // }
         }
 
@@ -497,7 +497,7 @@
             if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
                 if (isNaN(times) || times <= 0) {
-                    times = 100
+                    times = App.Params.YanjiuMax
                 }
                 if (App.Data.Player.HP["潜能"] > times) {
                     var cmds = ["yanjiu " + skill.SkillID + " " + times]
@@ -533,7 +533,7 @@
             if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
                 if (isNaN(times) || times <= 0) {
-                    times = 100
+                    times = App.Params.YanjiuMax
                 }
                 if (App.Data.Player.HP["潜能"] > times) {
                     learned = true
@@ -567,6 +567,7 @@
         if (App.Data.Player.HP["经验"] > 100000 && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
             return function () {
                 App.Commands.PushCommands(
+                    App.Move.NewToCommand(App.Params.LocDazuo),
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun regenerate;yun recover"),
                     App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
@@ -574,9 +575,6 @@
                     App.Commands.NewDoCommand("hp"),
                     App.NewSyncCommand(),
                 )
-                if (App.Map.Room.Data["NoFight"] || App.Map.Room.ID == App.Params.LocMaster) {
-                    App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
-                }
                 App.Next()
             }
         }
@@ -619,7 +617,12 @@
         App.Core.Study.CurrentSkill = null
     })
     App.Sender.RegisterAlias("#jifa", function (data) {
-        App.Send(GetVariable("jifa"))
+        data = data.trim()
+        if (data) {
+            App.Send(App.Core.Study.GetJifaCommand(data))
+        } else {
+            App.Send(GetVariable("jifa"))
+        }
     })
     App.Sender.RegisterAlias("#jiqu", function (data) {
         App.Send(App.Random(App.Core.Study.Jiqu.Commands))

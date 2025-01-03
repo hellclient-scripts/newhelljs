@@ -15,7 +15,7 @@ $.Module(function (App) {
     }
     let Quest = App.Quests.NewQuest("idle")
     Quest.Name = "在指定位置发待"
-    Quest.Desc = "结束当前任务队列"
+    Quest.Desc = "在指定位置发待"
     Quest.Intro = ""
     Quest.Help = ""
     Quest.GetReady = function (q, data) {

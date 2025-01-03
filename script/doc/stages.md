@@ -37,6 +37,14 @@
 
 ## 师门任务场景
 
+### mqgivehead
+
+给头前触发的场景。#mqbefore前一定会有一个mqgivehead
+
+```
+#mqgivehead xue feng about sword
+```
+
 ### #mqbefore
 
 接任务前的场景。一般用来ask修养或者研究学习
