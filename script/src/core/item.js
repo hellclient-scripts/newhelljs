@@ -1,3 +1,4 @@
+//道具模块
 (function (App) {
     let objectModule = App.RequireModule("helllibjs/object/object.js")
 
@@ -15,12 +16,14 @@
         App.Data.Item.Count = 0
         App.Data.Item.Money = null
     }
+    //计算现金
     App.Core.Item.GetMoney = function () {
         if (App.Data.Item.Money == null) {
             App.Data.Item.Money = App.Data.Item.List.FindByName("一千两银票").Sum() * 10 + App.Data.Item.List.FindByName("黄金").Sum()
         }
         return App.Data.Item.Money
     }
+    //定义检查器i
     let checkerI = App.Checker.Register("i", "i", 30000)
 
     App.BindEvent("core.noitem", App.Core.Item.NoItem)
@@ -38,6 +41,7 @@
     App.BindEvent("core.item", App.Core.Item.OnItem)
     let matcheritem = /^(  |□|○)(.+)\(([^\(\)]+)\)$/
     let matcherend = /^目前携带了(.+)件物品。$/
+    //道具统计的计划
     let PlanOnItem = new App.Plan(
         App.Positions.Connect,
         function (task) {
@@ -71,15 +75,18 @@
             checkerI.Reset()
         },
     )
+    //检查乾坤袋
     App.Core.Item.CheckQiankunBag = function () {
         if (App.Data.Item.List.FindByID("qiankun bag").First()) {
             App.Send("l qiankun bag of me")
         }
         checkerQiankunBag.Reset()
     }
+    //qianunbag的检查
     let checkerQiankunBag = App.Checker.Register("qiankunbag", App.Core.Item.CheckQiankunBag, 600000)
     //[ 1]  丹玉磨(danyu mo)                          1          
     let matcherQiankunBag = /^\[\s*(\d+)\]\s*(\S+)\((.+)\)\s*(\d+)\s*$/
+    //统计乾坤袋的计划
     let PlanQiankunBag = new App.Plan(App.Positions.Connect,
         function (task) {
             let mode = 0

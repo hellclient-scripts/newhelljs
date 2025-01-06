@@ -1,5 +1,7 @@
+// 默认系统参数文件
 (function () {
-    let paramsModule = App.RequireModule("helllibjs/params/params.js")
+    let paramsModule = App.RequireModule("helllibjs/params/params.js") //使用params库,定义统一格式的可配置参数
+    // 默认设定,用户不可修改
     App.Params = {
         Drink: "shui dai",
         DrinkMin: 3,
@@ -35,8 +37,8 @@
     App.NamedParams.AddNumber("CoinKeep", 0).WithName("最小铜钱数").WithDesc("身上保持的最少铜钱的数量")
     App.NamedParams.AddNumber("CashMax", 200).WithName("最大银票数").WithDesc("超过这个数量会去银行存银票")
     App.NamedParams.AddNumber("CashKeep", 30).WithName("最小银票数").WithDesc("预期身上银票的合理数量")
-    App.NamedParams.AddNumber("NumCmds", 22).WithName("每心跳指令数").WithDesc("每个心跳的指令数0")
-    App.NamedParams.AddNumber("SenderTimer", 1200).WithName("发送间隔").WithDesc("发送指令的间隔")
+    App.NamedParams.AddNumber("NumCmds", 20).WithName("每心跳指令数").WithDesc("每个心跳的指令数0")
+    App.NamedParams.AddNumber("SenderTimer", 1100).WithName("发送间隔").WithDesc("发送指令的间隔")
     App.NamedParams.AddNumber("NumStep", 6).WithName("多步行走步数").WithDesc("多步行走时的最大步数,小于等于1强制单步")
 
     App.NamedParams.AddString("ShowRoomID", "").WithName("显示房间ID").WithDesc("设为t打开")

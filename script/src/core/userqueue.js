@@ -1,9 +1,12 @@
+//用户队列模块
 (function (App) {
     let userqueueModule = App.RequireModule("helllibjs/command/userqueue.js")
     App.UserQueue = {}
+    //响应别名
     App.UserQueue.OnAlias = function (n, l, w) {
         App.UserQueue.Exec(l)
     }
+    //执行入口
     App.UserQueue.Exec = function (cmd) {
         App.Commands.PushCommands(
             App.Commands.NewFunctionCommand(App.Init),
@@ -11,7 +14,7 @@
         )
         App.Next()
     }
-
+    //实例及初始化
     App.UserQueue.UserQueue = new userqueueModule.UserQueue(App.Commands)
     App.UserQueue.UserQueue.RegisterCommand("#wait", userqueueModule.Wait)
     App.UserQueue.UserQueue.RegisterCommand("#loop", userqueueModule.Loop)

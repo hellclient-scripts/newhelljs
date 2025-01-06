@@ -1,3 +1,4 @@
+//学习模块
 (function (App) {
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
 
@@ -29,6 +30,7 @@
         "厨娘": "chu niang",
         "李博渊": "li boyuan",
     }
+    //学习给钱的计划
     let PlanStudy = new App.Plan(App.Positions["Response"],
         (task) => {
             task.AddTrigger(matcherGiveMoney, function (tri, result) {
@@ -39,6 +41,7 @@
         , (result) => {
         }
     )
+    //学习的基本结构
     class Learn {
         constructor(line, defaultType) {
             line = line.trim()
@@ -58,6 +61,7 @@
             this.Before = data[5] ? data[5] : ""
             this.After = data[6] ? data[6] : ""
         }
+        //当前学习的介绍
         Intro() {
             let result = ""
             result += "技能ID " + this.SkillID
@@ -83,6 +87,7 @@
             }
             return result
         }
+        //执行学习
         Execute() {
             switch (this.Type) {
                 case "yanjiu":
@@ -188,9 +193,11 @@
                     return
             }
         }
+        //冷却当前学习
         Cooldown(interval) {
             this.Next = (new Date()).getTime() + interval
         }
+        //检查
         Check() {
             let skill = App.Data.Player.Skills[this.SkillID]
             if (skill) {
@@ -214,22 +221,23 @@
             }
 
             for (var limit of this.Limit) {
-                if (!isNaN(limit)) {
+                if (!isNaN(limit)) {//数字limit直接限制
                     if (skill && skill["等级"] >= limit) {
                         return false
                     }
                 }
                 let data = limit.trim().split(" ")
+                //limit可以有特殊设置
                 switch (data[0]) {
                     case "":
                         break
-                    case "pot":
+                    case "pot"://判断潜能
                         if (!isNaN(data[1])) {
                             if (App.Data.Player.HP["潜能"] < (data[1] - 0)) {
                                 return false
                             }
                         }
-                    default:
+                    default://相对其他技能限制,可以用 skill +100 或者 skill-100 的形式
                         let tskill = App.Data.Player.Skills[data[0]]
                         if (data[1] == null || isNaN(data1)) {
                             data[1] = "0"
@@ -263,6 +271,7 @@
         Next = 0
         DefaultType = ""
     }
+    //在给定的列表中，按mode和type进行过滤，选择合适的技能，important技能优先
     let filterskill = (list, mode, type) => {
         let filtered = []
         let important = null
@@ -304,9 +313,11 @@
         return null
 
     }
+    //按类型过滤技能
     App.Core.Study.FilterSkill = (type) => {
         return filterskill(App.Core.Study.Learn, App.Core.Study.LearnMode, type)
     }
+    //获取所有可以学习的技能
     App.Core.Study.AllCanLearn = () => {
         let result = []
         App.Core.Study.Learn.forEach(learn => {
@@ -316,6 +327,7 @@
         })
         return result
     }
+    //获取所有可以lian的技能
     App.Core.Study.AllCanLian = () => {
         let result = []
         App.Core.Study.Lian.forEach(learn => {
@@ -325,16 +337,19 @@
         })
         return result
     }
+    //获取一个lian技能
     App.Core.Study.FilterLian = (type) => {
         return filterskill(App.Core.Study.Lian, App.Core.Study.LianMode, type)
     }
     App.Core.Study.CurrentSkill = null
     App.Core.Study.LastPot = 0
     App.Core.Study.LearndTimes = 0
+    //判断是否到了minpot
     App.Core.Study.HitMinPot = () => {
         let minpot = GetVariable("min_pot")
         return (!isNaN(minpot) && App.Data.Player.HP["潜能"] < (minpot - 0)) || App.Data.Player.HP["潜能"] <= 10
     }
+    //执行学习
     App.Core.Study.DoLearn = (context) => {
         if (!App.Core.Study.HitMinPot()) {
             if (App.Core.Study.CurrentSkill == null) {
@@ -344,7 +359,7 @@
                 }
             }
             if (App.Core.Study.CurrentSkill) {
-                if (App.Data.Player.HP["潜能"] >= App.Core.Study.LastPot) {
+                if (App.Data.Player.HP["潜能"] >= App.Core.Study.LastPot) {//多次学习潜能没减少，则进入冷却
                     App.Core.Study.LearndTimes++
                 } else {
                     App.Core.Study.LearndTimes = 0
@@ -365,6 +380,7 @@
         }
         App.Next()
     }
+    //加载学习设置
     App.Core.Study.Load = () => {
         App.Core.Study.Init()
         App.LoadVariable("jiqu").forEach(data => {
@@ -463,6 +479,7 @@
 
     }
     App.Core.Study.Load()
+    //修改study变量，设置学习内容
     App.Core.Study.SetLearn = (type, skill, from, loc) => {
         let lines = GetVariable("study").split("\n")
         if (lines.length == 1 && lines[0] == "") {
@@ -472,6 +489,7 @@
         SetVariable("study", lines.join("\n"))
         App.ReloadVariable()
     }
+    //修改study变量，设置老师
     App.Core.Study.SetTeacher = (id, loc) => {
         let lines = GetVariable("study").split("\n")
         if (lines.length == 1 && lines[0] == "") {
@@ -490,6 +508,7 @@
         SetVariable("study", lines.join("\n"))
         App.ReloadVariable()
     }
+    //注册#yanjiu别名
     App.Sender.RegisterAlias("#yanjiu", function (data) {
         let minpot = GetVariable("min_pot")
         if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
@@ -509,6 +528,7 @@
             }
         }
     })
+    //注册#lian别名
     App.Sender.RegisterAlias("#lian", function () {
         let skill = App.Core.Study.FilterLian("lian")
         if (skill) {
@@ -524,10 +544,11 @@
             App.Send("yun recover;yun regenerate;hp")
         }
     })
+    //注册#yanjiulian别名
     App.Sender.RegisterAlias("#yanjiulian", function (data) {
         let skill
         let minpot = GetVariable("min_pot")
-        let learned = false
+        let learned = false//防止发送多个hp
         if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
             skill = App.Core.Study.FilterSkill()
             if (skill && skill.Type == "yanjiu") {
@@ -561,7 +582,7 @@
             App.Send("yun recover;yun regenerate;hp")
         }
     })
-
+    //注册jiqu准备
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let max = context["JiquMax"] != null ? context["JiquMax"] : App.Core.Study.Jiqu.Max
         if (App.Data.Player.HP["经验"] > 100000 && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
@@ -580,6 +601,7 @@
         }
         return null
     }))
+    //注册study准备
     App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Core.Study.HitMinPot()) {
             return null
@@ -606,6 +628,7 @@
         }
         return null
     }))
+    //注册#study用户队列
     App.UserQueue.UserQueue.RegisterCommand("#study", function (uq, data) {
         uq.Commands.Append(
             App.NewPrepareCommand("commonWithStudy"),
@@ -613,9 +636,11 @@
         )
         uq.Commands.Next()
     })
+    //技能提升后重新设置学习
     App.BindEvent("core.skillimproved", function () {
         App.Core.Study.CurrentSkill = null
     })
+    //注册#jifa别名，带参数会过滤jifa变量
     App.Sender.RegisterAlias("#jifa", function (data) {
         data = data.trim()
         if (data) {
@@ -624,9 +649,11 @@
             App.Send(GetVariable("jifa"))
         }
     })
+    //注册#jiqu别名
     App.Sender.RegisterAlias("#jiqu", function (data) {
         App.Send(App.Random(App.Core.Study.Jiqu.Commands))
     })
+    //注册#jifa指令
     App.UserQueue.UserQueue.RegisterCommand("#jifa", function (uq, data) {
         uq.Commands.Append(
             App.Commands.NewDoCommand(GetVariable("jifa")),
@@ -634,6 +661,7 @@
         )
         uq.Commands.Next()
     })
+    //获取指定base的激发指令
     App.Core.Study.GetJifaCommand = (base) => {
         let cmd = ""
         GetVariable("jifa").split("\n").forEach((line) => {

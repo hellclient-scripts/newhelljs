@@ -1,3 +1,4 @@
+//参数加载模块
 (function (App) {
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
     App.Core.Params = {}
@@ -21,6 +22,7 @@
         })
         App.QuestNamedParams.SetStringValues(App.Core.Params.QuestData)
     }
+    //设置参数函数，第一个参数为变量名,第二个参数为变量值
     App.Core.Params.Set = (id, val) => {
         let result = []
         let matched = false
@@ -41,6 +43,7 @@
         SetVariable("params", result.join("\n"))
         App.ReloadVariable()
     }
+    //设置任务参数函数，第一个参数为变量名,第二个参数为变量值
     App.Core.Params.SetQuest = (id, val) => {
         let result = []
         let matched = false
@@ -61,6 +64,6 @@
         SetVariable("quest_params", result.join("\n"))
         App.ReloadVariable()
     }
-
+    //加载参数
     App.Core.Params.Load()
 })(App)

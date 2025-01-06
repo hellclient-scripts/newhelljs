@@ -1,9 +1,13 @@
+//副本基础模块
 (function (App) {
     let line = App.Include("helllibjs/lib/line/line.js")
 
     App.Core.Fuben = {}
+    //最后一次副本的事件
     App.Core.Fuben.Last = 0
+    //当前副本
     App.Core.Fuben.Current = null
+    //创建新的副本地图
     App.Core.Fuben.NewMaze = () => {
         if (App.Core.Fuben.Current) {
             App.Core.Fuben.Current.Destory()
@@ -20,6 +24,7 @@
     }
     App.Map.AppendTagsIniter(App.Core.Fuben.OnInitTags)
     let matcherLine = /^([◎─ ●│]+)$/
+    //副本迷宫解析类
     class Maze {
         Prefix = "mazemap"
         Rooms = []
@@ -51,7 +56,7 @@
 
         }
     }
-
+    //处理副本地图的计划
     let PlanMazeMap = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -126,6 +131,7 @@
             App.Core.Fuben.Current = null
         }
     )
+    //加载副本地图
     App.Core.Fuben.LoadMazeMap = () => {
         App.Commands.PushCommands(
             App.Commands.NewPlanCommand(PlanMazeMap)

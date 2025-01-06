@@ -1,14 +1,17 @@
+//房间处理模块
 (function (App) {
     let objectModule = App.RequireModule("helllibjs/object/object.js")
     let mapModule = App.RequireModule("helllibjs/map/map.js")
 
     App.Core.Room = {}
     App.Core.Room.Current = null
+    //创建实例，绑定position
     App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
         App.Map.Room.WithData("Objects", new objectModule.List())
     }
     initRoom()
+    //处理房间名
     App.Engine.SetFilter("core.normalroomname", function (event) {
         let words = App.History.CurrentOutput.Words
         if (words.length == 1 && words[0].Color != "" && words[0].Bold == true) {
@@ -22,6 +25,7 @@
     }
     App.BindEvent("core.roomname", App.Core.Room.OnName)
     reExit = /[a-z]+/g
+    //响应房间出口
     App.Core.Room.OnExit = function (event) {
         App.Map.EnterNewRoom(App.Core.Room.Current)
         initRoom()
@@ -36,6 +40,7 @@
     let matcherOnHeal = /^    (\S{2,8})正坐在地下(.+)。$/
     let matcherOnYanlian = /^    (\S{2,8})正在演练招式。$/
     let matcherOnObj = /^    ((\S+) )?(\S*[「\(].+[\)」])?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
+    //处理得到出口之后的信息(npc和道具列表)的计划
     var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherOnObj, function (trigger, result, event) {
@@ -69,6 +74,7 @@
                 if (output.length > 4 && output.startsWith("    ") && output[4] != " ") {
                     return true
                 }
+                //未匹配过的行代表npc和道具结束
                 return event.Context.Get("core.room.onobject")
             })
         }, function (result) {
@@ -82,7 +88,9 @@
                 App.RaiseEvent(new App.Event("core.roomentry"))
             }
         })
+    //处理id here指令
     let matcherIDHere = /^(\S+)\s*=\s*([^、]+)/
+    //根据id here的计划记录信息的计划
     var PlanOnIDHere = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherIDHere, function (trigger, result, event) {
@@ -104,6 +112,7 @@
         })
     }
     App.BindEvent("core.idhere", App.Core.Room.OnIDHere)
+    //非战斗房间的记录，可以通过这个防止在非战斗房间发呆
     App.BindEvent("core.nofight", function () {
         App.Map.Room.Data["NoFight"] = true
     })

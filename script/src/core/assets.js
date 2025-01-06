@@ -1,3 +1,4 @@
+//物品售卖模块
 (function (App) {
     let assetsModule = App.RequireModule("helllibjs/assets/assets.js")
     let conditionsModule = App.RequireModule("helllibjs/conditions/conditions.js")
@@ -7,17 +8,18 @@
     App.Core.Assets.Rules = []
     App.Core.Assets.StaticRules = []
     App.Core.Assets.GoodsRules = []
+    // 配置文件的匹配条件
     App.Core.Assets.MatchFunction = function (rule, asset) {
         switch (rule.Data.Name) {
-            case "any":
+            case "any"://任意
                 break
             case "":
-            case "id":
+            case "id"://id 匹配,默认
                 if (!(rule.Data.UserData.includes(asset.Item.ID))) {
                     return
                 }
                 break
-            case "name":
+            case "name"://中文名匹配
                 if (!(rule.Data.UserData.includes(asset.Item.GetData().Name))) {
                     return
                 }
@@ -25,14 +27,17 @@
             default:
                 return
         }
+        // 再做一轮添加匹配
         if (!App.Core.Assets.Conditions.Check(rule.Data.Conditions, asset)) {
             return
         }
         return rule.Data.Command
     }
+    //将单行文本解析为处理规则
     App.Core.Assets.ParseRule = function (data) {
         return App.Assets.Parse(data, App.Core.Assets.MatchFunction)
     }
+    //读取变量中的规则列表
     App.Core.Assets.LoadRules = function () {
         App.Core.Assets.Rules = []
         App.LoadVariable("sell").forEach(data => {
@@ -40,6 +45,7 @@
         })
     }
     App.Core.Assets.LoadRules()
+    //读取默认配置
     App.LoadLines("data/assets.txt").forEach(data => {
         App.Core.Assets.StaticRules.push(App.Core.Assets.ParseRule(data))
     })
@@ -60,7 +66,7 @@
     App.Core.Assets.GoMaintain = function (result) {
         if (result) {
             switch (result.Command) {
-                case "#sell":
+                case "#sell"://出售
                     App.Commands.PushCommands(
                         App.Move.NewToCommand("48"),
                         App.Commands.NewDoCommand("sell " + result.Asset.Item.IDLower),
@@ -68,7 +74,7 @@
                         App.NewSyncCommand(),
                         App.Commands.NewWaitCommand(1000),)
                     break
-                case "#drop":
+                case "#drop"://丢到客店
                     App.Commands.PushCommands(
                         App.Move.NewToCommand("26"),
                         App.Commands.NewDoCommand("drop " + result.Asset.Item.IDLower),
@@ -77,14 +83,14 @@
                         App.Commands.NewWaitCommand(1000),
                     )
                     break
-                case "#drophere":
+                case "#drophere"://原地丢
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand("drop " + result.Asset.Item.IDLower),
                         App.Commands.NewDoCommand("i"),
                         App.NewSyncCommand(),
                     )
                     break
-                case "#store":
+                case "#store"://存起来
                     if (App.Data.Item.List.FindByID("qiankun bag").First()) {
                         App.Commands.PushCommands(
                             App.Commands.NewDoCommand("keep " + result.Asset.Item.IDLower),
@@ -100,7 +106,7 @@
                         )
                     }
                     break
-                case "#pack":
+                case "#pack"://打包带身上
                     if (App.Data.Item.List.FindByID("qiankun bag").First()) {
                         App.Commands.PushCommands(
                             App.Commands.NewDoCommand("keep " + result.Asset.Item.IDLower),
@@ -122,7 +128,7 @@
                         )
                     }
                     break
-                case "#use":
+                case "#use"://直接使用(勋章)
                     App.Commands.PushCommands(
                         App.Commands.NewDoCommand("use " + result.Asset.Item.IDLower),
                         App.Commands.NewDoCommand("i;donate"),
@@ -136,7 +142,9 @@
         }
         App.Next()
     }
+    //准备时的上下文
     App.Core.Assets.PrepareDataKey = "assetsrules"
+    //注册一个处理物品的准备
     App.Proposals.Register("assets", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let canStore = (App.Data.Item.List.FindByID("qiankun bag").First() != null) || (GetVariable("house").trim() != "" && App.Data.Item.List.FindByID("key").First() != null)
         for (item of App.Data.Item.List.Items) {

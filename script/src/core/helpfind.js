@@ -1,3 +1,4 @@
+//help 模块
 (function (App) {
     App.Core.HelpFind = {}
     var data_helpfind = {}
@@ -75,11 +76,11 @@
         data_lasthelp_time = t
         Broadcast("help " + GetWorldInfo() + " " + name, true)
     }
+    //清理数据
     function on_gc() {
-        //借宝地一用	
         var t = (new Date()).getTime()
         for (var key in data_helpfind) {
-            if (t - data_helpfind[key] > 60000) {
+            if (t - data_helpfind[key] > 600000) {
                 delete data_helpfind[key]
             }
         }

@@ -1,4 +1,6 @@
+//用户信息模块
 (function (App) {
+    //武学技能列表
     let martial = {
         "force": true,
         "dodge": true,
@@ -20,6 +22,7 @@
         "axe": true,
         "poison": true,
     }
+    //空手技能列表
     let unarmedskill = {
         "unarmed": true,
         "cuff": true,
@@ -28,6 +31,7 @@
         "hand": true,
         "claw": true,
     }
+    //武器技能列表
     let weaponskill = {
         "sword": true,
         "blade": true,
@@ -39,6 +43,7 @@
         "throwing": true,
         "axe": true,
     }
+    //音乐技能列表
     let music = {
         "chuixiao-jifa": true,
         "guzheng-jifa": true,
@@ -53,6 +58,7 @@
         Skills: {},
         Jifa: {},
     }
+    //HP的checker
     let checkerHP = App.Checker.Register("hp", "yun recover;yun regenerate;hp", 5000)
     // ┌───个人状态────────────┬───────────────────┐
     // │【精气】 160     / 160      [100%]    │【精力】 0       / 0       (+   0)    │
@@ -69,7 +75,7 @@
     var matcherHPLine4 = /^│【饮水】\s*(-?\d+)\s*\/\s+(-?\d+)\s*\[.+\]\s+│【经验】\s+(-?\d+)\s+│$/
     var matcherHPLine5 = /^│\s+│【体会】\s+(-?\d+)\s+│$/
     var matcherHPEnd = /^└─+.+─+─┘$/
-
+    //响应hp指令的计划
     var PlanOnHP = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherHPLine1, function (trigger, result, event) {
@@ -124,6 +130,7 @@
     // 杀气(hatred)
     // 小周天运转(self)
     matcherSpecial = /^\S+\(([a-z]+)\)$/
+    //响应special指令的计划
     var PlanOnSpecial = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherSpecial, function (trigger, result, event) {
@@ -161,6 +168,7 @@
         })
 
     }
+    //score的checker
     let checkerScore = App.Checker.Register("score", "score", 600000)
 
     App.BindEvent("core.score", App.Core.OnScore)
@@ -171,6 +179,7 @@
     var matcherScoreYueli = /^│灵慧：(\d+)\s+正气：(\d+)\s+│阅历：(\d+)\s+│$/
     var matcherScoreMenzhong = /^│住宅：(\S+)\s+│门贡：(\d+)\s*点\s*│$/
     var matcherScoreBreakup = /^│武学宗师：(\S)\s*任督二脉：(\S)\s*│杀害玩家：.*│$/
+    //响应score指令的计划
     var PlanOnScore = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherScoreFamily, function (trigger, result, event) {
@@ -209,8 +218,8 @@
             checkerScore.Reset()
         })
 
-    var LastType = ""
-    var LastBasic = ""
+    var LastType = ""//skills的最后一个类型(当前类型)
+    var LastBasic = ""//skills的最后一个基本(当前基本)
     App.Core.OnSkills = function (event) {
         event.Context.Propose(function () {
             App.Data.Player.Skills = {}
@@ -219,6 +228,7 @@
             PlanOnSkills.Execute()
         })
     }
+    //计算最大等级
     App.Core.GetMaxSkillLevel = function () {
         let max = 0
         let maxskill = null
@@ -233,6 +243,7 @@
         }
         return maxskill
     }
+    //skills的checker
     let checkerSkills = App.Checker.Register("skills", "skills", 300000)
     App.BindEvent("core.skills", App.Core.OnSkills)
     // ┌─────────────┬─────────────┬──────┬──────┐
@@ -250,6 +261,7 @@
     var matcherSkillsType = /^├─+.+项([^─]+)─+┼─+┼─+┼─+┤$/
     var matcherSkills = /^│(  |□)(\S+)\s+│(\S+)\s+│【.+】│\s*(\d+) \/\s*(\d+)\s*│$/
     var matcherSkillsEnd = /^└─*┴─*┴─*┴─*┘$/
+    //处理skills结果的计划
     var PlanOnSkills = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherSkillsType, function (trigger, result, event) {
@@ -297,13 +309,14 @@
     }
     App.BindEvent("core.noskill", App.Core.OnNoSkill)
 
-
+    //cha force(检查是否正确激活了内功，失败基本是挂了)
     App.Core.OnChaForce = function (event) {
         event.Context.Propose(function () {
             App.Data.Player.NoForce = true
             PlanOnChaForce.Execute()
         })
     }
+    //cha force的计划
     var PlanOnChaForce = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherSkills, function (trigger, result, event) {
@@ -316,7 +329,7 @@
             task.AddTrigger(matcherSkillsEnd)
         })
     App.BindEvent("core.chaforce", App.Core.OnChaForce)
-
+    //处理hp -m信息
     App.Core.OnHPM = function (event) {
         event.Context.Propose(function () {
             App.Data.Player.HPM = {}
@@ -334,7 +347,7 @@
     var matcherHMP2 = /^【潜能上限】\s*(\S+)\s*【体会上限】\s*(\S+)\s*$/
     var matcherHMP3 = /^【当前等级】\s*(\S+)\s*【升级所需】\s*(\S+)\s*$/
     var matcherHMP4 = /^【最大加怒】\s*(\S+)\s*【最大加力】\s*(\S+)\s*$/
-
+    //处理hp -m的计划
     var PlanOnHPM = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherHMP1, function (trigger, result, event) {
@@ -363,9 +376,11 @@
         function (result) {
             checkerHPM.Reset()
         })
-
+    //hpm的checker
     let checkerHPM = App.Checker.Register("hpm", "hp -m", 300000)
+    App.BindEvent("core.hpm", App.Core.OnHPM)
 
+    //jifa的checker
     let checkerJifa = App.Checker.Register("jifa", "jifa", 30 * 60 * 1000)
     App.Core.OnJifa = function (event) {
         event.Context.Propose(function () {
@@ -382,6 +397,7 @@
     // ├───其他功夫────┼───────────┼───────────┤
     // └───────────┴───────────┴───────────┘
     let matcherJifa = /^│(\S+) \((.+)\)\s*│(\S+)\s*│有效等级：\s*(\d+)\s*│$/
+    //处理jifa结果的计划
     var PlanOnJifa = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherJifa, function (trigger, result, event) {
@@ -407,16 +423,18 @@
     }
     App.BindEvent("core.nojifa", App.Core.OnNoJifa)
 
-    App.BindEvent("core.hpm", App.Core.OnHPM)
+    //技能升级时重置相关的checker
     App.BindEvent("core.skillimproved", function () {
         checkerHPM.Force()
         checkerSkills.Force()
         checkerJifa.Force()
     })
+    //获取最大经验设置
     App.Core.GetMaxExp = () => {
         let expmax = GetVariable("max_exp").trim()
         return (expmax && !isNaN(expmax)) ? expmax - 0 : 0
     }
+    //离开pkd的计划
     let PlanLeavePkd = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -437,7 +455,7 @@
             App.Fail()
         }
     )
-
+    //吃magic water的计划
     let PlanEatLu = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -457,6 +475,7 @@
             App.Fail()
         }
     )
+    //pkd的放箭名
     let pkd = {
         "屠人场": true,
         "宰人场": true,
@@ -471,6 +490,7 @@
         "诛人场": true,
         "戮人场": true,
     }
+    //吃magic water的指令
     App.Core.EatLu = () => {
         $.PushCommands(
             $.To("306"),
@@ -488,6 +508,7 @@
         )
         $.Next()
     }
+    //donate的checker
     let checkerDonate = App.Checker.Register("donate", "donate", 30 * 60 * 1000)
     App.Core.OnDonate = function (event) {
         checkerDonate.Reset()

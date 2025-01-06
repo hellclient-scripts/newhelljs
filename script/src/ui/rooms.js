@@ -1,3 +1,4 @@
+// 房间列表功能
 (function (App) {
     App.UI.Rooms = {}
     App.UI.Rooms.Grid = Userinput.newdatagrid("房间信息", "rooms.h房间信息")

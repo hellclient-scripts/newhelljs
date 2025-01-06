@@ -1,9 +1,12 @@
+//道具处理模块
 (function (App) {
     let goodsModule = App.RequireModule("helllibjs/goods/goods.js")
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
 
     App.Core.Goods = {}
+    //商品实例
     App.Goods = new goodsModule.Goods()
+    //道具设置
     let file = "data/items.txt"
     Note("加载物品文件" + file)
     ReadLines(file).forEach(line => {
@@ -12,6 +15,7 @@
             App.Goods.LoadCSV(line, '|')
         }
     });
+    //购买函数
     let buyer = function (good) {
         App.PushCommands(
             App.Move.NewToCommand(good.From),
@@ -24,6 +28,7 @@
     }
     App.Goods.RegisterBuyer("", buyer)
     App.Goods.RegisterBuyer("buy", buyer)
+    //注册指令
     App.Commands.RegisterExecutor("buy", function (commands, running) {
         running.OnStart = function (arg) {
             let good = App.Goods.GetGood(running.Command.Data)
@@ -39,8 +44,10 @@
     App.Goods.NewBuyCommand = function (key) {
         return App.Commands.NewCommand("buy", key)
     }
+    //吃喝相关
     let LastEat = 0
     let IntervalEat = 10000
+    //吃喝，参数为是否强制吃喝，比如在沙漠
     App.Eat = function (force) {
         let now = (new Date()).getTime()
         if (force || (now - LastEat > IntervalEat)) {
@@ -54,6 +61,7 @@
     })
 
     App.Core.Goods.Items = []
+    //加载道具设置
     App.Core.Goods.Load = function () {
         App.Core.Goods.Items = []
         let items = []
@@ -65,14 +73,14 @@
                     item.Command = "#buy"
                 }
                 switch (item.Command) {
-                    case "#buy":
+                    case "#buy"://购买
                         if (App.Goods.GetGood(item.Data) == null) {
                             Note("物品 " + item.Data + " 未找到。")
                             return
                         }
                         break
-                    case "#fetch":
-                    case "#qu":
+                    case "#fetch"://从qiankun bag拿
+                    case "#qu"://从箱子里取
                         break
                     default:
                         PrintSystem(`item变量有未知的道具指令${item.Command}`)
@@ -86,6 +94,7 @@
         }
     }
     App.Core.Goods.Load()
+    //从乾坤袋里取，没有就放弃
     let fetch = (f, item) => {
         let num = item.Param - 0
         if (isNaN(num) || num < 0) {
@@ -101,6 +110,7 @@
         App.Next()
 
     }
+    //注册item的准备
     App.Proposals.Register("item", App.Proposals.NewProposal(function (proposals, context, exclude) {
         for (item of App.Core.Goods.Items) {
             let num = isNaN(item.Number) ? 1 : (item.Number - 0)
@@ -161,7 +171,7 @@
         }
         return null
     }))
-
+    //注册buy的用户队列
     App.UserQueue.UserQueue.RegisterCommand("#buy", function (uq, data) {
         let item = data.trim()
         if (!item || App.Goods.GetGood(item) == null) {

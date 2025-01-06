@@ -1,7 +1,11 @@
+//驱散模块
 (function (App) {
     App.Core.Dispel = {}
+    //是否需要驱散
     App.Core.Dispel.Need = false
+    //是否驱散失败
     App.Core.Dispel.Fail = false
+    //是否致命毒
     App.Core.Dispel.Deadly = false
     App.BindEvent("core.dispelok", function () {
         App.Core.Dispel.Need = false
@@ -17,6 +21,7 @@
     App.BindEvent("core.notdispelable", function () {
         App.Core.Dispel.Fail = true
     })
+    //注册解毒的准备
     App.Proposals.Register("dispel", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Core.Dispel.Need && App.Core.Dispel.Deadly && (App.Data.Player.HP["气血百分比"] <= 10 || App.Data.Player.HP["精气百分比"] <= 10)) {
             Note("致命毒")

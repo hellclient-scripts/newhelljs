@@ -1,3 +1,4 @@
+//显示md格式的帮助函数
 (function (App) {
     App.Core.Help = {}
     App.Core.Help.Show = function (file) {

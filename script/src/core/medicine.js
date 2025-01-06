@@ -1,12 +1,14 @@
+//吃药模块
 (function (App) {
     App.Core.Medicine = {}
     App.Core.Medicine.All = []
-    App.Core.Medicine.Interval = 3000
+    App.Core.Medicine.Interval = 3000//同一类药的吃药间隔
     App.Core.Medicine.Next = {}
     App.Core.Medicine.Next.疗伤 = 0
     App.Core.Medicine.Next.疗精 = 0
     App.Core.Medicine.Next.回精 = 0
     App.Core.Medicine.Next.回内 = 0
+    //药的基本结构
     class Medicine {
         ID = ""
         Name = ""
@@ -15,6 +17,7 @@
         回精 = false
         回内 = false
     }
+    //加载默认设置
     App.LoadLines("data/medicine.txt", "|").forEach((data) => {
         let med = new Medicine()
         med.Name = data[0]
@@ -36,6 +39,7 @@
         })
         return result.join("\n")
     }
+    //吃药
     let eatyao = (type) => {
         var now = (new Date()).getTime()
         if (now < App.Core.Medicine.Next[type]) {
@@ -56,6 +60,7 @@
         return null
 
     }
+    //注册一个eatyao的准备
     App.Proposals.Register("eatyao", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Data.Player.HP["当前精力"] < App.Params.NumJingliMin && App.Data.Player.HP["精力上限"] > 2 * App.Params.NumJingliMin) {
             return eatyao("回精")

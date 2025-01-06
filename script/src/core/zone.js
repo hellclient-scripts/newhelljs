@@ -1,10 +1,13 @@
+//区与模块
 (function (App) {
     App.Zone = {}
     App.Zone.Maps = {}
     App.Zone.Info = {}
+    //将起点和路径传为带房间id的path
     let convertPath = function (fr, cmds) {
         return App.Map.TraceRooms(fr, ...cmds.split(";"))
     }
+    //加载默认数据
     App.LoadLines("data/zones.txt", "|").forEach((data) => {
         switch (data[1]) {
             case "path":
@@ -14,6 +17,7 @@
                 PrintSystem("无效的路径类型" + data[1])
         }
     })
+    //加载小二信息
     App.LoadLines("data/info.txt", "|").forEach((data) => {
         App.Zone.Info[data[0]] = {
             ID: data[0],
@@ -29,60 +33,73 @@
     let CheckerIDLower = function (wanted) {
         return App.Map.Room.Data.Objects.FindByIDLower(wanted.Target).First()
     }
+    //默认的下一步回调
     App.Zone.DefaultNext = function (map, move, wanted) {
         move.Walk(map)
     }
+    //遍历目标结构
     class Wanted {
         constructor(target, zone) {
             this.Target = target
             this.Zone = zone
         }
-        Target = ""
-        Name = ""
-        Zone = ""
-        ID = ""
-        Loc = null
-        OnFound = null
-        SingleStep = false
-        Ordered = true
-        Next = App.Zone.DefaultNext
+        Target = ""//目标
+        Name = ""//名字
+        Zone = ""//去与
+        ID = ""//ud
+        Loc = null//位置
+        OnFound = null//找到的回调
+        SingleStep = false//是否单布
+        Ordered = true//是否按顺序
+        Next = App.Zone.DefaultNext//下一步的回调
+        Checker = DefaultChecker//检查函数
+        //链式调用
         WithID(id) {
             this.ID = id
             return this
         }
+        //链式调用
         WithLoc(loc) {
             this.Loc = loc
             return this
         }
+        //链式调用
         WithOnFound(found) {
             this.OnFound = found
             return this
         }
+        //链式调用
         WithSingleStep(s) {
             this.SingleStep = App.Params.NumStep <= 1
             return this
         }
+        //链式调用
         WithChecker(c) {
             this.Checker = c
             return this
         }
+        //链式调用
         WithOrdered(o) {
             this.Ordered = o
             return this
         }
+        //链式调用
         WithNext(next) {
             this.Next = next
             return this
         }
-        Checker = DefaultChecker
     }
+    //创建新的遍历目标
     App.NewWanted = function (target, zone) {
         return new Wanted(target, zone)
     }
+    //创建新的遍历目标，id部分大小写
     App.NewIDLowerWanted = function (target, zone) {
         return new Wanted(target, zone).WithChecker(CheckerIDLower)
     }
+    //当前目标
     App.Zone.Wanted = null
+    //注册用户队列
     App.UserQueue.UserQueue.RegisterCommand("#search", function (uq, data) {
         let result = SplitN(data, " ", 2)
         if (result.length != 2) {
@@ -102,6 +119,7 @@
         )
         uq.Commands.Next()
     })
+    //Finder路径初始化器
     App.Zone.Finder = function (move, map) {
         wanted = App.Zone.Wanted
         move.Option.MultipleStep = wanted.SingleStep != true
@@ -124,6 +142,7 @@
             wanted.Next(map, move, wanted)
         }
     }
+    //search区域名方法
     App.Zone.Search = function (wanted) {
         let rooms = App.Zone.Maps[wanted.Zone]
         if (!rooms) {
@@ -133,6 +152,7 @@
         }
         App.Zone.SearchRooms(rooms, wanted)
     }
+    //search指定房间
     App.Zone.SearchRooms = function (rooms, wanted) {
         App.Zone.Wanted = wanted
         wanted.Loc = null
@@ -166,6 +186,7 @@
         )
         App.Next()
     }
+    //注册#killin的用户队列
     App.UserQueue.UserQueue.RegisterCommand("#killin", function (uq, data) {
         let result = SplitN(data, " ", 2)
         if (result.length != 2) {

@@ -1,5 +1,6 @@
+// 任务参数组件
 (function () {
-    let paramsModule = App.RequireModule("helllibjs/params/params.js")
+    let paramsModule = App.RequireModule("helllibjs/params/params.js")//使用params库,定义统一格式的可配置参数
     App.QuestParams = {
     }
     App.QuestNamedParams = new paramsModule.Params(App.QuestParams)

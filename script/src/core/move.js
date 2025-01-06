@@ -1,9 +1,12 @@
+//移动模块
 (function (App) {
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     let dfsModule = App.RequireModule("helllibjs/map/dfs.js")
+    //多步移动判断
     App.Map.Movement.MultipleStepConverter.Checker = function (step, index, move, map) {
         return index != 0 && dfsModule.Backward[step.Command] != null
     }
+    //定位命令
     App.Map.Movement.DefaultLocateNext = (move, map, locate) => {
         //避免被关在房间里
         if (App.Map.Room.Exits.length == 0) {
@@ -16,10 +19,11 @@
         App.Map.Room.Keep = true
         App.Send("l")
     }
+    //注册#l别名
     App.Sender.RegisterAlias("#l", function (data) {
         App.Look()
     })
-
+    //移动模块切换指令
     App.Map.OnModeChange = (map, old, mode) => {
         if (mode == "locate") {
             App.Send("unset brief")
@@ -37,6 +41,7 @@
         }
         return dir
     }
+    //移动跟踪
     App.Map.Trace = function (map, rid, dir) {
         var flylist = Mapper.flylist()
         var exits = Mapper.getexits(rid)
@@ -48,24 +53,29 @@
         })
         return result
     }
+    //创建固定路线移动
     App.Move.NewPath = function (path, ...initers) {
         let pathlist = path.map(value => typeof value == "string" ? App.Map.NewStep(value) : value)
         return App.Map.NewRoute(new App.Map.Movement.Path(pathlist), ...initers)
     }
+    //创建定点路线移动
     App.Move.NewTo = function (target, ...initers) {
         if (typeof target == "string") {
             target = target.split(",").map((val) => val.trim())
         }
         return App.Map.NewRoute(new App.Map.Movement.To(target), ...initers)
     }
+    //创建房间路线移动
     App.Move.NewRooms = function (rooms, ...initers) {
         return App.Map.NewRoute(new App.Map.Movement.Rooms(rooms), ...initers)
     }
+    //创建固定房间移动
     App.Move.NewOrdered = function (rooms, ...initers) {
         return App.Map.NewRoute(new App.Map.Movement.Ordered(rooms), ...initers)
     }
     App.Move.LongtimeStepDelay = 60 * 1000
     App.Move.RetryStep = false
+    //移动的计划，移动失败处理
     App.Map.StepPlan = new App.Plan(
         App.Map.Position,
         function (task) {
@@ -136,6 +146,7 @@
             }
         }
     )
+    //移动休息(内力/体力不足)处理
     App.Move.NeedRest = function () {
         let snap = App.Map.Snap()
         App.Commands.Insert(
@@ -150,6 +161,7 @@
         App.Next()
 
     }
+    //移动失败处理
     App.Move.OnWalkFail = function (name) {
         $.RaiseStage("wait")
         App.Map.Position.Wait(1000, 0, () => {
@@ -157,9 +169,11 @@
             App.Core.Blocker.BlockStepRetry()
         })
     }
+    //被拦截处理
     App.Move.OnBlocker = function (name) {
         App.Core.Blocker.KillBlocker(name)
     }
+    //房间名回显
     App.BindEvent("core.roomentry", function (event) {
         event.Context.ProposeLater(function () {
             App.Map.OnWalking()
@@ -174,6 +188,7 @@
     mapModule.DefaultOnCancel = function (move, map) {
         App.Fail()
     }
+    //注册path指令
     App.Move.NewPathCommand = function (path, ...initers) {
         return App.Commands.NewCommand("path", { Target: path, Initers: initers })
     }
@@ -186,6 +201,7 @@
             App.Move.NewPath(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })
+    //注册to指令
     App.Move.NewToCommand = function (target, ...initers) {
         return App.Commands.NewCommand("to", { Target: target, Initers: initers })
     }
@@ -201,7 +217,7 @@
             App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
         }
     })
-
+    //注册rooms指令
     App.Move.NewRoomsCommand = function (target, ...initers) {
         return App.Commands.NewCommand("rooms", { Rooms: target, Initers: initers })
     }
@@ -210,7 +226,7 @@
             App.Move.NewRooms(running.Command.Data.Rooms, ...running.Command.Data.Initers).Execute()
         }
     })
-
+    //注册ordered指令
     App.Move.NewOrderedCommand = function (target, ...initers) {
         return App.Commands.NewCommand("ordered", { Rooms: target, Initers: initers })
     }
@@ -219,19 +235,22 @@
             App.Move.NewOrdered(running.Command.Data.Rooms, ...running.Command.Data.Initers).Execute()
         }
     })
-
+    //to别名
     App.Move.To = function (target) {
         App.Commands.Execute(App.Move.NewToCommand(target))
         App.Next()
     }
+    //rooms别名
     App.Move.Rooms = function (rooms) {
         App.Commands.Execute(App.Move.NewRoomsCommand(rooms))
         App.Next()
     }
+    //ordered别名
     App.Move.Ordered = function (rooms) {
         App.Commands.Execute(App.Move.NewOrderedCommand(rooms))
         App.Next()
     }
+    //加载设置
     App.Move.Load = () => {
         App.Map.Movement.MaxStep = App.Params.NumStep
     }

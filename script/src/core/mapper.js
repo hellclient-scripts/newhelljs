@@ -1,14 +1,18 @@
+//地图模块
 (function (App) {
     let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
     App.Mapper = {}
     App.Mapper.Lines = []
     roomshModule.CostToken = "%"
+    //roomsh实例
     App.RoomsH = new roomshModule.File()
     let mapfile = "data/rooms.h"
     Note("加载地图文件" + mapfile)
+    //加载地图
     App.RoomsH.Load(ReadLines(mapfile))
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
+    //添加房子
     App.Mapper.Addhouse = function (line) {
         if (line) {
             var data = line.split(" ")
@@ -72,7 +76,7 @@
             App.Mapper.Lines.push(line.Raw)
         }
     });
-
+    //加载额外出口
     App.LoadLines("data/exits.h", "|").forEach((data) => {
         App.Mapper.AddPath(data[0], data[1])
     })
@@ -102,6 +106,7 @@
         App.RaiseEvent(event)
     })
     App.Mapper.ExcludeRooms = {}
+    //扩展房间，第一个参数为房间id数组，第二个参数为膨胀多少格。
     App.Mapper.ExpandRooms = (rooms, expand) => {
         if (rooms == null || rooms.length == 0) {
             return []
@@ -159,11 +164,12 @@
         }
     }
     App.Map.AppendTagsIniter(App.Mapper.InitTag)
-
+    //额外地图定位
     let matcherssl = /^象一蓬蓬巨伞般伸向天空，把阳光遮得丝毫也无。尺把厚的松针/
     let matchergc = "错节，据传已有千年的树龄，是这座城市的历史见证。树干底部有一个很大"
     let matcheryp = "抽屉里散发出来的。神医平一指坐在茶几旁，独自喝着茶，看也不看你一眼。"
     let matcherdzm = "    前面就是明教的“地字门”了，这里是明教中女弟子"
+    //额外地图定位计划
     let PlanLocate = new App.Plan(
         App.Positions["Room"],
         (task) => {

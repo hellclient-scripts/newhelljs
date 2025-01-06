@@ -1,4 +1,6 @@
+//迷宫模块
 (function (App) {
+    //南疆沙漠
     App.Map.RegisterMaze("南疆沙漠", App.Map.NewMaze().WithCheckEnter(
         function (maze, move, map, step) {
             if (map.Room.Name == "南疆沙漠") {
@@ -29,6 +31,7 @@
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
     ))
+    //戈壁滩
     App.Map.RegisterMaze("戈壁滩", App.Map.NewMaze().WithCheckEnter(
         function (maze, move, map, step) {
             if (map.Room.Name == "戈壁滩") {
@@ -65,6 +68,8 @@
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
     ))
+    
+    //桃花迷阵
     App.Map.RegisterMaze("桃花迷阵", App.Map.NewMaze().WithCheckEnter(
         function (maze, move, map, step) {
             if (map.Room.Name == "桃花迷阵") {

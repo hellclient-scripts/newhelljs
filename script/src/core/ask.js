@@ -1,5 +1,7 @@
+//Ask NPC模块
 (function (App) {
     App.Core.Ask = {}
+    //ask的结果
     App.Data.Ask = {}
     let MaxAnswer = 100
     //你向店小二打听有关『123』的消息。
@@ -19,6 +21,7 @@
     //$N自己自言自语。
     //你现在的精神不太好，没法和别人套瓷。
     let matcherFail = /^(这个地方不能讲话。|这里没有这个人。|.+对着.+自言自语....|你自己自言自语。|你现在的精神不太好，没法和别人套瓷。)$/
+    //等待ask的计划
     let PlanOnAsk = new App.Plan(App.Positions.Connect,
         function (task) {
             App.Sync(function () { task.Cancel("sync") })
@@ -60,6 +63,7 @@
                         return true
                     }
                     App.Data.Ask.Result = "ok"
+                    //记录ask的结果
                     App.Data.Ask.Answers.push(App.History.GetLine())
                 }
                 return true
@@ -90,7 +94,7 @@
         App.Data.Ask.Name = ""
         App.Data.Ask.Question = question
         App.Data.Ask.Length = length ? length : 1
-        App.Data.Ask.Mode = 0
+        App.Data.Ask.Mode = 0 //当前ask的状态,0为未开始,1为npc在,开始ask,2为ask结束
         App.Data.Ask.Answers = []
         App.Data.Ask.LineNumber = 0
         App.Data.Ask.Result = ""

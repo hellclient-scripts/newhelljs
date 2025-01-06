@@ -1,3 +1,4 @@
+//工具,将npc的道具列表转换为标准格式
 (function (App) {
     let List = {
         To: "",

@@ -1,4 +1,6 @@
+// 模块主核心加载程序
 (function (app) {
+    // 定义App.Stop方法
     App.Stop = function () {
         Note("停止继续任务")
         App.RaiseEvent(new App.Event("core.stop"))
@@ -43,6 +45,6 @@
     App.Include("src/core/stage.js")
     App.Include("src/core/medicine.js")
     App.Include("src/core/fuben.js")
-    App.Include("src/core/params.js")//最后覆盖设置
+    App.Include("src/core/params.js")//需要最后引入最后覆盖设置
 
 })(App)

@@ -1,3 +1,4 @@
+//加载变量模块
 (function (App) {
     App.ReloadVariable = function () {
         App.LoadSender()

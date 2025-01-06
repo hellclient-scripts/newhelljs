@@ -1,6 +1,7 @@
+//意外处理模块
 (function (App) {
-
     App.Core.Emergency = {}
+    //昏迷处理。如果事件有callback,说明是有准备的昏迷(比如过天机阵)
     App.Core.Emergency.OnFaint = function (event) {
         event.Context.Propose(function () {
             App.Map.DiscardMove()
@@ -16,6 +17,7 @@
     }
 
     App.BindEvent("core.faint", App.Core.Emergency.OnFaint)
+    //治疗被打
     App.Core.Emergency.OnHealCombat = function () {
         Note("治疗被人打了")
         App.Reconnect()
@@ -23,6 +25,7 @@
     App.BindEvent("core.idlequit", (event) => {
         App.Log(event.Data.Output)
     })
+    //重置
     App.Core.Emergency.Reset = () => {
         for (var key in App.Positions) {
             App.Positions[key].Discard()
@@ -41,6 +44,7 @@
         App.Next()
     }
     App.BindEvent("core.healcombat", App.Core.Emergency.OnHealCombat)
+    //副本失败处理
     App.BindEvent("core.fubenfail", (event) => {
         event.Context.Propose(() => {
             let cb = event.Context.Get("callback")
@@ -52,6 +56,7 @@
         })
     })
     let checkdeathmode = 0
+    //检查是否挂了的计划
     let PlanCheckDeath = new App.Plan(App.Positions.Connect,
         function (task) {
             checkdeathmode = 0
@@ -89,7 +94,9 @@
             App.Next()
         }
     )
+    //是否不登录
     App.Core.Emergency.NoLogin = false
+    //检查是否挂了
     App.Core.Emergency.CheckDeath = function () {
         App.Commands.PushCommands(
             App.Commands.NewDoCommand("hp;i;cha force"),

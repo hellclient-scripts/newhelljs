@@ -1,65 +1,85 @@
+//战斗模块
 (function (App) {
     let combatModule = App.RequireModule("helllibjs/combat/combat.js")
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
-
     App.Core.Combat = {}
+    // 战斗配置的块结构
     class Block {
         Name = ""
         Conditions = []
         Actions = []
     }
+    //战斗参数结构
     class Option {
         constructor(quest) {
             this.Quest = quest
         }
+        //战斗任务
         Quest = ""
+        //战斗标签
         Tags = {}
+        //战斗指令
         Command = ""
+        //战斗时额外执行的计划
         Plan = null
+        // 按组发送击杀指令
         KillInGroup = false
+        // 打带跑
         HitAndRun = ""
         Ticker = 0
+        //链式调用
         WithHitAndRun(val) {
             this.HitAndRun = val
             return this
         }
+        //链式调用
         WithKillInGroup(val) {
             this.KillInGroup = val
             return this
         }
+        //链式调用
         WithTags(...tags) {
             tags.forEach(tag => {
                 this.Tags[tag] = true
             })
             return this
         }
+        //链式调用
         WithCommand(cmd) {
             this.Command = cmd
             return this
         }
+        //链式调用
         WithPlan(plan) {
             this.Plan = plan
             return this
         }
     }
+    //战斗的配置列表
     App.Core.Combat.Actions = null
+    //战斗的区块列表
     App.Core.Combat.Blocks = []
+    //判断当前战斗是否能否停止
     App.Core.Combat.CanStop = () => {
         return App.Combat.Data.HitAndRun == ""
     }
+    //创建新的战斗参数
     App.NewCombat = function (quest) {
         return new Option(quest)
     }
     let reDamage = /^【伤害统计】:你对(.+)的气血造成(.+)点伤害! $/
+    //战斗是否失败
     App.Core.Combat.Fail = false
     let Plan = new App.Plan(App.Positions["Combat"],
         function (task) {
             App.Core.Combat.Fail = false
             App.Combat.Position.Term.Set("core.combat.damage", 0)
+            //确定战斗是否还在进行
             task.AddTrigger("一边打架一边驯兽？你真是活腻了！", function () {
                 OmitOutput()
                 return true
             })
+            //内力不足
             task.AddCatcher("core.needneili", () => {
                 if (App.Core.Weapon.Touch) {
                     App.Send(`touch ${App.Core.Weapon.Touch}`)
@@ -111,10 +131,14 @@
             }
             App.Combat.Stop(App.Core.Combat.Fail ? "fail" : "")
         })
+    //战斗实例
     App.Combat = new combatModule.Combat(App.Positions["Combat"], Plan)
+    //战斗perform间隔
     App.Combat.Interval = 600
     let checkCombatCmd = "come"
+    //待发指令
     App.Core.Combat.Pending = {}
+    // peform函数
     App.Core.Combat.Perform = function () {
         if (App.Combat.Data.HitAndRun) {
             if (App.Combat.Data.Ticker > 1) {
@@ -139,6 +163,7 @@
             }
         })
     }
+    //战斗时的心跳
     App.Combat.Ticker = function (combat) {
         let msg = ""
         combat.Data.Ticker++
@@ -149,6 +174,7 @@
         App.Core.Combat.Perform()
         App.Send(checkCombatCmd)
     }
+    //战斗结束处理函数
     App.Combat.OnStop = function (combat, reason) {
         if (reason == "fail") {
             App.Send("yun recover;yun regenerate;hp;i")
@@ -165,21 +191,24 @@
         App.Send("yun recover;yun regenerate;hp;i")
         App.Commands.Execute(App.NewSyncCommand())
     }
+    //叫杀函数
     App.Core.Combat.Kill = function (id, data) {
         data = (data || App.NewCombat("")).WithTags("kill")
         App.Core.Combat.DoCombat(id, data)
     }
+    //反击函数
     App.Core.Combat.CounterAttack = function (id, data) {
         data = (data || App.NewCombat("")).WithTags("counterattack")
         App.Core.Combat.DoCombat(id, data)
-
     }
+    //替换变量
     App.Core.Combat.ReplaceCommand = (data) => {
         data = data.replaceAll("$1", App.Combat.Target)
         data = data.replaceAll("$wpon", App.Core.Weapon.OnCommand())
         data = data.replaceAll("$wpoff", App.Core.Weapon.OffCommand())
         return data
     }
+    //选用战术
     let pickActions = () => {
         if (App.Core.Combat.Actions == null) {
             App.Core.Combat.Actions = []
@@ -195,9 +224,11 @@
             }
         }
     }
+    //将指令加入待发
     App.Core.Combat.Pend = (cmd) => {
         App.Core.Combat.Pending[cmd] = true
     }
+    //开始战斗
     App.Core.Combat.DoCombat = function (id, data) {
         App.Combat.Target = id
         App.Combat.Data = data
@@ -220,6 +251,7 @@
         App.Send(checkCombatCmd)
         App.Combat.Start(id, data)
     }
+    //注册指令
     App.NewKillCommand = function (id, data) {
         return App.Commands.NewCommand("kill", { ID: id, Data: data })
     }
@@ -228,6 +260,7 @@
             App.Core.Combat.Kill(running.Command.Data.ID, running.Command.Data.Data)
         }
     })
+    //注册用户队列
     App.UserQueue.UserQueue.RegisterCommand("#kill", function (uq, data) {
         uq.Commands.Append(
             App.NewKillCommand(data, new Option("userqueue")),
@@ -235,6 +268,7 @@
         )
         uq.Commands.Next()
     })
+    //注册指令
     App.NewCounterAttackCommand = function (id, data) {
         return App.Commands.NewCommand("counterattack", { ID: id, Data: data })
     }
@@ -243,6 +277,7 @@
             App.Core.Combat.CounterAttack(running.Command.Data.ID, running.Command.Data.Data)
         }
     })
+    //过滤指令
     App.Core.Combat.FilterActions = function (...commands) {
         if (App.Core.Combat.Actions == null) {
             pickActions()
@@ -259,6 +294,7 @@
         })
         return result
     }
+    //加载设置函数
     App.Core.Combat.Load = function () {
         App.Core.Combat.Blocks = []
         App.Core.Combat.Actions = null
@@ -268,13 +304,13 @@
         App.LoadVariable("combat").forEach(data => {
             let action = actionModule.Parse(data)
             switch (action.Command) {
-                case "#block":
+                case "#block"://区块定义
                     currentBlock = new Block()
                     currentBlock.Name = action.Data
                     currentBlock.Conditions = [App.Quests.Conditions.Never]
                     App.Core.Combat.Blocks.unshift(currentBlock)
                     return
-                case "#apply":
+                case "#apply"://应用区块
                     currentBlock.Conditions.push(action.Conditions)
                     return
                 case "":
@@ -286,9 +322,11 @@
         })
     }
     App.Core.Combat.Load()
+    //注册ctype条件
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("ctype", function (data, target) {
         return App.Combat.Data && App.Combat.Data.Quest == data.trim()
     }))
+    //注册ctag条件
     App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("ctag", function (data, target) {
         return App.Combat.Data && App.Combat.Data.Tags[data.trim()]
     }))

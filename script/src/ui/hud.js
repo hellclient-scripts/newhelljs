@@ -1,3 +1,4 @@
+// HUD设置
 (function (App) {
     let uiModule = App.RequireModule("helllibjs/utils/ui.js")
 
@@ -124,6 +125,7 @@
     }
     App.HUD.Update()
     App.HUD.Next = 0
+    // HUD定时更新
     App.Engine.BindTimeHandler(function () {
         let now = (new Date()).getTime()
         if (now > App.HUD.Next) {
@@ -135,9 +137,9 @@
     App.HUD.Show = () => {
         var list = Userinput.newlist("信息", "请选择你要查看的信息", false)
         list.append("log", "完整日志")
-        list.publish("App.HUD.OnClisk")
+        list.publish("App.HUD.OnClick")
     }
-    App.HUD.OnClisk = (name, id, code, data) => {
+    App.HUD.OnClick = (name, id, code, data) => {
         switch (data) {
             case "log":
                 App.HUD.LogShow()
