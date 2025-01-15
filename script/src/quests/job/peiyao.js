@@ -1,10 +1,11 @@
+//配药任务模块
 $.Module(function (App) {
-    let Tiejiang = {}
+    let Peiyao = {}
     let jobs = {
         "平一指说道：好，你就帮我配药(peiyao)吧！喏，就这几味。": "peiyao",
         "平一指说道：让你干的活你干完了么？": "peiyao",
     }
-    Tiejiang.Start = function () {
+    Peiyao.Start = function () {
         if (!App.Quests.Stopped) {
             $.PushCommands(
                 $.Prepare(),
@@ -48,7 +49,7 @@ $.Module(function (App) {
     }
 
     Quest.Start = function (data) {
-        Tiejiang.Start()
+        Peiyao.Start()
     }
     App.Quests.Register(Quest)
 

@@ -1,5 +1,7 @@
+//钓鱼模块
 $.Module(function (App) {
     var Fish = {}
+    //准备鱼杆鱼饵
     App.Proposals.Register("quest.fish", App.Proposals.NewProposal(function (proposals, context, exclude) {
         if (App.Data.Item.List.FindByName("钓竿").First() == null) {
             return function () {
@@ -30,7 +32,8 @@ $.Module(function (App) {
         )
         App.Next()
     }
-    let matcher=/^(你的浮子忽然剧烈的震荡起来。|你的浮子忽左忽右摇摆个不停。|你的浮子猛然向下一窜，然后又跳出水面。)$/
+    let matcher = /^(你的浮子忽然剧烈的震荡起来。|你的浮子忽左忽右摇摆个不停。|你的浮子猛然向下一窜，然后又跳出水面。)$/
+    //钓鱼的计划
     let PlanFish = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -49,7 +52,7 @@ $.Module(function (App) {
             App.Next()
         }
     )
-
+    //定义任务
     let Quest = App.Quests.NewQuest("fish")
     Quest.Name = "钓鱼"
     Quest.Desc = "新人钓鱼任务"

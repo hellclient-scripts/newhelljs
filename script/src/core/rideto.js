@@ -41,13 +41,16 @@
             if (Mode == 0 || Mode == 1) {
                 return true
             }
-            if ((new Date()).getTime() - LastTry > 5 * 1000) {
+            if (canretry()) {
                 Mode = 0
                 return true
             }
         }
         return false
 
+    }
+    let canretry=()=>{
+        return (new Date()).getTime() - LastTry > 5 * 1000
     }
     App.Map.AppendTagsIniter(function () {
         App.Map.SetTag("ride", ridable())
@@ -56,7 +59,7 @@
     App.Engine.SetFilter("core.ride.nohorse", function (event) {
         var cmd = GetVariable("cmd_ride") || ""
         cmd = cmd.trim()
-        if (Mode == 0 && cmd) {
+        if ((Mode == 0||canretry()) && cmd) {
             Mode = 1
             App.Send(cmd + ";whistle;" + cmd)
             App.RaiseEvent(event)
@@ -64,6 +67,7 @@
         }
         LastTry = (new Date()).getTime()
         Mode = 2
+        App.Map.InitTags()
         App.RaiseEvent(event)
     })
     //响应临时不骑马的状态

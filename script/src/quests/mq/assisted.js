@@ -1,5 +1,7 @@
+//assist模块 被辅助
 $.Module(function (App) {
     let Assisted = {}
+    //任务NPC实例
     class NPC {
         constructor(name) {
             this.Name = name
@@ -15,11 +17,13 @@ $.Module(function (App) {
         Info = []
         Farlist = null
         Head = false
+        //设置NPC为逃跑
         Flee() {
             this.First = false
             this.Fled = true
             this.Info = [...Cities[this.Zone].Info]
         }
+        //设置区域
         SetZone(zone) {
             this.Zone = zone
             this.Fled = false
@@ -27,6 +31,7 @@ $.Module(function (App) {
             this.Farlist = null
             this.Times = 0
         }
+        //设置下一个很远的城市
         NextFar() {
             this.Zone = this.Farlist.shift()
             this.Times = 0
@@ -46,7 +51,7 @@ $.Module(function (App) {
     }
     let matchedRight = /^\S{1,6}决定帮助你一同完成任务，你是否同意\(right\|refuse (.+)\)？$/
     let matcherOK = /^ok (.+)-(.+)$/
-
+    //在聊天室等待assist的计划
     let PlanWaitReady = new App.Plan(
         App.Positions["Room"],
         (task) => {
@@ -106,11 +111,13 @@ $.Module(function (App) {
             Assisted.Prepare()
         }
     )
+    //发送assist信息
     Assisted.Send = (data) => {
         let msg = `quests.asssisted ${GetVariable("id")} ${data}`
         Note(`发出广播 ${data}`)
         Broadcast(msg, false)
     }
+    //等待ready
     Assisted.WaitReady = () => {
         $.PushCommands(
             $.To("2046"),
@@ -118,6 +125,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //报告信息
     Assisted.Report = () => {
         if (Assisted.Data.NPC != null) {
             Assisted.Send(`npc ${Assisted.Data.NPC.Name}-${Assisted.Data.NPC.Zone}-${Assisted.Data.NPC.Fled ? "t" : "f"}`)
@@ -131,6 +139,7 @@ $.Module(function (App) {
     Assisted.OnNpcFaint = function () {
         $.RaiseStage("npcfaint")
     }
+    //验证任务信息
     Assisted.Verify = () => {
         if (!App.Quests.Stopped) {
             if (Assisted.Data.Ready) {
@@ -145,6 +154,7 @@ $.Module(function (App) {
         }
         $.Next()
     }
+    //准备
     Assisted.Prepare = () => {
         $.PushCommands(
             $.Prepare("commonWithExp"),
@@ -152,6 +162,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //是否可以接信,这里永远不会
     Assisted.CanAccept = () => {
         return false
     }
@@ -163,6 +174,7 @@ $.Module(function (App) {
     let reNoMaster = "这里没有这个人，你怎么领任务？"
     let reNoQuest = "你现在没有领任何任务！"
     let reCurrent = /^师长交给你的任务，你已经连续完成了 (\d+) 个。$/
+    //接任务的计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -219,6 +231,7 @@ $.Module(function (App) {
             }
         }
     )
+    //交头
     Assisted.GiveHead = () => {
         $.PushCommands(
             $.To(App.Params.LocMaster),
@@ -226,7 +239,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
-
+    //接任务
     Assisted.AskQuest = () => {
         $.PushCommands(
             $.To(App.Params.LocMaster),
@@ -249,7 +262,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
-
+    //开始任务
     Assisted.Ready = () => {
         if (Assisted.Data.NPC) {
             $.PushCommands(
@@ -265,7 +278,7 @@ $.Module(function (App) {
         Note("准备")
         Assisted.Prepare()
     }
-
+    //叫杀
     Assisted.Kill = (loc, id) => {
         Assisted.Data.NPC.ID = id
         $.Insert(
@@ -279,6 +292,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //出帮手重连
     Assisted.Connect = () => {
         planQuest.Execute()
         $.PushCommands(
@@ -289,6 +303,7 @@ $.Module(function (App) {
     }
     let matcherDie = /^(.+)扑在地上挣扎了几下，腿一伸，口中喷出几口鲜血，死了！$/
     let matcherFaint = /^(.+)脚下一个不稳，跌在地上一动也不动了。$/
+    //战斗的计划
     let PlanCombat = new App.Plan(
         App.Positions["Combat"],
         (task) => {
@@ -310,7 +325,7 @@ $.Module(function (App) {
         },
         (result) => {
         })
-
+    //定义任务
     let Quest = App.Quests.NewQuest("assisted")
     Quest.Name = "师门任务(被协助)"
     Quest.Desc = ""
@@ -335,6 +350,7 @@ $.Module(function (App) {
     }
     let matcherHead = /^你捡起一颗(.+)的人头。$/
     let matcherreward = /^通过这次锻炼，你获得了/
+    //全局计划，统计数据
     let planQuest = new App.Plan(App.Quests.Position,
         (task) => {
             task.AddTrigger(matcherHead, (tri, result) => {
@@ -378,6 +394,7 @@ $.Module(function (App) {
         planQuest.Execute()
         Assisted.Prepare()
     }
+    //#start后清零
     App.BindEvent("core.queststart", (e) => {
         Assisted.Data.kills = 0
         Assisted.Data.helpded = 0

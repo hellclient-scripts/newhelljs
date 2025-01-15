@@ -260,18 +260,30 @@
         })
         skills.forEach((skill) => {
             let before = ""
+            let after = ""
             let limit = ""
             let jifa = skill["基本"]
+            let wp = App.Core.Weapon.GetWeapon(jifa)
             if (skill["武器"]) {
-                before = "#wpon"
+                if (wp) {
+                    before = `#wpon ${wp.Name}`
+                    after = `#wpoff ${wp.Name}`
+                } else {
+                    before = `#wpon`
+                }
             } else if (skill["空手"]) {
                 limit = skill["基本"]
                 jifa = "parry"
                 before = "#unwield"
             } else if (skill["音乐技能"]) {
-                before = "yun regenerate"
+                if (wp) {
+                    before = `yun regenerate;hand ${wp.ID}`
+                    after = `hand none`
+                } else {
+                    before = `yun regenerate`
+                }
             }
-            let cmd = `${skill.ID}|${limit}|lian|${jifa}||${before}|`
+            let cmd = `${skill.ID}|${limit}|lian|${jifa}||${before}|${after}`
             list.append(cmd, cmd)
         })
         list.publish("App.UI.Assist.LianOnAction")

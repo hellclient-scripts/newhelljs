@@ -108,7 +108,7 @@
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
-                        $.Wait(1000),
+                        $.Wait(1100),
                         $.Do("halt"),
                         $.Sync(),
                     )
@@ -130,7 +130,7 @@
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
-                        $.Wait(1000),
+                        $.Wait(1100),
                         $.Do("halt"),
                         $.Sync(),
                     )
@@ -160,7 +160,7 @@
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
-                        $.Wait(1000),
+                        $.Wait(1100),
                         $.Do("halt"),
                         $.Sync(),
                     )
@@ -239,7 +239,7 @@
                         }
                     default://相对其他技能限制,可以用 skill +100 或者 skill-100 的形式
                         let tskill = App.Data.Player.Skills[data[0]]
-                        if (data[1] == null || isNaN(data1)) {
+                        if (data[1] == null || isNaN(data[1])) {
                             data[1] = "0"
                         }
                         if (tskill && !isNaN(data[1])) {

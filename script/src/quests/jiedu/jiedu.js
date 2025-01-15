@@ -1,6 +1,7 @@
+//解毒模块
 $.Module(function (App) {
     let Jiedu = {}
-    Jiedu.All = false
+    Jiedu.All = false//是否解所有毒
     Jiedu.NeedJiedu = {}
     Jiedu.Do = () => {
         $.PushCommands(

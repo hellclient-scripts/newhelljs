@@ -1,3 +1,4 @@
+//停止模块
 $.Module(function (App) {
     let Stop = {}
     Stop.Start = (data) => {

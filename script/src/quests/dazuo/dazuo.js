@@ -1,7 +1,8 @@
+//打坐模块
 $.Module(function (App) {
     let Dazuo = {}
     Dazuo.Data = {
-        Target: null
+        Target: null//目标内力
     }
 
     Dazuo.Start = () => {
@@ -30,6 +31,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //任务定义
     let Quest = App.Quests.NewQuest("dazuo")
     Quest.Name = "打坐"
     Quest.Desc = "打坐到指定内力。如#start dazuo 300.不带参数打坐到内力上限"

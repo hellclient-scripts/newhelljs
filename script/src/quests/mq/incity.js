@@ -1,3 +1,4 @@
+//判断NPC是否在指定城市
 (function () {
     let incity = (coor, cy, Cities) => {
         if (Trim(coor) == "")

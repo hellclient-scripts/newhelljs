@@ -1,3 +1,4 @@
+//发呆模块
 $.Module(function (App) {
     let Idle = {}
     Idle.Start = (data) => {
@@ -14,8 +15,8 @@ $.Module(function (App) {
         App.Next()
     }
     let Quest = App.Quests.NewQuest("idle")
-    Quest.Name = "在指定位置发待"
-    Quest.Desc = "在指定位置发待"
+    Quest.Name = "在指定位置发呆"
+    Quest.Desc = "在指定位置发呆"
     Quest.Intro = ""
     Quest.Help = ""
     Quest.GetReady = function (q, data) {

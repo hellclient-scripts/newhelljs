@@ -1,3 +1,4 @@
+//做药模块
 $.Module(function (App) {
     let Lianyao = {}
     Lianyao.Data = {
@@ -25,6 +26,7 @@ $.Module(function (App) {
     let matcherHerb = /^你点了点药材，发现(.+)的分量还不够。$/
     let matcherSucces = /^你把「.+」成功的制好了！$/
     let matcherStart = /^你选出/
+    //做药的计划
     let PlanMake = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -75,9 +77,11 @@ $.Module(function (App) {
             }
         }
     )
+    //做药主流程
     Lianyao.Make = () => {
         // PlanMake.Execute()
         if (Lianyao.Data.Formula == null) {
+            //查看配方
             Lianyao.Formula()
             return
         }
@@ -94,6 +98,7 @@ $.Module(function (App) {
         }
         PlanMake.Execute()
     }
+    //补全材料
     Lianyao.BuyAll = (cmds) => {
         $.PushCommands(
             $.To("65"),
@@ -107,6 +112,7 @@ $.Module(function (App) {
     }
     let marcherFormualStart = /^炼制.+需要以下这些药材：$/
     let marcherFormualItem = /^([一二三四五六七八九十]+).(\S+)$/
+    //收集配方数据的计划
     let PlanFormula = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -146,7 +152,7 @@ $.Module(function (App) {
     Lianyao.Formula = () => {
         PlanFormula.Execute()
     }
-
+    //检查身上和qiankun bag里的mo
     Lianyao.CheckMo = () => {
         if (App.Data.Item.List.FindByIDLower("danyu mo").First() == null && App.Data.Item.List.FindByIDLower("yanbo").First() == null) {
             let qkmo = App.Data.QiankunBag.FindByIDLower("danyu mo").First()
@@ -173,6 +179,7 @@ $.Module(function (App) {
         }
         Lianyao.Make()
     }
+    //入口
     Lianyao.Start = () => {
         if (!App.Quests.Stopped && Sum() < Lianyao.Data.Number) {
             $.PushCommands(
@@ -185,9 +192,11 @@ $.Module(function (App) {
         }
         $.Next()
     }
+    //统计数据
     let Sum = () => {
         return App.Data.Item.List.FindByName(Lianyao.Data.Target).Sum() + App.Data.QiankunBag.FindByName(Lianyao.Data.Target).Sum()
     }
+    //定义任务
     let Quest = App.Quests.NewQuest("makeyao")
     Quest.Name = "做药"
     Quest.Desc = "做药，使用方式makeyao 九花玉露丸 1000"

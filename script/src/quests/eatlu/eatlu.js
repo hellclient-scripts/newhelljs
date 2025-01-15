@@ -1,3 +1,4 @@
+//吃magic water模块
 $.Module(function (App) {
     let Quest = App.Quests.NewQuest("eatlu")
     Quest.Name = "去Pkd吃天香玉露"

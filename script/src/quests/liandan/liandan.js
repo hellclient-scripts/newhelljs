@@ -1,15 +1,23 @@
+//炼丹任务模块
 $.Module(function (App) {
+    //是否固定房间
     let FixedRoom = ""
     let Room = ""
     Liandan = {}
     Liandan.Data = {
+        //炼丹次数
         Count: 0,
+        //按名字统计的丹数
         ByName: {},
     }
+    //多少时间后换一个房间
     let TimeToChange = 24000
+    //最后依次炼丹
     let Last = 0
     let preparedata = {}
+    //吃的单
     let eatList = ["longwang dan", "qinglong dan", "baihu dan", "zhuque dan", "xuanwu dan", "haoyue dan", "yinyang dan", "wanshou dan", "change dan"]
+    //丹的处理逻辑
     preparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#sell name=火麒丹,血麒丹,归元丹,小还丹,大还丹,还魂丹,补精丹,大补丹,雪参丹,十全大还丹,大云丹,养精丹,锁泉丹,小金丹,小云丹,蓄精丹,碧泉丹"),
         App.Core.Assets.ParseRule("#pack name=龟苓丹,映月丹,修罗无常丹,回阳无极丹,龙涎丹,邀月丹,子午龙甲丹,幻灵丹,轩辕补心丹,罗刹无常丹"),
@@ -18,6 +26,7 @@ $.Module(function (App) {
     let locations = ["1358", "1359", "1397", "1398", "1399", "1400", "1401"]
     let reGot = /^(.{1,6})找了半天，终于发现其中一株草苗与其它的草略/
     let reFail = /^一番摸索后，草丛中似乎没有.+要找的东西，/
+    //采药的计划
     let PlanCaiyao = new App.Plan(App.Map.Position,
         function (task) {
             task.AddTrigger(reGot, function (trigger, result) {
@@ -62,6 +71,7 @@ $.Module(function (App) {
     )
 
     let relian = /^(炉顶青烟渐渐转淡，丹药气味渐浓，你|炉顶青烟渐渐转淡，蓦然一道金光闪过，你)/
+    //炼丹的计划
     let PlanLiandan = new App.Plan(App.Map.Position,
         function (task) {
             task.AddTrigger("炼丹之地，切勿滋扰。")
@@ -80,7 +90,7 @@ $.Module(function (App) {
             $.Next()
         },
     )
-
+    //杀毒蛇
     Liandan.KillDuShe = function () {
         $.PushCommands(
             $.CounterAttack("du she", $.NewCombat("liandan").WithTags("liandan-dusha")),
@@ -89,6 +99,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //杀毒郎中
     Liandan.KillDuLangzhong = function () {
         $.PushCommands(
             $.CounterAttack("du langzhong", $.NewCombat("liandan").WithTags("liandan-langzhong")),
@@ -97,6 +108,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //采药逻辑
     Liandan.Cai = function () {
         if (App.Quests.Stoped) {
             $.Next()
@@ -114,6 +126,7 @@ $.Module(function (App) {
         App.Insert($.Plan(PlanCaiyao))
         App.Next()
     }
+    //更换房间
     Liandan.ChangeRoom = function () {
         let rooms = []
         locations.forEach(r => {
@@ -129,6 +142,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //ask开始任务
     Liandan.GoAsk = function () {
         Room = FixedRoom ? FixedRoom : App.Random(locations)
         $.PushCommands(
@@ -144,6 +158,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //采到药了，交药材
     Liandan.Jiao = function () {
         $.PushCommands(
             $.To("1387"),
@@ -177,6 +192,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //开始
     Liandan.Ready = function () {
         if (App.Quests.Stopped) {
             $.Next()
@@ -186,6 +202,7 @@ $.Module(function (App) {
     }
     // let matcherStart = "你将原料药材一一放进炉中，盘腿坐下，闭目静待。"
     let matcherResult = /你炼成了(.+)。/
+    //全局计划，统计数据
     let PlanQuest = new App.Plan(App.Quests.Position,
         (task) => {
             task.AddTrigger(matcherResult, (tri, result) => {
@@ -197,12 +214,14 @@ $.Module(function (App) {
             })
         },
     )
+    //#start后重置数据
     App.BindEvent("core.queststart", (e) => {
         Liandan.Data = {
             Count: 0,
             ByName: {},
         }
     })
+    //定义任务
     let Quest = App.Quests.NewQuest("liandan")
     Quest.Name = "炼丹"
     Quest.Desc = "北京姚春炼丹"

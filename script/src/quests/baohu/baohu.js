@@ -1,10 +1,16 @@
+//保护任务模块
 $.Module(function (App) {
     let Baohu = {}
+    //是否在NPC出现时重连
     Baohu.Reconnect = false
+    //任务总数
     Baohu.Count = 0
+    //连续任务
     Baohu.Continuous = 0
+    //NPC信息
     Baohu.NPCs = {}
     Baohu.Data = {}
+    //加载默认NPC信息
     App.LoadLines("src/quests/baohu/npc.txt", "|").forEach((data) => {
         Baohu.NPCs[data[0]] = {
             Name: data[0],
@@ -12,6 +18,7 @@ $.Module(function (App) {
             Loc: data[2].split(",")
         }
     })
+    //失败放弃
     Baohu.Fail = () => {
         $.PushCommands(
             $.To("174"),
@@ -20,6 +27,7 @@ $.Module(function (App) {
         $.Next()
     }
     let matcherProtect = /^汪剑通点了点头，对你说道:蒙古人收买了一批武林败类,好象要暗杀(.*)，你去保护他一下。/
+    //检查汪的回答
     Baohu.Check = () => {
         if (App.Data.Ask.Answers.length) {
             let answer = App.Data.Ask.Answers[0].Line
@@ -46,6 +54,7 @@ $.Module(function (App) {
         Quest.Cooldown(300000)
         App.Fail()
     }
+    //前往NPC位置
     Baohu.Go = (npcname) => {
         let npc = Baohu.NPCs[npcname];
         if (!npc) {
@@ -61,6 +70,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //重连处理
     Baohu.Connect = () => {
         App.Commands.Drop()
         PlanQuest.Execute()
@@ -75,7 +85,7 @@ $.Module(function (App) {
         $.Next()
     }
     let matcherHalt = /^你(身行向后一跃，跳出战圈不打了。|现在停不下来。)$/
-
+    //战斗的计划
     let PlanCombat = new App.Plan(
         App.Positions["Combat"],
         (task) => {
@@ -89,6 +99,7 @@ $.Module(function (App) {
         }
     )
     let matcherKill = /^你对(.+)的(黑衣人|邪派高手|绝世高手)喝道:大胆狂徒,竟敢在这撒野！！/
+    //等待NPC出现的计划
     let PlanProtect = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -142,6 +153,7 @@ $.Module(function (App) {
             Baohu.Fail()
         }
     )
+    //任务成功，交任务
     Baohu.Finish = () => {
         $.PushCommands(
             $.To("174"),
@@ -157,6 +169,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //到达NPC位置
     Baohu.Arrive = () => {
         if (App.Map.Room.Data.Objects.FindByIDLower(Baohu.Data.NPC.ID).First()) {
             Note("找到NPC,开始保护")
@@ -168,10 +181,12 @@ $.Module(function (App) {
     }
     //汪剑通对你说道:你已经连续完成了二百十六次任务。
     let matcherSuccess = /^汪剑通对你说道:你已经连续完成了(.+)次任务。$/
+    //任务全局计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             task.AddTrigger(matcherSuccess, (tri, result) => {
+                //记录连续保护次数
                 Quest.Cooldown(60000)
                 Baohu.Continuous = App.CNumber.ParseNumber(result[1])
                 Note(Baohu.Continuous)
@@ -194,6 +209,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //任务定义
     let Quest = App.Quests.NewQuest("baohu")
     Quest.Name = "保护任务"
     Quest.Desc = "可以加参数 recon,每次kill时重新连线"

@@ -1,6 +1,8 @@
+//钓金鱼赚钱
 $.Module(function (App) {
     let Goldfish = {}
     let Locs = ["2717", "2718", "2719", "2720"]
+    //渔获处理指令
     let Commands = {
         "龙虾": "get long xia;sell long xia",
         "金鲤鱼": "get jin liyu;sell jin liyu",
@@ -13,7 +15,9 @@ $.Module(function (App) {
     Goldfish.Data = {
         Loc: "",
     }
+    //屏蔽
     let matcherGag = /没有学会任何技|没有使用任何特殊技|喝太多了|吃太饱了|选择你要使用的内功|收起钓竿，看样子是不想再钓了|卖掉了一|捡起一|猛地一收钓竿|你的浮子震动了一下|仔细的放在钓钩上|顺势一拉杆|水面波澜不惊|一个个圆圈|就是没有鱼上钩|只好先扔在一旁|喝了几口|浮子轻轻的震动|忽左忽右摇摆/
+    //任务全局计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -41,6 +45,7 @@ $.Module(function (App) {
         PlanQuest.Execute()
         Goldfish.Go()
     }
+    //前往钓鱼
     Goldfish.Go = () => {
         $.PushCommands(
             $.Prepare("common", context),
@@ -51,6 +56,7 @@ $.Module(function (App) {
     }
     let matcherDraw = /^(> )*你的浮子(忽左忽右摇摆个不停|猛然向下一窜，然后又跳出水面)/
     let matchSuccess = /^你钓到了一.(.+)。$/
+    //钓鱼计划
     let PlanFish = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -74,6 +80,7 @@ $.Module(function (App) {
             App.Next()
         }
     )
+    //主核心逻辑
     Goldfish.Ready = () => {
         if (App.Data.Item.List.FindByIDLower("diao gan").First() == null) {
             if (App.Data.Item.List.FindByIDLower("gold").Sum() < 10) {
@@ -95,6 +102,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //任务定义
     let Quest = App.Quests.NewQuest("goldfish")
     Quest.Name = "钓金鱼"
     Quest.Desc = "大米钓鱼赚钱"

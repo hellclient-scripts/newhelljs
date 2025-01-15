@@ -1,10 +1,13 @@
+//爬灵感塔模块
 $.Module(function (App) {
     let relgtfloor = /^灵感.*塔\.第(.*)层$/
     let matcherNext = /^杨小邪\(yang xiaoxie\)偷偷告诉你：据说上面关押的是：(.*)，/
     let matcherWuchi = /^(看起来武痴想杀死你！|武痴左手两指|武痴双手虚虚实实|武痴轻轻地往上方一飘|武痴凝神闭息|武痴扬手|武痴身形忽然变得诡秘异常|武痴身子忽进忽退|武痴深深吸进一口气|武痴随手抓出)/
     let matcherLeft = /^\(你还有(\d+)张灵符\)$/
     let LGT = {}
+    //最后依次爬塔爬了多少层
     LGT.LastLevel = 0
+    //最后一次爬塔的时间
     LGT.Last = 0
     LGT.Data = {
         Level: 0,
@@ -12,6 +15,7 @@ $.Module(function (App) {
         Ready: 0,//0需要等待,1可以Check
         Entry: [],
     }
+    //遇到武痴后重连的代码
     LGT.Connect = () => {
         App.Commands.Drop()
         PlanQuest.Execute()
@@ -20,6 +24,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //任务全局计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -66,6 +71,7 @@ $.Module(function (App) {
             })
         }
     )
+    //尝试进塔的计划
     let PlanEnter = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -106,6 +112,7 @@ $.Module(function (App) {
         }
     )
     let matcherKnockFinish = /$你在灵感西塔上成功敲钟之后，/
+    //等待敲钟的计划
     let PlanKnock = new App.Plan(
         App.Map.Position,
         (task) => {
@@ -117,6 +124,7 @@ $.Module(function (App) {
             App.Next()
         }
     )
+    //爬塔时的核心逻辑
     LGT.Check = () => {
         if (LGT.Data.灵符 >= 2) {
             LGT.Next()
@@ -131,6 +139,7 @@ $.Module(function (App) {
             $.Next()
         }
     }
+    //继续爬塔
     LGT.Next = () => {
         $.PushCommands(
             $.Nobusy(),
@@ -145,6 +154,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //等待超时，一般是战斗失败
     LGT.Wait = () => {
         if (App.Map.Room.Data.Objects.FindByName("灵感塔囚徒").First()) {
             Note("等待进入下一层")
@@ -154,6 +164,7 @@ $.Module(function (App) {
             LGT.Check()
         }
     }
+    //战斗修正后的的代码，检查环境对象
     LGT.AfterRest = () => {
         $.PushCommands(
             $.Do("#l"),
@@ -162,6 +173,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //叫杀
     LGT.Kill = () => {
         let tags = []
         for (i = 0; i <= LGT.Data.Level; i = i + 10) {
@@ -185,10 +197,12 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //开始爬塔任务
     LGT.Start = function () {
         PlanQuest.Execute()
         LGT.Go()
     }
+    //准备进塔
     LGT.Go = function () {
         LGT.Data.Entry = ["wu", "nu", "eu", "su"]
         LGT.Data.Level = 0
@@ -201,6 +215,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //定义任务
     let Quest = App.Quests.NewQuest("lgt")
     Quest.Name = "灵感塔爬塔"
     Quest.Desc = ""

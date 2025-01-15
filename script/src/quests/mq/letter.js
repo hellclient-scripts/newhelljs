@@ -1,9 +1,11 @@
+//送信模块
 $.Module(function (App) {
     let Letter = {}
     let fangqi = {
         "襄阳": true,
         "关外": true,
     }
+    //NPC信息
     class NPC {
         constructor(name) {
             this.Name = name
@@ -14,12 +16,14 @@ $.Module(function (App) {
         Times = 0
         Gived = false
         First = true
+        //设置NPC在指定城市
         SetZone(zone) {
             this.Zone = zone
             this.Times = 0
         }
     }
     let Cities = {}
+    //加载城市信息
     App.LoadLines("src/quests/mq/cities.txt", "|").forEach((data) => {
         Cities[data[0]] = {
             Name: data[0],
@@ -33,6 +37,7 @@ $.Module(function (App) {
     Letter.Data = {
         start: null,
     }
+    //验证任务状态
     Letter.Verify = () => {
         if (!App.Quests.Stopped) {
             $.PushCommands(
@@ -42,6 +47,7 @@ $.Module(function (App) {
         }
         $.Next()
     }
+    //准备
     Letter.Prepare = () => {
         $.PushCommands(
             $.Prepare("commonWithExp"),
@@ -54,6 +60,7 @@ $.Module(function (App) {
     let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前把信送到/
     let reNoMaster = "这里没有这个人，你怎么领任务？"
     let reNoQuest = "你现在没有领任何任务！"
+    //任务的全局计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {

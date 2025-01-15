@@ -1,3 +1,4 @@
+//练功模块
 $.Module(function (App) {
     let Lian = {}
     Lian.NeedJifa = false
@@ -22,6 +23,7 @@ $.Module(function (App) {
                 )
             }
         } else {
+            //不继续练功了，激发技能
             if (Lian.NeedJifa) {
                 $.Append(
                     $.Do("#jifa"),
@@ -31,7 +33,7 @@ $.Module(function (App) {
         }
         App.Next()
     }
-
+    //定义任务
     let Quest = App.Quests.NewQuest("lianskill")
     Quest.Name = "练技能"
     Quest.Desc = "练习lian变量中设置的技能"

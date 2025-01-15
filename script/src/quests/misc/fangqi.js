@@ -1,3 +1,4 @@
+//放弃经验模块
 $.Module(function (App) {
     let Quit = {}
     Quit.Start = (data) => {

@@ -1,18 +1,23 @@
+//备齐任务模块
 $.Module(function (App) {
     let Beiqi = {}
     Beiqi.Data = {}
     Beiqi.Delay = 5 * 60 * 1000
     Beiqi.Tasks = {}
     let preparedata = {}
+    //保护中不出售道具
     preparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#carry name=铁甲,铁锤,竹棒,竹剑,普通匕首,钢刀,长剑,木刀,飞蝗石,铁莲子,铁棍"),
     ]
+    //最少现金
     preparedata["GoldKeep"] = 4
     let destoryPreparedata = {}
+    //结束后把道具卖了
     destoryPreparedata[App.Core.Assets.PrepareDataKey] = [
         App.Core.Assets.ParseRule("#sell name=铁甲,铁锤,竹棒,竹剑,普通匕首,钢刀,长剑,木刀,铁棍"),
         App.Core.Assets.ParseRule("#drophere name=飞蝗石,铁莲子"),
     ]
+    //加载任务列表
     $.LoadLines("src/quests/beiqi/task.txt", "|").forEach(data => {
         Beiqi.Tasks[data[0]] = {
             Key: data[0],
@@ -23,12 +28,14 @@ $.Module(function (App) {
         }
     })
     Beiqi.Receivers = {}
+    //加载收货人列表
     $.LoadLines("src/quests/beiqi/receiver.txt", "|").forEach(data => {
         Beiqi.Receivers[data[0]] = {
             Loc: data[1],
             ID: data[2],
         }
     })
+    //主逻辑
     let readyCommand = $.Function(function () {
         let now = $.Now()
         let max = 0
@@ -50,6 +57,7 @@ $.Module(function (App) {
         }
         $.Pop()
     })
+    //完成
     Beiqi.Finish = function () {
         $.PushCommands(
             $.Prepare("", destoryPreparedata),
@@ -73,6 +81,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //前往小二处
     Beiqi.Go = function () {
         let task = Beiqi.Data.Current
         $.PushCommands(
@@ -95,6 +104,7 @@ $.Module(function (App) {
     let nextCommand = $.Function(Beiqi.Next)
 
     let re = /.+说道：据说(.+)急需一批(.+)。嘿！你说他想干什么？$/
+    //检查小二回答
     Beiqi.Check = function () {
         if (App.Quests.Stopped) {
             $.Next()
@@ -122,6 +132,7 @@ $.Module(function (App) {
         }
         App.Fatal("beiqi", "未知的回答:" + answer)
     }
+    //交货给NPC
     Beiqi.Give = function () {
         let item = App.Data.Item.List.FindByName(Beiqi.Data.Quest.Item).First()
         if (item) {
@@ -130,7 +141,7 @@ $.Module(function (App) {
                 $.Nobusy(),
                 $.Do("give " + item.IDLower + " to " + Beiqi.Data.Quest.Receiver.ID),
                 $.Do("i;score"),
-                $.Wait(1000),
+                $.Wait(1100),
                 $.Function(Beiqi.Go)
             )
             $.Next()
@@ -148,6 +159,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //任务定义
     let Quest = App.Quests.NewQuest("beiqi")
     Quest.Name = "备齐"
     Quest.Desc = "做备齐任务，积累阅历"

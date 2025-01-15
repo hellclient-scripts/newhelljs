@@ -1,7 +1,9 @@
+//assist模块，辅助他人
 $.Module(function (App) {
     let incity = App.Include("src/quests/mq/incity.js")
     let Assisting = {}
     let farlist = ["佛山", "南海", "泉州", "福州", "汝州", "嵩山", "星宿", "天山", "武功", "灵州", "长安", "华山", "襄阳", "扬州", "苏州", "杭州", "成都", "终南", "关外", "大理", "西域"]
+    //NPC接口
     class NPC {
         constructor(name) {
             this.Name = name
@@ -18,12 +20,14 @@ $.Module(function (App) {
         Farlist = null
         Head = false
         Loc = null
+        //设置NPC逃跑
         Flee() {
             this.First = false
             this.Fled = true
             this.Loc = null
             this.Info = [...Cities[this.Zone].Info]
         }
+        // 设置NPC区域
         SetZone(zone) {
             this.Zone = zone
             this.Fled = false
@@ -31,6 +35,7 @@ $.Module(function (App) {
             this.Farlist = null
             this.Times = 0
         }
+        // 进入下一个很远城市
         NextFar() {
             this.Zone = this.Farlist.shift()
             this.Times = 0
@@ -39,6 +44,7 @@ $.Module(function (App) {
         }
     }
     let Cities = {}
+    //加载城市数据
     App.LoadLines("src/quests/mq/cities.txt", "|").forEach((data) => {
         Cities[data[0]] = {
             Name: data[0],
@@ -57,6 +63,7 @@ $.Module(function (App) {
         eff: 0,
     }
     let matcherNPC = /^npc (\S+)-(\S+)-(\S+)$/
+    //等待行动的计划
     let PlanWaitReady = new App.Plan(
         App.Positions["Room"],
         (task) => {
@@ -98,11 +105,13 @@ $.Module(function (App) {
             Assisting.Prepare()
         }
     )
+    //取消任务
     Assisting.Cancel = () => {
         Assisting.Send("cancel")
         Assisting.Data.NPC = null
         Assisting.WaitReady()
     }
+    //等待
     Assisting.WaitReady = () => {
         Note("进入准备模式")
         $.PushCommands(
@@ -111,6 +120,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //组内发送
     Assisting.Send = (data) => {
         let msg = `quests.asssisting ${GetVariable("id")} ${data}`
         Note(`发出广播 ${data}`)
@@ -120,6 +130,7 @@ $.Module(function (App) {
         $.RaiseStage("npcfaint")
         Assisting.Send(`ok ${App.Map.Room.ID ? App.Map.Room.ID : Assisting.Data.NPC.Loc}-${Assisting.Data.NPC.ID}`)
     }
+    //检查NPC是否还在
     Assisting.CheckYou = () => {
         $.PushCommands(
             $.Function(() => {
@@ -135,6 +146,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //验证任务
     Assisting.Verify = () => {
         if (!App.Quests.Stopped) {
             Assisting.WaitReady()
@@ -142,6 +154,7 @@ $.Module(function (App) {
         }
         $.Next()
     }
+    //准备辅助
     Assisting.Prepare = () => {
         $.PushCommands(
             $.Prepare("commonWithExp"),
@@ -150,7 +163,7 @@ $.Module(function (App) {
         $.Next()
     }
 
-
+    //找NPC的检查器
     let Checker = function (wanted) {
         let result = App.Map.Room.Data.Objects.FindByLabel(wanted.Target).Items
         for (var obj of result) {
@@ -175,7 +188,7 @@ $.Module(function (App) {
         }
         return null
     }
-
+    //任务开始
     Assisting.Ready = () => {
 
         if (Assisting.Data.NPC) {
@@ -194,6 +207,7 @@ $.Module(function (App) {
         Note("准备")
         Assisting.Prepare()
     }
+    //NPC在很远
     Assisting.Far = () => {
         if (Assisting.Data.NPC.Farlist == null) {
             Assisting.Data.NPC.Farlist = [...farlist]
@@ -211,6 +225,7 @@ $.Module(function (App) {
         Note("很远没找到，放弃")
         Assisting.Cancel()
     }
+    //就进击杀，NPC没杀成功的话就近及格寻找
     Assisting.KillNear = () => {
         if (App.Map.Room.ID && !Assisting.Data.NPC.Fled && !Assisting.Data.NPC.Died) {
             Assisting.Data.NPC.Loc = null
@@ -223,6 +238,7 @@ $.Module(function (App) {
         }
         App.Next()
     }
+    //定点击杀，确认NPC位置后前往击杀
     Assisting.KillLoc = () => {
         if (App.Zone.Wanted.ID) {
             Assisting.Data.NPC.ID = App.Zone.Wanted.ID
@@ -243,6 +259,7 @@ $.Module(function (App) {
         }
         $.Next()
     }
+    //搜索NPC
     Assisting.GoKill = () => {
         if (Assisting.Data.NPC.Times > 3) {
             Note("找不到")
@@ -276,6 +293,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //重连
     Assisting.Connect = () => {
         $.PushCommands(
             $.Function(App.Core.Emergency.CheckDeath),
@@ -288,6 +306,7 @@ $.Module(function (App) {
     let matcherFlee3 = /^在你一阵狂攻之下，(.+)只有招架之功，哪里还有/
     let matcherFlee = /^(.+)(摇摇欲坠|身负重伤|狂叫一声|晃了两下|再退一步|已是避|深吸一口气，神色略微好了)(.*)/
     let matcherHelper = /^看起来(.+)想杀死你！$/
+    //战斗计划
     let PlanCombat = new App.Plan(
         App.Positions["Combat"],
         (task) => {
@@ -337,6 +356,7 @@ $.Module(function (App) {
                 App.Reconnect(0, Assisting.Connect)
             }
         })
+    //问小二信息
     Assisting.AskInfo = function () {
         $.PushCommands(
             $.Prepare("common"),
@@ -345,6 +365,7 @@ $.Module(function (App) {
         App.Next()
     }
     let reCity = /^.*说道：.*(好像听人说过是在|他不是在|据说是躲到|好像去了|已经躲到|好像是去了|但是也有人说他在|有人说在|不过听人说在|听说是在|不过听说他好像在|现在应该是去了)(.*)/
+    //前往小二处问信息
     Assisting.GoAskInfo = function () {
         if (Assisting.Data.NPC.Info.length) {
             let infoid = Assisting.Data.NPC.Info.shift()
@@ -380,7 +401,7 @@ $.Module(function (App) {
         Note("没人知道")
         Assisting.CheckYou()
     }
-
+    //线报
     App.BindEvent("core.helpfind.onfound", (event) => {
         let name = event.Data.Name
         let id = event.Data.ID
@@ -411,6 +432,7 @@ $.Module(function (App) {
             Assisting.Data.NPC.Farlist = null
         }
     })
+    //定义任务
     let Quest = App.Quests.NewQuest("assisting")
     Quest.Name = "师门任务(协助)"
     Quest.Desc = ""
