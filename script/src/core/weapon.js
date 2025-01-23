@@ -281,6 +281,10 @@
     App.Sender.RegisterAlias("#hide", function (data) {
         App.Send(App.Core.Weapon.HideCommand(data))
     })
+    //注册touch武器的别名
+    App.Sender.RegisterAlias("#touch", function (data) {
+        App.Send(`touch ${App.Core.Weapon.Touch}`)
+    })
     //注册修武器的准备
     App.Proposals.Register("repair", App.Proposals.NewProposal(function (proposals, context, exclude) {
         let dur = context.WeaponDurationMin || App.Params.WeaponDurationMin

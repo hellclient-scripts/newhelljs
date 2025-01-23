@@ -1,18 +1,29 @@
+//打老秦任务模块
 $.Module(function (App) {
     let Qinling = {}
     Qinling.Data = {
+        //打一下就跑
         HitAndRun: true,
+        //是否已经结束
         Finished: false,
+        //开始时间
         Start: null,
+        //花费时间
         Cost: 0,
+        //总次数
         All: 0,
+        //成功次数
         Success: 0,
+        //礼物清单
         Gifts: {},
     }
+    //记录奖品
     let matcherDrop = /^当~~一声，一.(.+)从天而降，掉落在你面前。$/
+    //全局计划
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
+            //统计奖品
             task.AddTrigger(matcherDrop, (tri, result) => {
                 let gift = result[1]
                 if (!Qinling.Data.Gifts[gift]) {
@@ -21,6 +32,7 @@ $.Module(function (App) {
                 Qinling.Data.Gifts[gift]++
                 return true
             })
+            //副本失败
             task.AddCatcher("core.fubenfail", (catcher, event) => {
                 if (Qinling.Data.Finished) {
                     event.Context.Set("callback", () => {
@@ -40,6 +52,7 @@ $.Module(function (App) {
         App.Positions["Response"],
         (task) => {
             task.AddTrigger("祝你好运气！", (tri, result) => {
+                //成功进入副本
                 task.Data = "ok"
                 return true
             })
@@ -57,6 +70,7 @@ $.Module(function (App) {
             App.Fail()
         }
     )
+    //进副本
     Qinling.Enter = () => {
         App.Checker.GetCheck("weaponduration").Force()
         $.PushCommands(
@@ -66,7 +80,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
-
+    //进入成功
     Qinling.Entered = () => {
         Qinling.Data.All++
         Qinling.Data.Start = $.Now()
@@ -76,11 +90,12 @@ $.Module(function (App) {
         App.Core.Fuben.Last = $.Now()
         $.PushCommands(
             $.Path(["s"]),
-            $.Function(App.Core.Fuben.LoadMazeMap),
+            $.Function(App.Core.Fuben.LoadMazeMap),//加载地图
             $.Function(Qinling.Maze)
         )
         $.Next()
     }
+    //初始化地图
     Qinling.Maze = () => {
         App.Map.Room.ID = "2820"
         if (App.Core.Fuben.Current == null) {
@@ -95,16 +110,18 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //补全迷宫地图连接
     Qinling.AddApth = () => {
         App.Core.Fuben.Current.AddPath("2820", App.Core.Fuben.Current.Landmark["entry"], "s")
         App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], "2820", "n")
         App.Core.Fuben.Current.AddPath("2823", App.Core.Fuben.Current.Landmark["exit"], "n")
         App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "2823", "s")
     }
+    //杀老秦
     Qinling.KillQin = () => {
         $.PushCommands(
             $.Function(() => {
-                $.RaiseStage("qinbefore")
+                $.RaiseStage("qinbefore")//用于H&R时的初始化
                 $.Next()
             }),
             $.Do("i"),
@@ -139,13 +156,14 @@ $.Module(function (App) {
                         case "long sword":
                             break
                         default:
-                            App.Send(`get ${item.IDLower}`)
+                            App.Send(`get ${item.IDLower}`)//捡道具
                     }
                 })
                 App.Send("i")
                 $.Insert(
                     $.Path(["s"]),
                     $.Function(() => {
+                        //更新统计信息
                         Qinling.Data.Success++
                         Qinling.Data.Cost = Qinling.Data.Cost + $.Now() - Qinling.Data.Start
                         Qinling.Data.Finished = true
@@ -171,7 +189,7 @@ $.Module(function (App) {
             Gifts: {},
         }
     })
-
+    //任务实例
     let Quest = App.Quests.NewQuest("qinling")
     Quest.Name = "秦岭副本"
     Quest.Desc = ""

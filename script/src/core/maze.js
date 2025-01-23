@@ -18,7 +18,7 @@
 
             let cmd = App.Move.Filterdir(maze.Data.Step.Command)
             maze.Data.Count = maze.Data.Count + 1
-            if (maze.Data.Count % 8 == 0) {
+            if (maze.Data.Count % 4 == 0) {
                 App.Eat(true)
             }
             if (cmd == "sw") {
@@ -107,7 +107,7 @@
                 if (Math.floor(Math.random() * 5) == 1) cmd = "s";
             }
             maze.Data.Count = maze.Data.Count + 1
-            if (maze.Data.Count % 5 == 0) {
+            if (maze.Data.Count % 4 == 0) {
                 App.PushCommands(
                     App.Core.Heal.NewRestCommand(),
                     App.Commands.NewFunctionCommand(() => {

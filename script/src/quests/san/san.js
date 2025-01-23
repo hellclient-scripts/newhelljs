@@ -1,7 +1,8 @@
+//san 10lv的任内务模块
 $.Module(function (App) {
     let San = {}
-    let Helpers = ["huang shang", "nanhai shenni", "kuihua taijian", "dugu qiubai"]
-    let ImbueList = ["jiuzhuan jindan", "feicui lan", "magic water", "xisui dan", "xian dan", "puti zi"]
+    let Helpers = ["huang shang", "nanhai shenni", "kuihua taijian", "dugu qiubai"]//帮助san的npc
+    let ImbueList = ["jiuzhuan jindan", "feicui lan", "magic water", "xisui dan", "xian dan", "puti zi"]//尝试imbue的道具
     San.Data = {
         Weapon: "",
         Times: 0,
@@ -13,6 +14,7 @@ $.Module(function (App) {
         CurrenHelper: null,
     }
     let matcherTimes = /^(.+)已经运用灵物浸入了(.+)次，正在激发它的潜能。$/
+    //检查浸入次数的计划
     let PlanTimes = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -35,6 +37,7 @@ $.Module(function (App) {
     // 红楼剑阁已经运用灵物浸入了四十四次，正在激发它的潜能。
     //你拿出一柄红楼剑阁，握在手中。
     let matcherName = /^你拿出一.(.+)，握在手中。$/
+    //武器名的计划
     let PlanName = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -49,6 +52,7 @@ $.Module(function (App) {
             App.Next()
         }
     )
+    //准备
     San.Prepare = () => {
         $.PushCommands(
             $.Prepare(),
@@ -67,6 +71,7 @@ $.Module(function (App) {
         San.Data.ImbueList = [...ImbueList]
         San.Prepare()
     }
+    //检查内力精力
     San.CheckNeili = () => {
         if (App.Data.Player.HPM["内力上限"] - App.Data.Player.HP["内力上限"] > 180 || (App.Data.Player.HPM["内力上限"] > 8000 && App.Data.Player.HP["内力上限"] < 8000)) {
             $.PushCommands(
@@ -92,6 +97,7 @@ $.Module(function (App) {
     }
     let matcherSelfSan = /^你轻轻抚过.+，两指点于其上/
     let matcherSelfSaned = /^现在.+已经被充分的圣化了/
+    //san的计划
     let PlanSan = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -121,6 +127,7 @@ $.Module(function (App) {
 
             }
         })
+    //保存物品
     San.Store = () => {
         App.Push()
         if (San.Data.LastItem) {
@@ -142,6 +149,7 @@ $.Module(function (App) {
     let matcherNext = /^(.+)说道： 我已经为(.+)圣化过了，你需要去寻求他人帮助以继续圣化。$/
     let matcherSelf = /^(.+)说道：\.\.\.你还是拿回去自己圣化吧\.\.\.$/
     let matcherFinished = /^(.+)说道： 现在(.+)的潜力已经充分挖掘了，只是需要最后一步融合。/
+    //NPC帮助san的计划
     let PlanShow = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -210,6 +218,7 @@ $.Module(function (App) {
     )
     let matcherNextImbue = /^(.+)现在不需要用.+来浸入。$/
     let MatcherSucces = /^你将.+的效力浸入了.+。/
+    //Imbue的计划
     let PlanImbue = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -238,13 +247,14 @@ $.Module(function (App) {
             App.Next()
         }
     )
+    //尝试imbue物品
     San.GoImbue = () => {
         if (San.Data.ImbueList.length == 0) {
             Note("结束")
             App.Next()
             return
         }
-        let item = San.Data.ImbueList.shift()
+        let item = San.Data.ImbueList.shift()//依次尝试imbueList
         Note("尝试" + item + "。")
         $.PushCommands(
             $.Function(() => { San.FetchItem(item) }),
@@ -259,8 +269,8 @@ $.Module(function (App) {
             PrintSystem(`无法获取${San.Data.Weapon}的名字，请确认是否拼写错误。`)
             return
         }
-        if (San.Data.Helpers.length) {
-            San.Data.CurrenHelper = App.Core.NPC.Kungfu[San.Data.Helpers.shift()]
+        if (San.Data.Helpers.length) {//检查是否需要help
+            San.Data.CurrenHelper = App.Core.NPC.Kungfu[San.Data.Helpers.shift()]//下一个helper
             $.PushCommands(
                 $.To(San.Data.CurrenHelper.Loc),
                 $.Nobusy(),
@@ -280,7 +290,7 @@ $.Module(function (App) {
         $.Next()
     }
     San.Data.LastItem = null
-    San.FetchItem = (id) => {
+    San.FetchItem = (id) => {//获取道具
         $.PushCommands()
         San.Data.LastItem = null
         if (!App.Data.Item.List.FindByIDLower(id).First()) {
@@ -318,6 +328,7 @@ $.Module(function (App) {
         )
         App.Next()
     }
+    //实例化任务
     let Quest = App.Quests.NewQuest("san")
     Quest.Name = "san武器"
     Quest.Desc = "san 10lv"

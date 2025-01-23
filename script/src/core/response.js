@@ -1,6 +1,7 @@
 //响应同步模块
 (function (App) {
     //检查busy,第一个参数时周期，第二个参数是延迟，第三个参数是busy结束后的回调
+    //返回具体Task,可以取消
     let checkbusy = function (delay, offset, cb) {
         let nobusy = false
         delay = delay - 0
@@ -37,6 +38,7 @@
         }).WithName("sync")
 
         App.Send("bai")
+        return task
     }
 
     //检查目盲,第一个参数时周期，第二个参数是延迟，第三个参数是busy结束后的回调

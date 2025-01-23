@@ -18,6 +18,7 @@
     App.NamedParams.AddString("MasterID", "").WithName("掌门ID").WithDesc("掌门ID，未指定会根据门派自动判定")
     App.NamedParams.AddString("LocMaster", "").WithName("掌门坐标").WithDesc("掌门坐标，未指定会根据门派自动判定")
     App.NamedParams.AddString("LocDazuo", "1927").WithName("打坐坐标").WithDesc("打坐坐标，未指定会根据门派自动判定")
+    App.NamedParams.AddString("LocYanjiu", "").WithName("研究坐标").WithDesc("研究坐标，未指定会根据是否有房屋信息去1949或LocDazuo")
     App.NamedParams.AddString("LocSleep", "1929").WithName("睡觉坐标").WithDesc("睡觉坐标，未指定会根据门派自动判定")
     App.NamedParams.AddNumber("HealBelow", 75).WithName("气血下限").WithDesc("低于这个值会疗伤")
     App.NamedParams.AddNumber("LearnMax", 100).WithName("学习最大次数").WithDesc("每次学习的最大次数")

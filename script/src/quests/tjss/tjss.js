@@ -1,8 +1,10 @@
+//天机十算任务模块
 $.Module(function (App) {
     let TJSS = {}
     TJSS.Finished = false
 
     let matcher = /^某数，除(\d+)余(\d+)，除(\d+)余(\d+)，除(\d+)余(\d+)，除(\d+)余(\d+)$/
+    //计算的计划
     let PlanThink = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -15,7 +17,7 @@ $.Module(function (App) {
                 }
                 let results = []
                 let current = nums[3].num + nums[3].left
-                while (current < 10000) {
+                while (current < 10000) {//暴力尝试
                     if (current % nums[0].num == nums[0].left && current % nums[1].num == nums[1].left && current % nums[0].num == nums[0].left && current % nums[2].num == nums[2].left) {
                         results.push(current)
                     }

@@ -32,21 +32,21 @@
                 }
                 return true
             })
-            task.AddTrigger(matcherUnknown, function (result) {
+            task.AddTrigger(matcherUnknown, function (tri, result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "unknown"
                     App.Data.Ask.Mode = 2
                 }
                 return true
             })
-            task.AddTrigger(matcherRetry, function (result) {
+            task.AddTrigger(matcherRetry, function (tri, result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "retry"
                     App.Data.Ask.Mode = 2
                 }
                 return true
             })
-            task.AddTrigger(matcherFail, function (result) {
+            task.AddTrigger(matcherFail, function (tri, result) {
                 if (App.Data.Ask.LineNumber == 1 && App.Data.Ask.Mode == 1) {
                     App.Data.Ask.Result = "fail"
                     App.Data.Ask.Mode = 2

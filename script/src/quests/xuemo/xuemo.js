@@ -1,3 +1,4 @@
+//打血魔的任务模块
 $.Module(function (App) {
     let Xuemo = {}
     Xuemo.All = 0
@@ -15,6 +16,7 @@ $.Module(function (App) {
         "尸煞": false,
         Finish: false,
     }
+    //全局计划，统计每一种npc是否打完
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
@@ -120,6 +122,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    //进副本
     let PlanEnter = new App.Plan(
         App.Positions["Response"],
         (task) => {
@@ -141,6 +144,7 @@ $.Module(function (App) {
             App.Fail()
         }
     )
+    //检查地图
     Xuemo.Entered = () => {
         Xuemo.All++
         Note("进入副本，打探地图")
@@ -161,6 +165,7 @@ $.Module(function (App) {
         App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "2980", "s")
     }
     let macherAnswer = /^丁一有气无力地说道：这位.+，能听我一言吗？\(answer yes\/no\)$/
+    //找丁一的计划
     let PlanFindDingyi = new App.Plan(
         App.Positions["Connect"],
         (task, plan, data) => {
@@ -192,6 +197,7 @@ $.Module(function (App) {
             Xuemo.Leave()
         }
     )
+    //找丁一
     Xuemo.FindDingyi = () => {
         App.Map.Room.ID = "2978"
         Xuemo.AddApth()
@@ -207,18 +213,19 @@ $.Module(function (App) {
         }
         PlanFindDingyi.Execute()
     }
+    //离开副本
     Xuemo.Leave = () => {
-        App.Send("team talk 血魔副本离开"),
-            $.PushCommands(
-                $.To("2981"),
-                $.Path(["out"]),
-                $.Function(() => {
-                    Quest.Cooldown(120000)
-                    App.Next()
-                })
-            )
+        $.PushCommands(
+            $.To("2981"),
+            $.Path(["out"]),
+            $.Function(() => {
+                Quest.Cooldown(120000)
+                App.Next()
+            })
+        )
         $.Next()
     }
+    //杀npc
     Xuemo.KillAll = (killcmd) => {
         let snap = App.Map.Snap()
         if (!killcmd) {
@@ -239,7 +246,7 @@ $.Module(function (App) {
             $.Function(() => {
                 $.RaiseStage("prepare")
                 $.Sync(),
-                App.Map.Rollback(snap)
+                    App.Map.Rollback(snap)
                 switch (Xuemo.Data.Step) {
                     case 1:
                         if (Xuemo.Data.僵尸 && Xuemo.Data.骷髅 && Xuemo.Data.幽灵) {
@@ -279,6 +286,7 @@ $.Module(function (App) {
         App.Next()
 
     }
+    //检查是否有巫妖
     Xuemo.ChecSkeletonLich = () => {
         if (App.Map.Room.Name != "聚灵法阵") {
             App.Commands.Insert(
@@ -298,6 +306,7 @@ $.Module(function (App) {
         App.Map.Rollback(Xuemo.Data.Snap)
         App.Map.FinishMove()
     }
+    //杀巫妖
     Xuemo.KillSkeletonLich = () => {
         let sklive = App.Map.Room.Data.Objects.FindByName("巫妖").First()
         let killcmd
@@ -326,6 +335,7 @@ $.Module(function (App) {
         )
         App.Next()
     }
+    //遍历
     Xuemo.Wanted = (move, map, step) => {
         move.Option.MultipleStep = false
         move.OnArrive = function (move, map) {
@@ -415,24 +425,25 @@ $.Module(function (App) {
             }
         }
     }
-
+    //搜索逻辑
     Xuemo.Search = () => {
         $.RaiseStage("prepare")
         $.Sync(),
-        $.PushCommands(
-            $.Rooms(App.Core.Fuben.Current.Rooms, Xuemo.Wanted),
-            $.To("2978"),
-            $.Function(() => {
-                if (Xuemo.Data.Step == 4) {
-                    App.Send("give all to ding yi")
-                }
-                PlanReport.Execute()
+            $.PushCommands(
+                $.Rooms(App.Core.Fuben.Current.Rooms, Xuemo.Wanted),
+                $.To("2978"),
+                $.Function(() => {
+                    if (Xuemo.Data.Step == 4) {
+                        App.Send("give all to ding yi")
+                    }
+                    PlanReport.Execute()
 
-            })
-        )
+                })
+            )
         $.Next()
 
     }
+    //Report给丁一作下一步的计划
     let PlanReport = new App.Plan(
         App.Positions["Connect"],
         (task, plan, data) => {
@@ -493,6 +504,7 @@ $.Module(function (App) {
             Xuemo.Leave()
         }
     )
+    //杀骷髅的计划
     let PlanSkeleton = new App.Plan(
         App.Positions["Connect"],
         (task, plan, data) => {
@@ -502,6 +514,7 @@ $.Module(function (App) {
         (result) => {
             Xuemo.KillSkeleton()
         })
+    //杀光房间的计划
     Xuemo.Clean = () => {
         $.PushCommands(
             $.Function(() => {
@@ -527,8 +540,8 @@ $.Module(function (App) {
             })
         )
         App.Next()
-
     }
+    //杀骷髅
     Xuemo.KillSkeleton = () => {
         $.PushCommands(
             $.Function(Xuemo.Clean),
@@ -542,6 +555,7 @@ $.Module(function (App) {
         )
         App.Next()
     }
+    //杀丁一
     Xuemo.KillDingyi = () => {
         $.Insert(
             $.Do("team talk 血魔副本杀丁一"),
@@ -559,7 +573,7 @@ $.Module(function (App) {
         Xuemo.All = 0
         Xuemo.Success = 0
     })
-
+    //任务实例
     let Quest = App.Quests.NewQuest("xuemo")
     Quest.Name = "血魔副本"
     Quest.Desc = ""
