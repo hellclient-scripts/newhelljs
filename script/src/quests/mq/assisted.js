@@ -246,7 +246,7 @@ $.Module(function (App) {
             $.Plan(PlanQuest),
             $.Function(() => {
                 if (Assisted.Data.NoMaster) {
-                    Quest.Cooldown(3000000)
+                    Quest.Cooldown(300000)
                     Note("师傅没了，任务冷却5分钟")
                     App.Log("师傅没了")
                 } else if (Assisted.Data.NPC) {

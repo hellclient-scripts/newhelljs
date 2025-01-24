@@ -262,8 +262,15 @@
                     App.Core.Heal.NewRestCommand(),
                 )
             } else if (App.Data.Player.HP["气血百分比"] <= 20) {//失败
-                App.Fail()
-                return
+                let eatyao = App.Core.Medicine.EatYao("回血")
+                if (eatyao) {
+                    App.Commands.PushCommands(
+                        App.Commands.NewFunctionCommand(eatyao)
+                    )
+                } else {
+                    App.Fail()
+                    return
+                }
             } else if (App.Data.Player.HP["气血百分比"] <= App.Params.HealBelow) {//yun heal
                 App.Commands.PushCommands(
                     App.Commands.NewDoCommand("yun heal"),

@@ -35,10 +35,11 @@
         App.Commands.Discard()
         if (!App.Quests.IsStopped()) {
             App.Commands.Append(
+                App.Commands.NewWaitCommand(2000),
                 App.Commands.NewFunctionCommand(() => {
                     Note("重新执行任务队列")
                     App.Quests.Restart()
-                })
+                }),
             )
         }
         App.Next()
