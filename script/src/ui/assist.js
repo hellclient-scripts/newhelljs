@@ -20,6 +20,7 @@
         list.append("questparams", "任务参数设置")
         list.append("lian", "初始化练习清单")
         list.append("advance", "高级设置")
+        list.append("push", "推送设置")
         list.append("help", "使用帮助")
         list.publish("App.UI.Assist.OnClick")
     }
@@ -75,6 +76,9 @@
                 break
             case "advance":
                 App.UI.Assist.AdvanceShow()
+                break
+            case "push":
+                App.Push.Show()
                 break
             case "help":
                 App.Help()

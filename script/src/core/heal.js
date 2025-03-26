@@ -265,7 +265,8 @@
                 let eatyao = App.Core.Medicine.EatYao("回血")
                 if (eatyao) {
                     App.Commands.PushCommands(
-                        App.Commands.NewFunctionCommand(eatyao)
+                        App.Commands.NewFunctionCommand(eatyao),
+                        App.Core.Heal.NewRestCommand(),//重试
                     )
                 } else {
                     App.Fail()
