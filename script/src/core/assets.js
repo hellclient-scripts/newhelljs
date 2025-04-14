@@ -106,6 +106,14 @@
                         )
                     }
                     break
+                case "#home"://放在家里
+                    App.Commands.PushCommands(
+                        App.Move.NewToCommand("2682"),
+                        App.Commands.NewDoCommand("store " + result.Asset.Item.IDLower),
+                        App.Commands.NewDoCommand("i"),
+                        App.NewSyncCommand()
+                    )
+                    break
                 case "#pack"://打包带身上
                     if (App.Data.Item.List.FindByID("qiankun bag").First()) {
                         App.Commands.PushCommands(

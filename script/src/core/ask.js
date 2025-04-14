@@ -106,7 +106,7 @@
     }
     App.Commands.RegisterExecutor("ask", function (commands, running) {
         running.OnStart = function (arg) {
-            App.Ask(running.Command.Data.ID, running.Command.Data.Question, running.Command.Data.question)
+            App.Ask(running.Command.Data.ID, running.Command.Data.Question, running.Command.Data.Length)
         }
     })
 })(App)
