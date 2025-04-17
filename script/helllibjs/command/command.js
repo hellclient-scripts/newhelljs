@@ -1,5 +1,6 @@
 (function (App) {
     let module = {}
+    module.Debug = false;
     class RunningCommand {
         constructor(cmd) {
             this.Command = cmd
@@ -13,9 +14,13 @@
         constructor(name, data) {
             this.Name = name
             this.Data = data
+            if (module.Debug) {
+                this.Stack = (new Error()).stack
+            }
         }
         Context = {}
         Name = ""
+        Stack = ""
         Data = null
         OnEvent = null
     }

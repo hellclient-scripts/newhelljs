@@ -1,6 +1,7 @@
 //指令模块
 (function (App) {
     let commandModule = App.RequireModule("helllibjs/command/command.js")
+    // commandModule.Debug=true
     //指令实例
     App.Commands = new commandModule.Commands()
     //指令的Position
