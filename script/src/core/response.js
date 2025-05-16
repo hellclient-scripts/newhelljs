@@ -61,7 +61,7 @@
             }
         })
         var timer = task.AddTimer(delay, function () {
-            App.Send(`ask ${App.Data.Player.Score.ID} about blind`)
+            App.Send(`ask ${GetVariable("id")} about blind`)
             return true
         }).Reset(offset)
         task.AddTrigger("你自己自言自语。", function () {
@@ -76,7 +76,7 @@
             OmitOutput()
         }).WithName("sync")
 
-        App.Send(`ask ${App.Data.Player.Score.ID} about blind`)
+        App.Send(`ask ${ApGetVariable("id")} about blind`)
     }
     //同步，参数为回调
     let sync = function (cb) {
