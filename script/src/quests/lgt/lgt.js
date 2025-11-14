@@ -144,7 +144,7 @@ $.Module(function (App) {
         $.PushCommands(
             $.Nobusy(),
             $.Function(() => {
-                App.Send("yun recover;yun regenerage")
+                App.Send("yun recover;yun regenerate")
                 $.RaiseStage("prepare")
                 $.Sync()
                 $.Next()

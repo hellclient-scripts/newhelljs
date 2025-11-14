@@ -36,7 +36,7 @@
                 App.UI.Assist.CommonShow()
                 break
             case "rooms":
-                App.UI.Publishgrid(App.UI.Rooms.Grid, App.Mapper.Lines)
+                App.UI.Publishgrid(App.UI.Rooms.Grid, App.UI.Rooms.Lines())
                 break
             case "reload":
                 App.ReloadVariable()
@@ -78,7 +78,7 @@
                 App.UI.Assist.AdvanceShow()
                 break
             case "push":
-                App.Push.Show()
+                App.PushMessage.Show()
                 break
             case "help":
                 App.Help()

@@ -43,12 +43,11 @@
     }
     //移动跟踪
     App.Map.Trace = function (map, rid, dir) {
-        var flylist = Mapper.flylist()
-        var exits = Mapper.getexits(rid)
+        var exits = App.Map.GetRoomExits(rid, true)
         var result = ""
-        flylist.concat(exits).forEach(function (path) {
-            if (App.Move.Filterdir(path.command) == App.Move.Filterdir(dir)) {
-                result = path.to + ""
+        exits.forEach(function (path) {
+            if (App.Move.Filterdir(path.Command) == App.Move.Filterdir(dir)) {
+                result = path.To + ""
             }
         })
         return result

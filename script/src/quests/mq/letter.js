@@ -206,7 +206,7 @@ $.Module(function (App) {
         Letter.Data.NPC.First = false
         let wanted = $.NewWanted(Letter.Data.NPC.Name, zone).
             WithChecker(Checker).WithOrdered(true).WithID(Letter.Data.NPC.ID)
-        App.Send("yun recover;yun regenerage")
+        App.Send("yun recover;yun regenerate")
         $.RaiseStage("prepare")
         $.PushCommands(
             $.Prepare(),

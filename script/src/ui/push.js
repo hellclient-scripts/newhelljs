@@ -1,8 +1,8 @@
 //推送
 (function (App) {
-    const Package = "App.Push"
+    const Package = "App.PushMessage"
     let module = {}
-    App.Push = module
+    App.PushMessage = module
     let newconfig = () => {
         return {
             Server: "",

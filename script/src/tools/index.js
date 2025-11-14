@@ -1,4 +1,6 @@
 (function (App) {
     App.Tools = {}
     App.Include("src/tools/list.js")
+    App.Include("src/tools/hmm.js")
+
 })(App)

@@ -8,15 +8,18 @@
         return App.Map.TraceRooms(fr, ...cmds.split(";"))
     }
     //加载默认数据
-    App.LoadLines("data/zones.txt", "|").forEach((data) => {
-        switch (data[1]) {
-            case "path":
-                App.Zone.Maps[data[0]] = convertPath(data[2], data[3])
-                break
-            default:
-                PrintSystem("无效的路径类型" + data[1])
-        }
-    })
+    // App.LoadLines("data/zones.txt", "|").forEach((data) => {
+    //     switch (data[1]) {
+    //         case "path":
+    //             App.Zone.Maps[data[0]] = convertPath(data[2], data[3])
+    //             break
+    //         default:
+    //             PrintSystem("无效的路径类型" + data[1])
+    //     }
+    // })
+    App.Mapper.Database.APIListRoutes(App.Mapper.HMM.APIListOption.New().WithGroups(["quest"])).forEach((model) => {
+        App.Zone.Maps[model.Key]=model.Rooms
+    });
     //加载小二信息
     App.LoadLines("data/info.txt", "|").forEach((data) => {
         App.Zone.Info[data[0]] = {

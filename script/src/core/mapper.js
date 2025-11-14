@@ -1,18 +1,43 @@
 //地图模块
 (function (App) {
     let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
+    let mapModule = App.RequireModule("helllibjs/map/map.js")
     App.Mapper = {}
-    App.Mapper.Lines = []
-    roomshModule.CostToken = "%"
-    //roomsh实例
-    App.RoomsH = new roomshModule.File()
-    let mapfile = "data/rooms.h"
-    Note("加载地图文件" + mapfile)
-    //加载地图
-    App.RoomsH.Load(ReadLines(mapfile))
+    App.Mapper.HMM = mapModule.HMM
+    App.Mapper.Database = mapModule.Database
+    App.Map.Data.RoomsByName = {}
+    App.Mapper.HMM.HMMEncoder.DecodeRoomHook = (room) => {
+        if (!App.Map.Data.RoomsByName[room.Name]) {
+            App.Map.Data.RoomsByName[room.Name] = []
+        }
+        App.Map.Data.RoomsByName[room.Name].push(room.Key)
+        return room;
+    }
+    Note("加载地图文件" + "data/hell.hmm")
+    mapModule.Database.Import(ReadFile("data/hell.hmm"))
+
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
     //添加房子
+    App.Mapper.HomeRooms = []
+    App.Mapper.Paths = []
+    App.Mapper.NewCondition = function (tag, value = 1, not = false) {
+        return App.Mapper.HMM.ValueCondition.New(tag, value, not)
+    }
+    App.Mapper.NewExit = function (command, to, cost = 1) {
+        let model = App.Mapper.HMM.Exit.New()
+        model.Command = command
+        model.To = to
+        model.Cost = cost
+        return model
+    }
+    App.Mapper.NewRoom = function (key, name, exits = []) {
+        let model = App.Mapper.HMM.Room.New()
+        model.Key = key
+        model.Name = name
+        model.Exits = exits
+        return model
+    }
     App.Mapper.Addhouse = function (line) {
         if (line) {
             var data = line.split(" ")
@@ -23,25 +48,77 @@
             var hosuename = data[0]
             var houesid = data[1]
             var houseloc = data[2]
-            let houserooms = []
-            houserooms.push("1933=" + hosuename + "大院|n:1934,out:" + houseloc + ",")
-            houserooms.push("1934=" + hosuename + "前庭|e:1936,push、n。:1937,s:1933,w:1935,")
-            houserooms.push("1935=右卫舍|e:1934,")
-            houserooms.push("1936=左卫舍|w:1934,")
-            houserooms.push("1937=走道|n:1938,push、s。:1934,")
-            houserooms.push("1938=" + hosuename + "迎客厅|n:1939,s:1937,open door、e:2533,")
-            houserooms.push("1939=议事厅|e:1941,n:1942,s:1938,w:1940,")
-            houserooms.push("1940=" + hosuename + "武厅|e:1939,")
-            houserooms.push("1941=" + hosuename + "武厅|w:1939,")
-            houserooms.push("1942=" + hosuename + "中庭|open west、w:1943,n:1944,s:1939,")
-            houserooms.push("1943=左厢房|e:1942,")
-            houserooms.push("1944=后院|e:-1,n:1947,s:1942,w:1945,")
-            houserooms.push("1945=厨房|e:1944,")
-            houserooms.push("1946=备用|e。:1949,")
-            houserooms.push("1947=后花园|e:1948,s:1944,open door、w、close door:2681,")
-            houserooms.push("1948=竹林|e:1949,w:1947,")
-            houserooms.push("1949=听涛阁|w:1948,")
-            App.RoomsH.Load(houserooms)
+            App.Mapper.HomeRooms = [
+                App.Mapper.NewRoom("1933", `${hosuename}大院`, [
+                    App.Mapper.NewExit("n", "1934"),
+                    App.Mapper.NewExit("out", houseloc),
+                ]),
+                App.Mapper.NewRoom("1934", `${hosuename}前庭`, [
+                    App.Mapper.NewExit("e", "1936"),
+                    App.Mapper.NewExit("push、n。", "1937"),
+                    App.Mapper.NewExit("s", "1933"),
+                    App.Mapper.NewExit("w", "1935"),
+                ]),
+                App.Mapper.NewRoom("1935", `右卫舍`, [
+                    App.Mapper.NewExit("e", "1934"),
+                ]),
+                App.Mapper.NewRoom("1936", `左卫舍`, [
+                    App.Mapper.NewExit("w", "1934"),
+                ]),
+                App.Mapper.NewRoom("1937", `走道`, [
+                    App.Mapper.NewExit("n", "1938"),
+                    App.Mapper.NewExit("push、s。", "1934"),
+                ]),
+                App.Mapper.NewRoom("1938", `${hosuename}迎客厅`, [
+                    App.Mapper.NewExit("n", "1939"),
+                    App.Mapper.NewExit("s", "1937"),
+                    App.Mapper.NewExit("open door、e", "2533"),
+                ]),
+                App.Mapper.NewRoom("1939", `议事厅`, [
+                    App.Mapper.NewExit("e", "1941"),
+                    App.Mapper.NewExit("n", "1942"),
+                    App.Mapper.NewExit("s", "1938"),
+                    App.Mapper.NewExit("w", "1940"),
+                ]),
+                App.Mapper.NewRoom("1940", `${hosuename}武厅`, [
+                    App.Mapper.NewExit("e", "1939"),
+                ]),
+                App.Mapper.NewRoom("1941", `${hosuename}武厅`, [
+                    App.Mapper.NewExit("w", "1939"),
+                ]),
+                App.Mapper.NewRoom("1942", `${hosuename}中庭`, [
+                    App.Mapper.NewExit("open west、w", "1943"),
+                    App.Mapper.NewExit("n", "1944"),
+                    App.Mapper.NewExit("s", "1939"),
+                ]),
+                App.Mapper.NewRoom("1943", `左厢房`, [
+                    App.Mapper.NewExit("e", "1942"),
+                ]),
+                App.Mapper.NewRoom("1944", `后院`, [
+                    App.Mapper.NewExit("e", "-1"),
+                    App.Mapper.NewExit("n", "1947"),
+                    App.Mapper.NewExit("s", "1942"),
+                    App.Mapper.NewExit("w", "1945"),
+                ]),
+                App.Mapper.NewRoom("1945", `厨房`, [
+                    App.Mapper.NewExit("e", "1944"),
+                ]),
+                App.Mapper.NewRoom("1946", `备用`, [
+                    App.Mapper.NewExit("e。", "1949"),
+                ]),
+                App.Mapper.NewRoom("1947", `后花园`, [
+                    App.Mapper.NewExit("e", "1948"),
+                    App.Mapper.NewExit("s", "1944"),
+                    App.Mapper.NewExit("open door、w、close door", "2681"),
+                ]),
+                App.Mapper.NewRoom("1948", `竹林`, [
+                    App.Mapper.NewExit("e", "1949"),
+                    App.Mapper.NewExit("w", "1947"),
+                ]),
+                App.Mapper.NewRoom("1949", `听涛阁`, [
+                    App.Mapper.NewExit("w", "1948"),
+                ]),
+            ]
             world.Note("在位置 " + houseloc + " 添加房屋" + hosuename + "入口[" + houesid + "]")
             App.Mapper.HouseID = houesid
             App.Mapper.HouseLoc = houseloc
@@ -50,38 +127,39 @@
         }
     }
     App.Mapper.Addhouse(GetVariable("house"))
-    App.Mapper.AddPath = (fr, exitcmd) => {
-        let exit = App.RoomsH.ParsePath(fr, exitcmd)
-        if (exit.Ready()) {
-            exit.Command = exit.Command.replaceAll(_re, "")
-            exit.AddToMapper()
-        }
 
-    }
-    App.Map.Data.RoomsByName = {}
-    _re = /·/g
-    App.RoomsH.Data.forEach(line => {
-        if (line.Ready()) {
-            if (!App.Map.Data.RoomsByName[line.Name]) {
-                App.Map.Data.RoomsByName[line.Name] = []
-            }
-            App.Map.Data.RoomsByName[line.Name].push(line.ID)
-            Mapper.setroomname(line.ID, line.Name)
-            line.Exits.forEach(exit => {
-                if (exit.Ready()) {
-                    exit.Command = exit.Command.replaceAll(_re, "。")
-                    exit.AddToMapper()
-                }
-            })
-            App.Mapper.Lines.push(line.Raw)
-        }
-    });
+    _re = /·/g;
     //加载额外出口
-    App.LoadLines("data/exits.h", "|").forEach((data) => {
-        App.Mapper.AddPath(data[0], data[1])
+    // App.LoadLines("data/exits.h", "|").forEach((data) => {
+    //     App.Mapper.AddPath(data[0], data[1])
+    // })
+    (() => {
+        App.Mapper.Paths.push((() => {
+            let model = App.Mapper.HMM.Path.New()
+            model.From = "1236"
+            model.To = "1237"
+            model.Command = "cross"
+            model.Conditions = [App.Mapper.App.Mapper.NewCondition("winter")]
+            return model;
+        })())
+        App.Mapper.Paths.push((() => {
+            let model = App.Mapper.HMM.Path.New()
+            model.From = "1237"
+            model.To = "1236"
+            model.Command = "cross"
+            model.Conditions = [App.Mapper.App.Mapper.NewCondition("winter")]
+            return model;
+        })())
     })
+
     if (App.Mapper.HouseID && App.Mapper.HouseLoc) {
-        App.Mapper.AddPath(App.Mapper.HouseLoc, App.Mapper.HouseID + ":1933")
+        App.Mapper.Paths.push((() => {
+            let model = App.Mapper.HMM.Path.New()
+            model.From = App.Mapper.HouseLoc
+            model.To = "1933"
+            model.Command = App.Mapper.HouseID
+            return model;
+        })())
     }
 
 
@@ -108,46 +186,7 @@
     App.Mapper.ExcludeRooms = {}
     //扩展房间，第一个参数为房间id数组，第二个参数为膨胀多少格。
     App.Mapper.ExpandRooms = (rooms, expand) => {
-        if (rooms == null || rooms.length == 0) {
-            return []
-        }
-        if (!expand || expand <= 0) {
-            return rooms
-        }
-        let result = {}
-        App.Map.InitTags()
-        let tomap = {}
-        while (expand > 0) {
-            let next = []
-            expand = expand - 1
-            for (var i = 0; i < rooms.length; i++) {
-                rid = rooms[i]
-                if (result[rid]) {
-                    continue
-                }
-                result[rid] = true
-                //去除 不应该参与计算的路径
-                Mapper.settag("calc", true)
-                let exits = Mapper.getexits(rid)
-                for (var ei = 0; ei < exits.length; ei++) {
-                    let exit = exits[ei]
-                    if (exit.to == "-1" || App.Mapper.ExcludeRooms[exit.to] || tomap[exit.to] || result[exit.to] || exit.delay > 20 || exit.command.indexOf("rideto ") > -1 || exit.command.indexOf("goto") > -1) {
-                        continue
-                    }
-                    tomap[exit.to] = true
-                    next.push(exit.to)
-                }
-            }
-            if (next.length == 0) {
-                break
-            }
-            rooms = next
-        }
-        for (var k in tomap) {
-            result[k] = true
-        }
-        return Object.keys(result)
-
+        return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context,)
     }
     App.Mapper.Data = {}
     App.Mapper.InWinter = function () {
@@ -155,6 +194,14 @@
     }
 
     App.Mapper.InitTag = function (map) {
+        if (App.Mapper.HomeRooms.length) {
+            map.AddTemporaryRooms(App.Mapper.HomeRooms)
+        }
+        if (App.Mapper.Paths.length) {
+            App.Mapper.Paths.forEach((p) => {
+                map.AddTemporaryPath(p)
+            })
+        }
         if (App.Mapper.InWinter()) {
             map.SetTag("winter", true)
             map.BlockPath("1236", "1237")

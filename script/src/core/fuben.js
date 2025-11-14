@@ -7,6 +7,7 @@
     App.Core.Fuben.Last = 0
     //当前副本
     App.Core.Fuben.Current = null
+    App.Core.Fuben.CurrentRooms = []
     //创建新的副本地图
     App.Core.Fuben.NewMaze = () => {
         if (App.Core.Fuben.Current) {
@@ -20,6 +21,7 @@
             App.Core.Fuben.Current.Paths.forEach((p) => {
                 map.AddTemporaryPath(p.from, p)
             })
+            map.AddTemporaryRooms(App.Core.Fuben.CurrentRooms)
         }
     }
     App.Map.AppendTagsIniter(App.Core.Fuben.OnInitTags)
@@ -40,16 +42,18 @@
             this.AddPath(`${this.Prefix}-${x2}-${y2}`, `${this.Prefix}-${x}-${y}`, from)
         }
         AddPath(from, to, command) {
-            let path = Mapper.newpath()
-            path.from = from
-            path.to = to
-            path.command = command
+            let path = App.Mapper.HMM.Path.New()
+            path.From = from
+            path.To = to
+            path.Command = command
             this.Paths.push(path)
         }
         Install() {
-            Mapper.ResetTemporary()
+            App.Core.Fuben.CurrentRooms=[]
             this.Rooms.forEach((room) => {
-                Mapper.SetRoomName(room)
+                App.Core.Fuben.CurrentRooms.push(
+                    App.Mapper.NewRoom(room,"")
+                )
             })
         }
         Destory() {

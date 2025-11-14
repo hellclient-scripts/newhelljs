@@ -202,7 +202,7 @@ fish
 
 比如
 ```
-#prepare||#to 1927||yun regererate||#wpon||yong jue||yong jue||yong jue||yong jue||yong jue||#loop
+#prepare||#to 1927||yun regenerate||#wpon||yong jue||yong jue||yong jue||yong jue||yong jue||#loop
 ```
 能做简单的yong jue队列。
 

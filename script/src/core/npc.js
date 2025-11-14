@@ -113,12 +113,21 @@
     })
     App.Core.NPC.Kungfu = {}
     //加载npc师傅列表
-    App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {
-        App.Core.NPC.Kungfu[data[0]] = {
-            Key: data[0],
-            Name: data[1],
-            Loc: data[2],
-            ID: data[3],
+    // App.LoadLines("data/kungfunpc.txt", "|").forEach((data) => {
+    //     App.Core.NPC.Kungfu[data[0]] = {
+    //         Key: data[0],
+    //         Name: data[1],
+    //         Loc: data[2],
+    //         ID: data[3],
+    //     }
+    // })
+    App.Mapper.Database.APIListMarkers(App.Mapper.HMM.APIListOption.New().WithGroups(["npc"])).forEach((model) => {
+        let data = model.Message.split("|")
+        App.Core.NPC.Kungfu[model.Key] = {
+            Key: model.Key,
+            Name: [data[0]],
+            Loc: [data[1]],
+            ID: [data[2]],
         }
     })
 })(App)

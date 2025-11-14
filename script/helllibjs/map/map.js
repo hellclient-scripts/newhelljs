@@ -1,8 +1,11 @@
 (function (App) {
     let movementModule = App.RequireModule("helllibjs/map/movement.js")
+    let hmm = App.Include("helllibjs/lib/hmm/hmm.js")
     let module = {}
     module.DefaultStepTimeout = 3000
     module.DefaultResendDelay = 500
+    module.HMM = hmm
+    module.Database = new hmm.MapDatabase()
     module.DefaultOnModeChange = (map, oldmode, newmode) => {
     }
     class Room {
@@ -51,12 +54,7 @@
     }
     let DefaultTrace = function (map, fr, cmd) {
         if (fr != "") {
-            let exits = Mapper.getexits(fr + "")
-            for (var i = 0; i < exits.length; i++) {
-                if (exits[i].command == cmd) {
-                    return exits[i].to
-                }
-            }
+            return hmm.APITraice(fr, cmd, this.Context, hmm.MapperOptions.New())
         }
         return ""
     }
@@ -72,6 +70,7 @@
             this.StepTimeout = module.DefaultStepTimeout
             this.ResendDelay = module.DefaultResendDelay
         }
+        Context = new hmm.Context()
         CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
         Room = new Room()
@@ -80,6 +79,7 @@
         #tags = {}
         #blocked = []
         #temporaryPaths = []
+        #temporaryRooms = []
         Data = {}
         Movement = null
         StepPlan = null
@@ -150,13 +150,18 @@
         }
         FlashTags() {
             this.#tags = {}
-            Mapper.flashtags()
-            Mapper.ResetTemporary()
+            this.Context = hmm.Context.New();
+            //Mapper.flashtags()
+            //Mapper.ResetTemporary()
             this.#blocked = []
             this.#temporaryPaths = []
+            this.#temporaryRooms = []
         }
-        AddTemporaryPath(from, path) {
-            this.#temporaryPaths.push({ From: from, Path: path })
+        AddTemporaryRooms(rooms) {
+            this.#temporaryRooms = this.#temporaryRooms.concat(rooms)
+        }
+        AddTemporaryPath(path) {
+            this.#temporaryPaths.push(path)
         }
         BlockPath(from, to) {
             this.#blocked.push([from, to])
@@ -177,12 +182,16 @@
             })
             for (var key in this.#tags) {
                 if (this.#tags[key]) {
-                    Mapper.settag(key, true)
+                    this.Context.WithTags([hmm.ValueTag.New(key, 1)])
+                    //Mapper.settag(key, true)
                 }
             }
-            this.#temporaryPaths.forEach(tp => {
-                Mapper.AddTemporaryPath(tp.From, tp.Path)
+            this.#blocked.forEach(val => {
+                this.Context.WithBlockedLinks([hmm.Link.New(val[0], val[1])])
             })
+            this.Context.WithRooms(this.#temporaryRooms)
+            this.Context.WithPaths(this.#temporaryPaths)
+
         }
         UpdateMapperOption(option) {
             if (option.blockedpath == null) {
@@ -202,46 +211,45 @@
             return result
 
         }
-        GetMapperPath(from, fly, to, options) {
+        GetMapperPath(from, fly, to) {
             if (typeof (to) != "object") {
                 to = [to]
             }
             if (to.length == 0) {
                 return []
             }
-            let result = Mapper.GetPath(from, fly, to, options)
+            let result = module.Database.APIQueryPathAny([from], to, this.Context, this.GetMapperOptions(!fly))
+
             if (result == null) {
                 return null
             }
             let path = []
-            result.forEach(step => {
-                path.push(new Step(step.command, step.to))
+            result.Steps.forEach(step => {
+                path.push(new Step(step.Command, step.Target))
             })
             return this.filterpath(path)
         }
-        GetMapperWalkAll(rooms, fly, distance, options) {
-            let result = Mapper.WalkAll(rooms, fly, distance, options)
+        GetMapperWalkAll(rooms, fly, distance) {
+            let result = module.Database.APIQueryPathAll(rooms[0], rooms, this.Context, this.GetMapperOptions(!fly).WithMaxTotalCost(distance))
             if (result == null) {
                 return null
             }
             let path = []
-            result.steps.forEach(step => {
-                path.push(new Step(step.command, step.to))
+            result.Steps.forEach(step => {
+                path.push(new Step(step.Command, step.Target))
             })
             return this.filterpath(path)
+
         }
-        GetMapperWalkOrdered(from, rooms, fly, options) {
+        GetMapperWalkOrdered(from, rooms, fly) {
             let path = []
-            let current = from
-            for (var i in rooms) {
-                let result = Mapper.GetPath(current, fly, [rooms[i]], options)
-                if (result != null) {
-                    result.forEach(step => {
-                        path.push(new Step(step.command, step.to))
-                    })
-                    current = rooms[i]
-                }
+            let result = module.Database.APIQueryPathOrdered(from, rooms, this.Context, this.GetMapperOptions(!fly))
+            if (result == null) {
+                return null
             }
+            result.Steps.forEach(step => {
+                path.push(new Step(step.Command, step.Target))
+            })
             return this.filterpath(path)
         }
         OnWalking() {
@@ -337,6 +345,12 @@
         }
         RegisterMaze(name, maze) {
             this.Mazes[name] = maze
+        }
+        GetRoomExits(rid, withouttemp = false, withoutfly = false) {
+            return module.Database.APIGetRoomExits(rid, !withouttemp ? this.Context : hmm.Context.New(), this.GetMapperOptions(withoutfly))
+        }
+        GetMapperOptions(withoutfly) {
+            return hmm.MapperOptions.New().WithDisableShortcuts(withoutfly)
         }
     }
     class Step {
