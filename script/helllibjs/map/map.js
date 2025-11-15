@@ -182,7 +182,7 @@
             })
             for (var key in this.#tags) {
                 if (this.#tags[key]) {
-                    this.Context.WithTags([hmm.ValueTag.New(key, 1)])
+                    this.Context.WithTags([hmm.ValueTag.New(key, this.#tags[key])])
                     //Mapper.settag(key, true)
                 }
             }
