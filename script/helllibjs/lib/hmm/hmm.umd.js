@@ -150,6 +150,9 @@ class MapDatabase {
             this.Current.MarkAsModified();
         }
     }
+    APIVersion() {
+        return MapDatabase.Version;
+    }
     APIListLandmarks(option) {
         if (this.Current != null) {
             let list = [];
@@ -665,6 +668,7 @@ class MapDatabase {
     }
 }
 exports.MapDatabase = MapDatabase;
+MapDatabase.Version = 1000;
 
 
 /***/ }),
@@ -2527,6 +2531,7 @@ class RoomFilter {
         this.RoomConditions = [];
         this.HasAnyExitTo = [];
         this.HasAnyData = [];
+        this.HasAnyName = [];
         this.ContainsAnyData = [];
         this.ContainsAnyName = [];
         this.ContainsAnyKey = [];
@@ -2538,6 +2543,17 @@ class RoomFilter {
         if (this.HasAnyData.length > 0) {
             for (let data of this.HasAnyData) {
                 if (room.GetData(data.Key) === data.Value) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+    ValidateHasAnyName(room) {
+        if (this.HasAnyName.length > 0) {
+            for (let data of this.HasAnyName) {
+                if (room.Name === data) {
                     return true;
                 }
             }
@@ -2596,6 +2612,9 @@ class RoomFilter {
             }
         }
         if (!this.ValidateHasAnyExitTo(room)) {
+            return false;
+        }
+        if (!this.ValidateHasAnyName(room)) {
             return false;
         }
         if (!this.ValidateContainsAnyData(room)) {
