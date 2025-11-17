@@ -168,6 +168,11 @@
         }
         SetTag(name, value, force) {
             let old = this.#tags[name]
+            if (value === true || value === null || value === undefined) {
+                value = 1
+            } else if (value === false) {
+                value = 0
+            }
             if (old == null || force) {
                 this.#tags[name] = value
             }
