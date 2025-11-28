@@ -19,7 +19,7 @@
     App.Core.Fuben.OnInitTags = (map) => {
         if (App.Core.Fuben.Current) {
             App.Core.Fuben.Current.Paths.forEach((p) => {
-                map.AddTemporaryPath(p.from, p)
+                map.AddTemporaryPath(p)
             })
             map.AddTemporaryRooms(App.Core.Fuben.CurrentRooms)
         }

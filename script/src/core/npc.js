@@ -106,7 +106,7 @@
     App.Map.AppendTagsIniter((map) => {
         if (App.Params.IDPass) {
             App.Params.IDPass.split(",").forEach(val => {
-                map.SetTag(val.trim(), true)
+                map.SetTag(val.trim(), 1)
             })
 
         }

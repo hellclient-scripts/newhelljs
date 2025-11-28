@@ -203,11 +203,11 @@
             })
         }
         if (App.Mapper.InWinter()) {
-            map.SetTag("winter", true)
+            map.SetTag("winter", 1)
             map.BlockPath("1236", "1237")
             map.BlockPath("1238", "1237")
         } else {
-            map.SetTag("winter", false)
+            map.SetTag("winter", 0)
         }
     }
     App.Map.AppendTagsIniter(App.Mapper.InitTag)

@@ -13,14 +13,14 @@
         cmd = cmd.trim()
         if (cmd) {
             if (Mode == 0 || Mode == 1) {
-                return true
+                return 1
             }
             if (canretry()) {
                 Mode = 0
-                return true
+                return 1
             }
         }
-        return false
+        return 0
 
     }
     let canretry = () => {

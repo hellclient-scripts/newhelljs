@@ -76,7 +76,7 @@
             OmitOutput()
         }).WithName("sync")
 
-        App.Send(`ask ${ApGetVariable("id")} about blind`)
+        App.Send(`ask ${GetVariable("id")} about blind`)
     }
     //同步，参数为回调
     let sync = function (cb) {
