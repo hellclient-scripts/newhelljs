@@ -54,7 +54,7 @@
     }
     let DefaultTrace = function (map, fr, cmd) {
         if (fr != "") {
-            return hmm.APITraice(fr, cmd, this.Context, hmm.MapperOptions.New())
+            return hmm.APITrackExit(fr, cmd, this.Context, hmm.MapperOptions.New())
         }
         return ""
     }
@@ -188,7 +188,6 @@
             for (var key in this.#tags) {
                 if (this.#tags[key]) {
                     this.Context.WithTags([hmm.ValueTag.New(key, this.#tags[key])])
-                    //Mapper.settag(key, true)
                 }
             }
             this.#blocked.forEach(val => {

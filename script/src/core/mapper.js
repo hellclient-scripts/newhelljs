@@ -1,5 +1,6 @@
 //地图模块
 (function (App) {
+
     let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     App.Mapper = {}
