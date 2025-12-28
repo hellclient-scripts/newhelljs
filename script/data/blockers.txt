@@ -1,7 +1,6 @@
 安健刚|an jiangang|1000000
 孟健雄|meng jianxiong|1000000
 心砚|xin yan|1000000
-大汉|da han|100000
 周绮|zhou yi|1000000
 蒋四根|jiang sigen|1000000
 石双英|shi shuangying|1000000
@@ -13,7 +12,7 @@
 常赫志|chang hezhi|1000000
 赵半山|zhao banshan|1000000
 周仲英|zhou zhongying|1000000
-陆菲青|lu feiqing|1000000
+//陆菲青|lu feiqing|1000000
 无尘|wuchen daozhang|1000000
 摘星子|zhaixing zi|800000
 虚通|xu tong|50000
@@ -30,3 +29,6 @@
 褚万里|chu wanli|400000
 空见|kong jian|5000000
 道一|daoyi chanshi|50000
+康府侍卫|shi wei|100000
+鳌府侍卫|shi wei|100000
+鳌拜而|ao bai|1000000

@@ -53,24 +53,24 @@
         return result
     }
     //创建固定路线移动
-    App.Move.NewPath = function (path, ...initers) {
+    App.Move.NewPath = function (path, ...initiators) {
         let pathlist = path.map(value => typeof value == "string" ? App.Map.NewStep(value) : value)
-        return App.Map.NewRoute(new App.Map.Movement.Path(pathlist), ...initers)
+        return App.Map.NewRoute(new App.Map.Movement.Path(pathlist), ...initiators)
     }
     //创建定点路线移动
-    App.Move.NewTo = function (target, ...initers) {
+    App.Move.NewTo = function (target, ...initiators) {
         if (typeof target == "string") {
             target = target.split(",").map((val) => val.trim())
         }
-        return App.Map.NewRoute(new App.Map.Movement.To(target), ...initers)
+        return App.Map.NewRoute(new App.Map.Movement.To(target), ...initiators)
     }
     //创建房间路线移动
-    App.Move.NewRooms = function (rooms, ...initers) {
-        return App.Map.NewRoute(new App.Map.Movement.Rooms(rooms), ...initers)
+    App.Move.NewRooms = function (rooms, ...initiators) {
+        return App.Map.NewRoute(new App.Map.Movement.Rooms(rooms), ...initiators)
     }
     //创建固定房间移动
-    App.Move.NewOrdered = function (rooms, ...initers) {
-        return App.Map.NewRoute(new App.Map.Movement.Ordered(rooms), ...initers)
+    App.Move.NewOrdered = function (rooms, ...initiators) {
+        return App.Map.NewRoute(new App.Map.Movement.Ordered(rooms), ...initiators)
     }
     App.Move.LongtimeStepDelay = 60 * 1000
     App.Move.RetryStep = false
@@ -97,6 +97,11 @@
             task.AddCatcher("core.walkresend").WithName("walkresend")
             task.AddCatcher("core.walkretry").WithName("walkretry")
             task.AddCatcher("core.walkfail").WithName("walkfail")
+            task.AddCatcher("core.blocked2", (catcher, event) => {
+                if (App.Core.Room.Current.ID == "") {
+                    return true;
+                }
+            }).WithName("blocked2")
             task.AddCatcher("core.blocked", (catcher, event) => {
                 catcher.WithData(event.Data)
             }).WithName("blocked")
@@ -120,7 +125,9 @@
                                 return
                             }
                             App.Map.Room.ID = ""
-                            App.Map.Retry()
+                            App.Sync(() => {
+                                App.Map.Retry()
+                            })
                             break
                         case "walkbusy":
                             App.Map.Resend()
@@ -133,6 +140,9 @@
                             break
                         case "blocked":
                             App.Move.OnBlocker(result.Data)
+                            break
+                        case "blocked2":
+                            App.Core.Blocker.BlockStepRetry()
                             break
                         case "needrest":
                             App.Move.NeedRest()
@@ -188,8 +198,8 @@
         App.Fail()
     }
     //注册path指令
-    App.Move.NewPathCommand = function (path, ...initers) {
-        return App.Commands.NewCommand("path", { Target: path, Initers: initers })
+    App.Move.NewPathCommand = function (path, ...initiators) {
+        return App.Commands.NewCommand("path", { Target: path, Initers: initiators })
     }
     App.Commands.RegisterExecutor("path", function (commands, running) {
         running.OnStart = function (arg) {
@@ -201,8 +211,8 @@
         }
     })
     //注册to指令
-    App.Move.NewToCommand = function (target, ...initers) {
-        return App.Commands.NewCommand("to", { Target: target, Initers: initers })
+    App.Move.NewToCommand = function (target, ...initiators) {
+        return App.Commands.NewCommand("to", { Target: target, Initers: initiators })
     }
     App.Commands.RegisterExecutor("to", function (commands, running) {
         running.OnStart = function (arg) {
@@ -217,8 +227,8 @@
         }
     })
     //注册rooms指令
-    App.Move.NewRoomsCommand = function (target, ...initers) {
-        return App.Commands.NewCommand("rooms", { Rooms: target, Initers: initers })
+    App.Move.NewRoomsCommand = function (target, ...initiators) {
+        return App.Commands.NewCommand("rooms", { Rooms: target, Initers: initiators })
     }
     App.Commands.RegisterExecutor("rooms", function (commands, running) {
         running.OnStart = function (arg) {
@@ -226,8 +236,8 @@
         }
     })
     //注册ordered指令
-    App.Move.NewOrderedCommand = function (target, ...initers) {
-        return App.Commands.NewCommand("ordered", { Rooms: target, Initers: initers })
+    App.Move.NewOrderedCommand = function (target, ...initiators) {
+        return App.Commands.NewCommand("ordered", { Rooms: target, Initers: initiators })
     }
     App.Commands.RegisterExecutor("ordered", function (commands, running) {
         running.OnStart = function (arg) {

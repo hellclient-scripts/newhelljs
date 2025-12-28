@@ -29,4 +29,5 @@
     App.Include("src/quests/baohu/baohu.js")
     App.Include("src/quests/jiedu/jiedu.js")
     App.Include("src/quests/sxd/sxd.js")
+    App.Include("src/quests/streetview/streetview.js")
 })(App)

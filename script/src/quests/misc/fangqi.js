@@ -1,7 +1,7 @@
 //放弃经验模块
 $.Module(function (App) {
-    let Quit = {}
-    Quit.Start = (data) => {
+    let Fangqi = {}
+    Fangqi.Start = (data) => {
         App.Stop()
         App.Next()
     }
@@ -23,8 +23,7 @@ $.Module(function (App) {
         return
     }
     Quest.Start = function (data) {
-        Quit.Start(data)
+        Fangqi.Start(data)
     }
     App.Quests.Register(Quest)
-
 })

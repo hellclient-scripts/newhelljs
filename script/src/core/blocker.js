@@ -25,7 +25,7 @@
         }
     }
     //初始化地图信息时拦截拉黑的出口
-    App.Map.AppendTagsIniter((map) => {
+    App.Map.AppendInitiator((map) => {
         for (var key in App.Core.Blocker.Blocked) {
             let blocked = App.Core.Blocker.Blocked[key]
             if ((new Date()).getTime() - blocked.Created > 100000) {

@@ -24,7 +24,7 @@
             map.AddTemporaryRooms(App.Core.Fuben.CurrentRooms)
         }
     }
-    App.Map.AppendTagsIniter(App.Core.Fuben.OnInitTags)
+    App.Map.AppendInitiator(App.Core.Fuben.OnInitTags)
     let matcherLine = /^([◎─ ●│]+)$/
     //副本迷宫解析类
     class Maze {

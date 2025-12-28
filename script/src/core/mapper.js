@@ -140,7 +140,7 @@
             model.From = "1236"
             model.To = "1237"
             model.Command = "cross"
-            model.Conditions = [App.Mapper.App.Mapper.NewCondition("winter")]
+            model.Conditions = [App.Mapper.NewCondition("winter")]
             return model;
         })())
         App.Mapper.Paths.push((() => {
@@ -148,7 +148,7 @@
             model.From = "1237"
             model.To = "1236"
             model.Command = "cross"
-            model.Conditions = [App.Mapper.App.Mapper.NewCondition("winter")]
+            model.Conditions = [App.Mapper.NewCondition("winter")]
             return model;
         })())
     })
@@ -159,6 +159,7 @@
             model.From = App.Mapper.HouseLoc
             model.To = "1933"
             model.Command = App.Mapper.HouseID
+            model.Conditions = [App.Mapper.NewCondition("streeview", 1, true)]
             return model;
         })())
     }
@@ -211,7 +212,7 @@
             map.SetTag("winter", 0)
         }
     }
-    App.Map.AppendTagsIniter(App.Mapper.InitTag)
+    App.Map.AppendInitiator(App.Mapper.InitTag)
     //额外地图定位
     let matcherssl = /^象一蓬蓬巨伞般伸向天空，把阳光遮得丝毫也无。尺把厚的松针/
     let matchergc = "错节，据传已有千年的树龄，是这座城市的历史见证。树干底部有一个很大"
@@ -239,4 +240,13 @@
             PlanLocate.Execute()
         }
     })
+    App.Map.AppendInitiator((map) => {
+        for (var key in App.Data.Player.Skills) {
+            let skill = App.Data.Player.Skills[key]
+            if (skill["基本"] == skill.ID) {
+                map.SetTag(skill.ID, skill["等级"])
+            }
+        }
+    })
+
 })(App)

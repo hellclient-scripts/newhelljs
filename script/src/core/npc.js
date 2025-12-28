@@ -103,7 +103,7 @@
         }
     }
     //根据门派调整移动信息
-    App.Map.AppendTagsIniter((map) => {
+    App.Map.AppendInitiator((map) => {
         if (App.Params.IDPass) {
             App.Params.IDPass.split(",").forEach(val => {
                 map.SetTag(val.trim(), 1)

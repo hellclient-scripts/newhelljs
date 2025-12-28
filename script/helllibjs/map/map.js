@@ -74,7 +74,7 @@
         CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
         Room = new Room()
-        #tagsIniter = []
+        #initiator = []
         Move = null
         #tags = {}
         #blocked = []
@@ -96,8 +96,8 @@
         OnModeChange = module.DefaultOnModeChange
         Mazes = {}
         Trace = DefaultTrace
-        AppendTagsIniter(fn) {
-            this.#tagsIniter.push(fn)
+        AppendInitiator(fn) {
+            this.#initiator.push(fn)
         }
         TracePath(fr, ...commands) {
             let result = []
@@ -182,7 +182,7 @@
             if (this.Move != null) {
                 this.Move.InitTags(this)
             }
-            this.#tagsIniter.forEach(fn => {
+            this.#initiator.forEach(fn => {
                 fn(this)
             })
             for (var key in this.#tags) {
@@ -338,11 +338,14 @@
             this.ChangeMode("")
             move.Walk(this)
         }
-        NewRoute(...initers) {
-            return new Route(this, ...initers)
+        NewRoute(...initiators) {
+            return new Route(this, ...initiators)
         }
         NewStep(command, target) {
             return new Step(command, target)
+        }
+        NewTag(key, value) {
+            return new Tag(key, value)
         }
         NewMaze() {
             return new Maze()
@@ -521,7 +524,7 @@
         InitTags(map) {
             if (this.Option != null) {
                 for (var key in this.Option.Tags) {
-                    let value = Option.Tags[key]
+                    let value = this.Option.Tags[key]
                     if (value != null) {
                         map.SetTag(key, value)
                     }
@@ -557,20 +560,32 @@
         }
 
     }
+    class Tag {
+        constructor(key = "", value = 1) {
+            this.Key = key;
+            this.Value = value;
+        }
+        Key = ""
+        Value = 1
+        ApplyTo(move, map) {
+            move.Option.Tags[this.Key] = this.Value
+        }
+
+    }
     class Route {
-        constructor(map, ...initers) {
+        constructor(map, ...initiators) {
             this.Map = map
-            this.Initers = initers
+            this.Initers = initiators
         }
         Map = null
         Initers = []
         Execute() {
             let move = new Move()
-            this.Initers.forEach(initer => {
-                if (typeof (initer) == "function") {
-                    initer(move, this.Map)
+            this.Initers.forEach(initiator => {
+                if (typeof (initiator) == "function") {
+                    initiator(move, this.Map)
                 } else {
-                    initer.ApplyTo(move, this.Map)
+                    initiator.ApplyTo(move, this.Map)
                 }
 
             })
@@ -613,6 +628,7 @@
     module.Room = Room
     module.Vehicle = Vehicle
     module.Move = Move
+    module.Tag = Tag
     module.Step = Step
     module.Option = Option
     return module

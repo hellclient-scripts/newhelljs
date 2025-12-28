@@ -68,7 +68,7 @@
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
     ))
-    
+
     //桃花迷阵
     App.Map.RegisterMaze("桃花迷阵", App.Map.NewMaze().WithCheckEnter(
         function (maze, move, map, step) {
@@ -85,6 +85,7 @@
     ).WithWalk(
         function (maze, move, map) {
             App.Eat(true)
+            let cmd = App.Move.Filterdir(maze.Data.Command)
             map.TrySteps([App.Map.NewStep(cmd)])
         }
     ))

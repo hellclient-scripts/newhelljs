@@ -26,8 +26,12 @@
     let canretry = () => {
         return (new Date()).getTime() - LastTry > 5 * 1000
     }
-    App.Map.AppendTagsIniter(function () {
+    App.Map.AppendInitiator(function () {
         App.Map.SetTag("ride", ridable())
+    })
+    App.Engine.SetFilter("core.ride.unride", function (event) {
+        App.Send("unride")
+        App.RaiseEvent(event)
     })
     //响应没有马的状况
     App.Engine.SetFilter("core.ride.nohorse", function (event) {
