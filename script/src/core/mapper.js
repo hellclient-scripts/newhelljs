@@ -14,8 +14,23 @@
         App.Map.Data.RoomsByName[room.Name].push(room.Key)
         return room;
     }
-    Note("加载地图文件" + "data/hell.hmm")
-    mapModule.Database.Import(ReadFile("data/hell.hmm"))
+    var mappath = "data/hell.hmm"
+    var maploaded = false;
+    if (App.Core.Params.Data["MapEditing"] == "t") {
+        Note("地图编辑模式已开启，加载 export.hmm")
+        if (HasHomeFile("export.hmm")) {
+            Note("找到地图文件export.hmm,加载中...")
+            mappath = "export.hmm";
+            mapModule.Database.Import(ReadHomeFile("export.hmm"))
+            maploaded = true;
+        } else {
+            Note("未找到地图文件export.hmm，请确认文件存在！")
+        }
+    }
+    if (!maploaded) {
+        Note("加载地图文件" + mappath)
+        mapModule.Database.Import(ReadFile(mappath))
+    }
 
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
@@ -244,7 +259,7 @@
         for (var key in App.Data.Player.Skills) {
             let skill = App.Data.Player.Skills[key]
             if (skill["基本"] == skill.ID) {
-                map.SetTag(skill.ID, skill["等级"])
+                map.SetTag("skill-" + skill.ID, skill["等级"])
             }
         }
     })

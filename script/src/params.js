@@ -44,5 +44,6 @@
 
     App.NamedParams.AddString("ShowRoomID", "").WithName("显示房间ID").WithDesc("设为t打开")
     App.NamedParams.AddString("Echo", "t").WithName("指令回显").WithDesc("设为f关闭回显")
+    App.NamedParams.AddString("MapEditing", "f").WithName("地图编辑模式").WithDesc("设为t开启地图编辑模式，加载World文件夹下的export.hmm")
 
 })()
