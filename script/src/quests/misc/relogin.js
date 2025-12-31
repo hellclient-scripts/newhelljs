@@ -4,7 +4,7 @@ $.Module(function (App) {
     Relogin.Start = (data) => {
         let loc = data.trim()
         if (!loc) {
-            loc = "26"
+            loc = App.Mapper.HouseID ? "1949" : "26"
         }
         $.PushCommands(
             $.To(loc),
@@ -13,7 +13,7 @@ $.Module(function (App) {
                 Note("退出游戏，准备重新连接")
                 App.Core.Connect.Next = (new Date()).getTime() + 32000
                 App.Send("quit")
-                App.Core.Connect.Callback=App.Next
+                App.Core.Connect.Callback = App.Next
             })
         )
         App.Next()

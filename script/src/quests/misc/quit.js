@@ -4,7 +4,7 @@ $.Module(function (App) {
     Quit.Start = (data) => {
         let loc = data.trim()
         if (!loc) {
-            loc = "26"
+            loc = App.Mapper.HouseID?"1949":"26"
         }
         $.PushCommands(
             $.To(loc),
@@ -20,7 +20,7 @@ $.Module(function (App) {
     }
     let Quest = App.Quests.NewQuest("quit")
     Quest.Name = "退出"
-    Quest.Desc = "退出并不再连线"
+    Quest.Desc = "退出并不再连线,可以指定位置"
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Start = function (data) {
