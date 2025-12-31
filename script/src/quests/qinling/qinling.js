@@ -177,6 +177,9 @@ $.Module(function (App) {
         )
         $.Next()
     }
+    App.BindEvent("core.relogin", (e) => {
+        Quest.Cooldown(0)
+    })
     App.BindEvent("core.queststart", (e) => {
         Qinling.Data = {
             HitAndRun: true,
@@ -197,31 +200,31 @@ $.Module(function (App) {
     Quest.Help = ""
     Quest.Group = "qinling"
     Quest.OnHUD = () => {
-        return [
-            new App.HUD.UI.Word("秦陵:"),
-            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
-        ]
+            return [
+                new App.HUD.UI.Word("秦陵:"),
+                new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
+            ]
 
-    }
-    Quest.OnSummary = () => {
-        return [
-            new App.HUD.UI.Word("秦:"),
-            new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
-        ]
-
-    }
-    Quest.OnReport = () => {
-        let gift = []
-        for (var name in Qinling.Data.Gifts) {
-            gift.push(`${name}:${Qinling.Data.Gifts[name]}件`)
         }
-        let rate = Qinling.Data.All > 0 ? (Qinling.Data.Success * 100 / Qinling.Data.All).toFixed(0) + "%" : "-"
-        let cost = Qinling.Data.Success > 0 ? (Qinling.Data.Cost / Qinling.Data.Success / 1000).toFixed() + "秒" : "-"
-        return [`秦陵-成功 ${Qinling.Data.Success}次 共计 ${Qinling.Data.All}次 成功率 ${rate} 平均耗时 ${cost} 道具： ${gift.join(" , ")}`]
-    }
+    Quest.OnSummary = () => {
+            return [
+                new App.HUD.UI.Word("秦:"),
+                new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Qinling.Data.Success), 5, true),
+            ]
+
+        }
+    Quest.OnReport = () => {
+            let gift = []
+            for (var name in Qinling.Data.Gifts) {
+                gift.push(`${name}:${Qinling.Data.Gifts[name]}件`)
+            }
+            let rate = Qinling.Data.All > 0 ? (Qinling.Data.Success * 100 / Qinling.Data.All).toFixed(0) + "%" : "-"
+            let cost = Qinling.Data.Success > 0 ? (Qinling.Data.Cost / Qinling.Data.Success / 1000).toFixed() + "秒" : "-"
+            return [`秦陵-成功 ${Qinling.Data.Success}次 共计 ${Qinling.Data.All}次 成功率 ${rate} 平均耗时 ${cost} 道具： ${gift.join(" , ")}`]
+        }
     Quest.Start = function (data) {
-        Qinling.Start()
-    }
+            Qinling.Start()
+        }
     App.Quests.Register(Quest)
     App.Quests.Qinling = Qinling
 })

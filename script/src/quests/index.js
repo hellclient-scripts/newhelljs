@@ -16,6 +16,7 @@
     App.Include("src/quests/tuna/tuna.js")
     App.Include("src/quests/eatlu/eatlu.js")
     App.Include("src/quests/misc/quit.js")
+    App.Include("src/quests/misc/relogin.js")
     App.Include("src/quests/misc/stop.js")
     App.Include("src/quests/misc/fangqi.js")
     App.Include("src/quests/misc/idle.js")

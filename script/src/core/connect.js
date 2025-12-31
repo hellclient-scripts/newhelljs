@@ -1,7 +1,7 @@
 //连线模块
 (function (App) {
     App.Core.Connect = {}
-    //先词自动连线事件
+    //下次自动连线事件
     App.Core.Connect.Next = (new Date()).getTime() + 1000
     //是否已经登陆成功
     App.Core.Connect.Entered = false
@@ -138,9 +138,11 @@
                     switch (result.Name) {
                         case "enter":
                             App.RaiseEvent(new App.Event("core.entermud", false).WithType("system"))
+                            App.RaiseEvent(new App.Event("core.relogin", false).WithType("system"))
                             break
                         case "reenter":
                             App.RaiseEvent(new App.Event("core.entermud", true).WithType("system"))
+                            App.RaiseEvent(new App.Event("core.reconnect", false).WithType("system"))
                             break
                         case "toofast":
                         case "toofast2":
