@@ -23,7 +23,10 @@
         App.Reconnect()
     }
     App.BindEvent("core.idlequit", (event) => {
-        App.Log(event.Data.Output)
+        if (!App.Quests.IsStopped()) {
+            App.Log(event.Data.Output)
+            App.PushMessage.Notify("任务流程意外", "任务停滞，未正常流转")
+        }
     })
     //重置
     App.Core.Emergency.Reset = () => {
@@ -85,6 +88,7 @@
             } else {
                 if (checkdeathmode == 2 && !App.Data.Player.NoForce) {
                     Note("意外死亡")
+                    App.PushMessage.Notify("任务状态异常终止", "严重异常")
                     App.Core.Emergency.NoLogin = true
                     App.Commands.Discard()
                     Disconnect()

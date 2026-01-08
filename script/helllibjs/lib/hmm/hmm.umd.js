@@ -51,7 +51,9 @@ const room_1 = __webpack_require__(/*! ../models/room */ "./src/models/room.ts")
 const shortcut_1 = __webpack_require__(/*! ../models/shortcut */ "./src/models/shortcut.ts");
 const snapshot_1 = __webpack_require__(/*! ../models/snapshot */ "./src/models/snapshot.ts");
 const variable_1 = __webpack_require__(/*! ../models/variable */ "./src/models/variable.ts");
+const context_1 = __webpack_require__(/*! ../models/context */ "./src/models/context.ts");
 const mapper_1 = __webpack_require__(/*! ../helpers/mapper */ "./src/helpers/mapper.ts");
+const mapperoption_1 = __webpack_require__(/*! ../models/mapperoption */ "./src/models/mapperoption.ts");
 const snapshothelper_1 = __webpack_require__(/*! ../helpers/snapshothelper */ "./src/helpers/snapshothelper.ts");
 const hmmencoder_1 = __webpack_require__(/*! ../helpers/hmmencoder */ "./src/helpers/hmmencoder.ts");
 class APIListOption {
@@ -152,6 +154,12 @@ class MapDatabase {
     }
     APIVersion() {
         return MapDatabase.Version;
+    }
+    APIInfo() {
+        if (this.Current != null) {
+            return this.Current.Map.Info;
+        }
+        return null;
     }
     APIListLandmarks(option) {
         if (this.Current != null) {
@@ -450,18 +458,24 @@ class MapDatabase {
     }
     APIQueryPathAny(from, target, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             return new mapper_1.Walking(new mapper_1.Mapper(this.Current, context, options)).QueryPathAny(from, target, 0).SuccessOrNull();
         }
         return null;
     }
     APIQueryPathAll(start, target, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             return new mapper_1.Walking(new mapper_1.Mapper(this.Current, context, options)).QueryPathAll(start, target).SuccessOrNull();
         }
         return null;
     }
     APIQueryPathOrdered(start, target, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             return new mapper_1.Walking(new mapper_1.Mapper(this.Current, context, options)).QueryPathOrdered(start, target).SuccessOrNull();
         }
         return null;
@@ -506,12 +520,16 @@ class MapDatabase {
     }
     APIDilate(src, iterations, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             return new mapper_1.Walking(new mapper_1.Mapper(this.Current, context, options)).Dilate(src, iterations);
         }
         return [];
     }
     APITrackExit(start, command, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             let mapper = new mapper_1.Mapper(this.Current, context, options);
             let room = mapper.GetRoom(start);
             if (room != null) {
@@ -536,11 +554,13 @@ class MapDatabase {
     }
     APIGetRoom(key, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             return new mapper_1.Mapper(this.Current, context, options).GetRoom(key);
         }
         return null;
     }
-    APIClearSnapshot(filter) {
+    APIClearSnapshots(filter) {
         if (this.Current != null) {
             this.Current.Records.Snapshots = this.Current.Records.Snapshots.filter(s => !filter.Validate(s));
             this.Current.MarkAsModified();
@@ -658,6 +678,8 @@ class MapDatabase {
     }
     APIGetRoomExits(key, context, options) {
         if (this.Current != null) {
+            context !== null && context !== void 0 ? context : (context = new context_1.Context());
+            options !== null && options !== void 0 ? options : (options = new mapperoption_1.MapperOptions());
             let mapper = new mapper_1.Mapper(this.Current, context, options);
             let room = mapper.GetRoom(key);
             if (room != null) {
@@ -668,7 +690,7 @@ class MapDatabase {
     }
 }
 exports.MapDatabase = MapDatabase;
-MapDatabase.Version = 1000;
+MapDatabase.Version = 1004;
 
 
 /***/ }),
@@ -1129,6 +1151,10 @@ class Mapper {
             if (cost != null) {
                 return cost;
             }
+            let cost2 = costs[""];
+            if (cost2 != null) {
+                return cost2;
+            }
         }
         return exit.Cost;
     }
@@ -1140,12 +1166,12 @@ class Mapper {
         }
         if (!this.Options.DisableShortcuts) {
             for (let key of Object.keys(this.MapFile.Records.Shortcuts)) {
-                if (base_1.ValueTag.ValidteConditions(room.Tags, this.MapFile.Records.Shortcuts[key].RoomConditions)) {
+                if (base_1.ValueTag.ValidateConditions(room.Tags, this.MapFile.Records.Shortcuts[key].RoomConditions)) {
                     result.push(this.MapFile.Records.Shortcuts[key]);
                 }
             }
             for (let shortcut of this.Context.Shortcuts) {
-                if (base_1.ValueTag.ValidteConditions(room.Tags, shortcut.RoomConditions)) {
+                if (base_1.ValueTag.ValidateConditions(room.Tags, shortcut.RoomConditions)) {
                     result.push(shortcut);
                 }
             }
@@ -1169,7 +1195,10 @@ class Mapper {
         if (this.Options.MaxTotalCost > 0 && cost > this.Options.MaxTotalCost) {
             return false;
         }
-        if (!this.Context.ValidteConditions(exit.Conditions)) {
+        if (!this.Context.ValidateConditions(exit.Conditions)) {
+            return false;
+        }
+        if (!this.Options.ValidateCommand(exit.Command)) {
             return false;
         }
         return true;
@@ -1181,7 +1210,7 @@ class Mapper {
         if (Object.keys(this.Context.Whitelist).length > 0 && this.Context.Whitelist[room.Key] == null) {
             return false;
         }
-        if (!base_1.ValueTag.ValidteConditions(room.Tags, this.Context.RoomConditions)) {
+        if (!base_1.ValueTag.ValidateConditions(room.Tags, this.Context.RoomConditions)) {
             return false;
         }
         return true;
@@ -1319,7 +1348,7 @@ class ValueTag {
         }
         return value < 1;
     }
-    static ValidteConditions(tags, conditions) {
+    static ValidateConditions(tags, conditions) {
         for (let rcondition of conditions) {
             if (ValueTag.HasTag(tags, rcondition.Key, rcondition.Value) == rcondition.Not) {
                 return false;
@@ -1666,7 +1695,7 @@ class Context {
         }
         return value <= 0;
     }
-    ValidteConditions(conditions) {
+    ValidateConditions(conditions) {
         for (let rcondition of conditions) {
             if (this.HasTag(rcondition.Key, rcondition.Value) == rcondition.Not) {
                 return false;
@@ -2141,18 +2170,6 @@ class Map {
         this.Encoding = MapEncoding.Default;
         this.Info = new MapInfo();
     }
-    // void Arrange()
-    // {
-    //     Room.Sort(Rooms);
-    //     Marker.Sort(Markers);
-    //     Route.Sort(Routes);
-    //     Trace.Sort(Traces);
-    //     Region.Sort(Regions);
-    //     Landmark.Sort(Landmarks);
-    //     Shortcut.Sort(Shortcuts);
-    //     Variable.Sort(Variables);
-    //     Snapshot.Sort(Snapshots);
-    // }
     static Create(name, desc) {
         let result = new Map();
         result.Info = MapInfo.Create(name, desc);
@@ -2302,6 +2319,7 @@ class MapperOptions {
         this.MaxExitCost = 0;
         this.MaxTotalCost = 0;
         this.DisableShortcuts = false;
+        this.CommandWhitelist = {};
     }
     static New() {
         return new MapperOptions();
@@ -2317,6 +2335,22 @@ class MapperOptions {
     WithDisableShortcuts(disable) {
         this.DisableShortcuts = disable;
         return this;
+    }
+    WithCommandWhitelist(list) {
+        list.forEach(cmd => {
+            this.CommandWhitelist[cmd] = true;
+        });
+        return this;
+    }
+    ClearCommandWhitelist() {
+        this.CommandWhitelist = {};
+        return this;
+    }
+    ValidateCommand(cmd) {
+        if (Object.keys(this.CommandWhitelist).length === 0) {
+            return true;
+        }
+        return this.CommandWhitelist[cmd] === true;
     }
 }
 exports.MapperOptions = MapperOptions;
@@ -2532,6 +2566,7 @@ class RoomFilter {
         this.HasAnyExitTo = [];
         this.HasAnyData = [];
         this.HasAnyName = [];
+        this.HasAnyGroup = [];
         this.ContainsAnyData = [];
         this.ContainsAnyName = [];
         this.ContainsAnyKey = [];
@@ -2554,6 +2589,17 @@ class RoomFilter {
         if (this.HasAnyName.length > 0) {
             for (let data of this.HasAnyName) {
                 if (room.Name === data) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+    ValidateHasAnyGroup(room) {
+        if (this.HasAnyGroup.length > 0) {
+            for (let data of this.HasAnyGroup) {
+                if (room.Group === data) {
                     return true;
                 }
             }
@@ -2607,7 +2653,7 @@ class RoomFilter {
     }
     Validate(room) {
         if (this.RoomConditions.length > 0) {
-            if (!base_1.ValueTag.ValidteConditions(room.Tags, this.RoomConditions)) {
+            if (!base_1.ValueTag.ValidateConditions(room.Tags, this.RoomConditions)) {
                 return false;
             }
         }
@@ -2615,6 +2661,9 @@ class RoomFilter {
             return false;
         }
         if (!this.ValidateHasAnyName(room)) {
+            return false;
+        }
+        if (!this.ValidateHasAnyGroup(room)) {
             return false;
         }
         if (!this.ValidateContainsAnyData(room)) {
@@ -3111,12 +3160,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SnapshotSearchResult = exports.SnapshotSearch = exports.SnapshotFilter = void 0;
 class SnapshotFilter {
     constructor(key, type, group) {
+        this.MaxCount = 0;
         this.Key = key;
         this.Type = type;
         this.Group = group;
     }
     static New(key, type, group) {
         return new SnapshotFilter(key, type, group);
+    }
+    WithMaxCount(count) {
+        this.MaxCount = count;
+        return this;
     }
     Validate(model) {
         if (this.Key !== null && model.Key !== this.Key) {
@@ -3126,6 +3180,9 @@ class SnapshotFilter {
             return false;
         }
         if (this.Group !== null && model.Group !== this.Group) {
+            return false;
+        }
+        if (this.MaxCount > 0 && model.Count > this.MaxCount) {
             return false;
         }
         return true;
@@ -3139,6 +3196,7 @@ class SnapshotSearch {
         this.Keywords = [];
         this.PartialMatch = true;
         this.Any = false;
+        this.MaxNoise = 0;
     }
     static New() {
         return new SnapshotSearch();
@@ -3161,10 +3219,20 @@ class SnapshotSearch {
         if (this.Keywords.length === 0) {
             return true;
         }
+        let noise = 0;
         for (let keyword of this.Keywords) {
             if (keyword !== "") {
                 if (this.match(keyword, model) == this.Any) {
-                    return this.Any;
+                    if (!this.Any) {
+                        //在完全匹配时，只有噪音超过允许的最大值才验证失败。
+                        noise++;
+                        if (noise > this.MaxNoise) {
+                            return false;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 }
             }
         }
@@ -3310,8 +3378,10 @@ class Trace {
     }
     AddLocations(loctions) {
         for (let l of loctions) {
-            this.Locations = this.Locations.filter(d => d !== l);
-            this.Locations.push(l);
+            if (l != "") {
+                this.Locations = this.Locations.filter(d => d !== l);
+                this.Locations.push(l);
+            }
         }
         this.Arrange();
     }

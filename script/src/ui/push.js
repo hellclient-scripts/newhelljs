@@ -3,6 +3,7 @@
     const Package = "App.PushMessage"
     let module = {}
     App.PushMessage = module
+    //通过 App.PushMessage.Notify("title","content")可以发送推送
     let newconfig = () => {
         return {
             Server: "",

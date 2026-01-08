@@ -203,7 +203,7 @@
     App.Mapper.ExcludeRooms = {}
     //扩展房间，第一个参数为房间id数组，第二个参数为膨胀多少格。
     App.Mapper.ExpandRooms = (rooms, expand) => {
-        return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context,)
+        return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context)
     }
     App.Mapper.Data = {}
     App.Mapper.InWinter = function () {

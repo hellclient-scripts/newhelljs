@@ -371,10 +371,10 @@
                 App.Core.Study.LastPot = App.Data.Player.HP["潜能"]
                 if (App.Core.Study.LearndTimes < 4) {
                     if (App.Core.Study.CurrentSkill.Check()) {
+                        $.Insert($.Function(() => { App.Core.Study.DoLearn(context) }))
                         $.PushCommands(
                             $.Function(() => { App.Core.Study.CurrentSkill.Execute() }),
                             $.Prepare("common", context),
-                            $.Function(() => { App.Core.Study.DoLearn(context) }),
                         )
                     }
                 } else {
