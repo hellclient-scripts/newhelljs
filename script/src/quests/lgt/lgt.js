@@ -65,6 +65,9 @@ $.Module(function (App) {
                 App.Commands.Drop()
                 return true
             })
+            task.AddTrigger("你大喝一声五官齐齐溢血，扑到窗户边挣扎着，一头从塔上栽了下去...", (tri, result) => {
+                $.Next()
+            })
             task.AddTrigger("你听到无数天魔在耳边吟唱嘶吼，莫大的压力使你开始神智迷糊了...", (tri, result) => {
                 // LGT.Check()
                 return true
