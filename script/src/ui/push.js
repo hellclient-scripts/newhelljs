@@ -37,7 +37,7 @@
         module.Auth(`${Package}.Lark.Setup`, module.Lark.SetupStart)
     }
     module.Lark.SetupStart = function () {
-        Userinput.prompt(`${Package}.Lark.OnWebhook`, "请输入Webhook地址", "请输入机器人的的Webhook地址，留空不使用飞书。参考:https://open.feishu.cn/document/client-docs/bot-v3/add-custom-bot", module.Config.LarkWebHook || "")
+        Userinput.prompt(`${Package}.Lark.OnWebhook`, "请输入Webhook地址", "请输入机器人的的Webhook地址，留空不使用飞书。参考:https://forum.hellclient.com/topic/14/", module.Config.LarkWebHook || "")
     }
     module.Lark.OnWebhook = (name, id, code, data) => {
         if (code == 0) {

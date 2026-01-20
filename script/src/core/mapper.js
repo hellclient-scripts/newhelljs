@@ -1,9 +1,8 @@
 //地图模块
 (function (App) {
-
-    let roomshModule = App.RequireModule("helllibjs/roomsh/roomsh.js")
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     App.Mapper = {}
+    App.Mapper.CommonExits = ["west", "east", "south", "north", "up", "down", "enter", "out", "n", "s", "e", "w", "ne", "nw", "se", "sw", "u", "d", "northup", "northdown", "southup", "southdown", "eastup", "eastdown", "westup", "westdown", "nu", "nd", "eu", "ed", "wu", "wd", "su", "sd"]
     App.Mapper.HMM = mapModule.HMM
     App.Mapper.Database = mapModule.Database
     App.Map.Data.RoomsByName = {}
@@ -202,8 +201,12 @@
     })
     App.Mapper.ExcludeRooms = {}
     //扩展房间，第一个参数为房间id数组，第二个参数为膨胀多少格。
-    App.Mapper.ExpandRooms = (rooms, expand) => {
-        return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context)
+    App.Mapper.ExpandRooms = (rooms, expand, common) => {
+        var opt = App.Mapper.HMM.MapperOptions.New()
+        if (common) {
+            opt.WithCommandWhitelist(App.Mapper.CommonExits)
+        }
+        return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context, opt)
     }
     App.Mapper.Data = {}
     App.Mapper.InWinter = function () {

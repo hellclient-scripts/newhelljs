@@ -169,7 +169,7 @@ $.Module(function (App) {
     Letter.KillNear = () => {
         if (App.Map.Room.ID && !Letter.Data.NPC.Fled && !Letter.Data.NPC.Gived) {
             Letter.Data.NPC.Loc = null
-            let rooms = App.Mapper.ExpandRooms([App.Map.Room.ID], 2)
+            let rooms = App.Mapper.ExpandRooms([App.Map.Room.ID], 2, true)
             App.Zone.Wanted = $.NewWanted(Letter.Data.NPC.Name, Letter.Data.NPC.Name.Zone).WithChecker(Checker).WithID(Letter.Data.NPC.ID)
             $.PushCommands(
                 $.Rooms(rooms, App.Zone.Finder),
