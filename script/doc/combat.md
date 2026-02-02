@@ -89,8 +89,8 @@ ctype qinling>#apply
 优先busy,优先攻击skeleton lich
 
 战斗类型为xuemo,战斗标签为boss的，使用 丁一 block
-优先共计定义
+优先攻击丁一
 
 战斗类型为qinling的
 busy+输出秦始皇
-然后只有共计的一次pfm
+然后只有攻击的一次pfm
