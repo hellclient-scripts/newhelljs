@@ -114,3 +114,5 @@ $.Rest = App.Core.Heal.NewRestCommand
 // 现金准备指令,参数为具体需要的gold数值
 $.PrepareMoney = App.NewPrepareMoneyCommand
 
+//获取Marker位置
+$.RID=App.Mapper.LoadMarker

@@ -230,7 +230,7 @@ $.Module(function (App) {
         if (App.Map.Room.ID && !Assisting.Data.NPC.Fled && !Assisting.Data.NPC.Died) {
             Assisting.Data.NPC.Loc = null
             let rooms = App.Mapper.ExpandRooms([App.Map.Room.ID], 2, true)
-            App.Zone.Wanted = $.NewWanted(Assisting.Data.NPC.Name, Assisting.Data.NPC.Zone).WithChecker(Checker).WithID(Assisting.Data.NPC.ID)
+            App.Zone.Wanted = $.NewWanted(Assisting.Data.NPC.Name, Assisting.Data.NPC.Zone).WithChecker(Checker).WithID(Assisting.Data.NPC.ID).WithSingleStep(true)
             $.PushCommands(
                 $.Rooms(rooms, App.Zone.Finder),
                 $.Function(Assisting.KillLoc),

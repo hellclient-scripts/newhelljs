@@ -48,7 +48,7 @@
         }
         Target = ""//目标
         Name = ""//名字
-        Zone = ""//去与
+        Zone = ""//区域
         ID = ""//ud
         Loc = null//位置
         OnFound = null//找到的回调
@@ -73,7 +73,7 @@
         }
         //链式调用
         WithSingleStep(s) {
-            this.SingleStep = App.Params.NumStep <= 1
+            this.SingleStep = s
             return this
         }
         //链式调用

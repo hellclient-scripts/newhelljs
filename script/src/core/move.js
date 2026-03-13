@@ -223,7 +223,7 @@
             if (target) {
                 Note(`${App.Map.Room.ID} 前往 ${target.join(",")}`)
             }
-            App.Move.NewTo(running.Command.Data.Target, ...running.Command.Data.Initers).Execute()
+            App.Move.NewTo(target, ...running.Command.Data.Initers).Execute()
         }
     })
     //注册rooms指令

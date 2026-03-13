@@ -9,11 +9,13 @@
         }
         natures[line] = true
      })
+    App.Core.RoomsByName={}
     App.Core.Room = {}
     App.Core.Room.Desc = []
     App.Core.Room.MaxDescLines=10
     App.Core.Room.DescStart = false
     App.Core.Room.Current = null
+    App.Core.RoomsByName={}
     //创建实例，绑定position
     App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
@@ -110,7 +112,7 @@
         }, function (result) {
             if (result.Type != "cancel") {
                 if (App.Map.Room.Name && !App.Map.Room.ID) {
-                    let idlist = App.Map.Data.RoomsByName[App.Map.Room.Name]
+                    let idlist = App.Core.RoomsByName[App.Map.Room.Name]
                     if (idlist && idlist.length == 1) {
                         App.Map.Room.ID = idlist[0]
                     }

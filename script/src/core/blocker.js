@@ -18,7 +18,7 @@
     })
     //快速别名，拉黑当前路径
     App.Core.Blocker.Block = (from, to) => {
-        App.Core.Blocker.Blocked["form>to"] = {
+        App.Core.Blocker.Blocked[`${from}>${to}`] = {
             Created: (new Date()).getTime(),
             From: from,
             To: to,

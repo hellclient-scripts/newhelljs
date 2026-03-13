@@ -97,7 +97,7 @@ $.Module(function (App) {
     }
     //初始化地图
     Qinling.Maze = () => {
-        App.Map.Room.ID = "2820"
+        App.Map.Room.ID = $.RID("fuben|qinlin-entry")
         if (App.Core.Fuben.Current == null) {
             Quest.Cooldown(120000)
             App.Send("quit")
@@ -105,17 +105,17 @@ $.Module(function (App) {
         }
         Qinling.AddApth()
         $.PushCommands(
-            $.To("2824"),
+            $.To("fuben|qinlin-exit2"),
             $.Function(Qinling.KillQin),
         )
         $.Next()
     }
     //补全迷宫地图连接
     Qinling.AddApth = () => {
-        App.Core.Fuben.Current.AddPath("2820", App.Core.Fuben.Current.Landmark["entry"], "s")
-        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], "2820", "n")
-        App.Core.Fuben.Current.AddPath("2823", App.Core.Fuben.Current.Landmark["exit"], "n")
-        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "2823", "s")
+        App.Core.Fuben.Current.AddPath("fuben|qinlin-entry", App.Core.Fuben.Current.Landmark["entry"], "s")
+        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], "fuben|qinlin-entry", "n")
+        App.Core.Fuben.Current.AddPath("fuben|qinlin-exit", App.Core.Fuben.Current.Landmark["exit"], "n")
+        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "fuben|qinlin-exit", "s")
     }
     //杀老秦
     Qinling.KillQin = () => {

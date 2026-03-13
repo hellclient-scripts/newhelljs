@@ -5,12 +5,12 @@
     App.Mapper.CommonExits = ["west", "east", "south", "north", "up", "down", "enter", "out", "n", "s", "e", "w", "ne", "nw", "se", "sw", "u", "d", "northup", "northdown", "southup", "southdown", "eastup", "eastdown", "westup", "westdown", "nu", "nd", "eu", "ed", "wu", "wd", "su", "sd"]
     App.Mapper.HMM = mapModule.HMM
     App.Mapper.Database = mapModule.Database
-    App.Map.Data.RoomsByName = {}
+    App.Core.RoomsByName = {}
     App.Mapper.HMM.HMMEncoder.DecodeRoomHook = (room) => {
-        if (!App.Map.Data.RoomsByName[room.Name]) {
-            App.Map.Data.RoomsByName[room.Name] = []
+        if (!App.Core.RoomsByName[room.Name]) {
+            App.Core.RoomsByName[room.Name] = []
         }
-        App.Map.Data.RoomsByName[room.Name].push(room.Key)
+        App.Core.RoomsByName[room.Name].push(room.Key)
         return room;
     }
     var mappath = "data/hell.hmm"
@@ -30,7 +30,16 @@
         Note("加载地图文件" + mappath)
         mapModule.Database.Import(ReadFile(mappath))
     }
-
+    App.Mapper.Data.Markers = {}
+    mapModule.Database.APIListMarkers(mapModule.HMM.APIListOption.New()).forEach((marker) => {
+        App.Mapper.Data.Markers[marker.Key] = marker.Value
+    })
+    App.Mapper.LoadMarker = (key) => {
+        if (App.Mapper.Data.Markers[key]) {
+            return App.Mapper.Data.Markers[key]
+        }
+        return key;
+    }
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
     //添加房子
@@ -173,7 +182,7 @@
             model.From = App.Mapper.HouseLoc
             model.To = "1933"
             model.Command = App.Mapper.HouseID
-            model.Conditions = [App.Mapper.NewCondition("streeview", 1, true)]
+            model.Conditions = [App.Mapper.NewCondition("streetview", 1, true)]
             return model;
         })())
     }

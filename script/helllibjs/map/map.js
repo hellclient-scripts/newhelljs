@@ -487,8 +487,8 @@
             if (step.Target) {
                 map.Room.ID = step.Target
             }
-            if (this.Maze) {
-                this.OnStepFinsih(this.Maze, map, step)
+            if (this.#maze) {
+                this.#maze.OnStepFinsih(move,map, step)
             } else {
                 this.OnStepFinsih(this, map, step)
             }
@@ -601,12 +601,16 @@
     let DefaultMazeWalk = function (maze, move, map) {
         return
     }
+    let DefaultMazeMoveOnStepFinish = function (move, map,step) {
+        move.OnStepFinsih(move, map, step)
+        return
+    }
     class Maze {
         Data = null
         CheckEnter = DefaultMazeCheckEnter
         CheckEscaped = DefaultMazeEscaped
         Walk = DefaultMazeWalk
-        OnStepFinsih = DefaultMoveOnStepFinish
+        OnStepFinsih = DefaultMazeMoveOnStepFinish
         NextRoom = ""
         WithCheckEnter(fn) {
             this.CheckEnter = fn

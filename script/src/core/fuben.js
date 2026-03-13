@@ -38,6 +38,8 @@
             return room
         }
         AddRoomPath(x, y, x2, y2, to, from) {
+            from = App.Mapper.LoadMarker(from)
+            to = App.Mapper.LoadMarker(to)
             this.AddPath(`${this.Prefix}-${x}-${y}`, `${this.Prefix}-${x2}-${y2}`, to)
             this.AddPath(`${this.Prefix}-${x2}-${y2}`, `${this.Prefix}-${x}-${y}`, from)
         }
@@ -49,10 +51,10 @@
             this.Paths.push(path)
         }
         Install() {
-            App.Core.Fuben.CurrentRooms=[]
+            App.Core.Fuben.CurrentRooms = []
             this.Rooms.forEach((room) => {
                 App.Core.Fuben.CurrentRooms.push(
-                    App.Mapper.NewRoom(room,"")
+                    App.Mapper.NewRoom(room, "")
                 )
             })
         }
