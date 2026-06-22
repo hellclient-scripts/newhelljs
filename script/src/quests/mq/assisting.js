@@ -457,7 +457,7 @@ $.Module(function (App) {
         Assisting.Data.NPC = null
         Assisting.Prepare()
     }
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(()=> {
         Assisting.Data.kills = 0
         Assisting.Data.helpded = 0
         Assisting.Data.start = null

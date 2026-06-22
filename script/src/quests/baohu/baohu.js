@@ -122,11 +122,6 @@ $.Module(function (App) {
                 }
                 Baohu.Data.ID = id
                 Baohu.Data.Type = result[2]
-                $.PushCommands(
-                    $.CounterAttack(`${GetVariable("id")}'s ${id}`, App.NewCombat("baohu").WithTags(`baohu-${result[2]}`).WithPlan(PlanCombat)),
-                    $.Function(Baohu.Finish),
-                )
-                $.Next()
             }).WithName("ok")
             let wait = Baohu.Data.Start + 28000 - $.Now()
             if (wait > 0) {
@@ -146,6 +141,11 @@ $.Module(function (App) {
         },
         (result) => {
             if (result.Name == "ok") {
+                $.PushCommands(
+                    $.CounterAttack(`${GetVariable("id")}'s ${Baohu.Data.ID}`, App.NewCombat("baohu").WithTags(`baohu-${Baohu.Data.Type}`).WithPlan(PlanCombat)),
+                    $.Function(Baohu.Finish),
+                )
+                $.Next()
                 return
             }
             App.Send("halt")

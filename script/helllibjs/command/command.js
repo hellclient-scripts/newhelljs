@@ -122,8 +122,8 @@
             return this.NewCommand(this.CommandNameFunction, fn)
         }
 
-        NewDoCommand(cmd) {
-            return this.NewCommand(this.CommandNameDo, cmd)
+        NewDoCommand(cmd, raw) {
+            return this.NewCommand(this.CommandNameDo, { Cmd: cmd, Raw: raw })
         }
         NewWaitCommand(delay, offset) {
             return this.NewCommand(this.CommandNameWait, { Delay: delay, Offset: offset })
@@ -281,7 +281,7 @@
     }
     module.ExecutorDo = function (commands, running) {
         running.OnStart = function (arg) {
-            App.Send(running.Command.Data)
+            App.Send(running.Command.Data.Cmd, false, running.Command.Data.Raw)
             commands.Next()
         }
     }

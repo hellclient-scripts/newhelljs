@@ -116,3 +116,7 @@ $.PrepareMoney = App.NewPrepareMoneyCommand
 
 //获取Marker位置
 $.RID=App.Mapper.LoadMarker
+
+//切换时间片的指令
+$.Timeslice=App.NewTimesliceCommand
+$.TimesliceIf=App.NewTimesliceIfCommand

@@ -1,24 +1,26 @@
 (function (App) {
     let module = {}
     let actionModule = App.RequireModule("helllibjs/conditions/action.js")
-    module.DefaultParse=function(data,matcher){
-        let action=actionModule.Parse(data)
+    module.DefaultParse = function (data, matcher) {
+        let action = actionModule.Parse(data)
         action.ParseNumber().ParseName()
-        action.UserData=[]
-        action.Data.split(",").forEach(data=>{
+        action.UserData = []
+        action.Data.split(",").forEach(data => {
             action.UserData.push(data.trim())
         })
-        let rule=new Rule(matcher,action)
+        let rule = new Rule(matcher, action)
         return rule
 
     }
     class Result {
-        constructor(command, asset) {
+        constructor(command, asset, data) {
             this.Command = command
             this.Asset = asset
+            this.Data = data
         }
         Command = null
         Asset = null
+        Data = null
     }
     class Rule {
         constructor(match, data) {
@@ -67,14 +69,14 @@
             for (let rulelist of rulelists) {
                 for (let rule of rulelist) {
                     let command = rule.Match(rule, asset)
-                    if (command!=null) {
-                        return new Result(command, asset)
+                    if (command != null) {
+                        return new Result(command, asset,rule.Data)
                     }
                 }
             }
             return null
         }
-        Parse=module.DefaultParse
+        Parse = module.DefaultParse
     }
     module.Assets = Assets
     return module

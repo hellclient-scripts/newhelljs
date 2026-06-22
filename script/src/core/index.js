@@ -11,7 +11,7 @@
     App.Include("src/core/fatal.js")
     App.Include("src/core/log.js")
     App.Include("src/core/init.js")
-     App.Include("src/core/params.js")
+    App.Include("src/core/params.js")
     App.Include("src/core/committee.js")
     App.Include("src/core/commands.js")
     App.Include("src/core/userqueue.js")
@@ -46,6 +46,8 @@
     App.Include("src/core/stage.js")
     App.Include("src/core/medicine.js")
     App.Include("src/core/fuben.js")
-   //需要最后引入最后覆盖设置
+    App.Include("src/core/timeslice.js")
+    App.Include("src/core/analytics.js")
+    //需要最后引入最后覆盖设置
     App.Core.Params.Load()
 })(App)

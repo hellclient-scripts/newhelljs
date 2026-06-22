@@ -6,6 +6,7 @@
     App.Core.Study.Jiqu = {}
     App.Core.Study.Init = function () {
         App.Core.Study.Jiqu.Max = null
+        App.Core.Study.Jiqu.Limit = 0
         App.Core.Study.Jiqu.Commands = []
         App.Core.Study.Learn = []
         App.Core.Study.LearnMode = 0
@@ -15,8 +16,8 @@
         App.Core.Study.LianMode = 0
     }
     App.Core.Study.LearnMode = 0
-    App.Params.YanjiuMax = 100
-    App.Params.LianMax = 50
+    // App.Params.YanjiuMax = 100
+    // App.Params.LianMax = 50
     App.Core.Study.Learn = []
     App.Core.Study.LianMode = 0
     App.Core.Study.Lian = []
@@ -41,6 +42,9 @@
         , (result) => {
         }
     )
+    App.Core.Study.NewLearn = (data, type) => {
+        return new Learn(data, type)
+    }
     //学习的基本结构
     class Learn {
         constructor(line, defaultType) {
@@ -96,7 +100,7 @@
                         if (App.Params.LocYanjiu) {
                             loc = App.Params.LocYanjiu
                         } else {
-                            loc = App.Mapper.HouseLoc ? "1949" : App.Params.LocDazuo
+                            loc = App.Params.LocDazuo
                         }
                     }
                     var times = App.Params.YanjiuMax
@@ -109,6 +113,7 @@
                     $.PushCommands(
                         $.To(loc),
                         $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do("yun regenerate"),
                         $.Do(cmds.join(";")),
                         $.Function(() => { $.RaiseStage("wait"); App.Next() }),
                         $.Do("hp"),
@@ -192,6 +197,33 @@
                     )
                     $.Next()
                     break
+                case "du":
+                    if (!this.Loc) {
+                        PrintSystem("未知的学习位置 " + this.Loc)
+                        return
+                    }
+                    if (!this.From) {
+                        PrintSystem("未知的读目标 " + this.From)
+                        return
+                    }
+                    var cmds = [this.From]
+                    if (this.Before) { cmds.unshift(this.Before) }
+                    if (this.After) { cmds.push(this.After) }
+                    $.PushCommands(
+                        $.To(this.Loc),
+                        $.Function(() => { PlanStudy.Execute(); App.Next() }),
+                        $.Do(cmds.join(";")),
+                        $.Function(() => {
+                            $.RaiseStage("wait")
+                            $.Next()
+                        }),
+                        $.Wait(1000),
+                        $.Do("hp"),
+                        $.Sync(),
+                    )
+                    $.Next()
+                    break
+
                 default:
                     PrintSystem("未知的学习指令 " + this.Type)
                     return
@@ -205,7 +237,7 @@
         Check() {
             let skill = App.Data.Player.Skills[this.SkillID]
             if (skill) {
-                if (skill["受限经验"] && skill["等级"] >= (App.Data.Player.HPM["当前等级"] - 1)) {
+                if (skill["受限经验"] && skill["等级"] >= (App.Data.Player.HPM["当前等级"])) {
                     return false
                 }
             }
@@ -225,12 +257,13 @@
             }
 
             for (var limit of this.Limit) {
+                limit = limit.trim()
                 if (!isNaN(limit)) {//数字limit直接限制
                     if (skill && skill["等级"] >= limit) {
                         return false
                     }
                 }
-                let data = limit.trim().split(" ")
+                let data = SplitN(limit, " ", 2)
                 //limit可以有特殊设置
                 switch (data[0]) {
                     case "":
@@ -241,23 +274,44 @@
                                 return false
                             }
                         }
+                        break
+                    case "more":
+                        let limit = data[1] ? data[1].trim() : "0"
+                        if (skill && skill["等级"] <= limit - 0) {
+                            return false
+                        }
+                        break
                     default://相对其他技能限制,可以用 skill +100 或者 skill-100 的形式
                         let tskill = App.Data.Player.Skills[data[0]]
-                        if (data[1] == null || isNaN(data[1])) {
-                            data[1] = "0"
-                        }
-                        if (tskill && !isNaN(data[1])) {
+                        if (tskill) {
                             let level = data[1] ? data[1].trim() : "0"
-                            let abs = 1
-                            if (level[0] == "+") {
+                            if (level[0] == "@") {
                                 level = level.slice(1)
-                            } else if (level[0] == "-") {
-                                abs = -1
+                                if (tskill["等级"] < (level - 0)) {
+                                    return false
+                                }
+                            } else if (level[0] == "*") {
                                 level = level.slice(1)
-                            }
-                            let offset = level * abs
-                            if (skill["等级"] >= tskill["等级"] + offset) {
-                                return false
+                                if (skill["等级"] >= tskill["等级"] * (level - 0)) {
+                                    return false
+                                }
+                            } else {
+                                if (data[1] == null || isNaN(data[1])) {
+                                    data[1] = "0"
+                                }
+                                if (!isNaN(data[1])) {
+                                    let abs = 1
+                                    if (level[0] == "+") {
+                                        level = level.slice(1)
+                                    } else if (level[0] == "-") {
+                                        abs = -1
+                                        level = level.slice(1)
+                                    }
+                                    let offset = level * abs
+                                    if (skill["等级"] >= tskill["等级"] + offset) {
+                                        return false
+                                    }
+                                }
                             }
                         }
                 }
@@ -317,14 +371,17 @@
         return null
 
     }
+    App.Core.Study.GetLearnSkills = () => {
+        return (App.Quests.Data.Study || []).concat(App.Core.Study.Learn)
+    }
     //按类型过滤技能
     App.Core.Study.FilterSkill = (type) => {
-        return filterskill(App.Core.Study.Learn, App.Core.Study.LearnMode, type)
+        return filterskill(App.Core.Study.GetLearnSkills(), App.Core.Study.LearnMode, type)
     }
     //获取所有可以学习的技能
     App.Core.Study.AllCanLearn = () => {
         let result = []
-        App.Core.Study.Learn.forEach(learn => {
+        App.Core.Study.GetLearnSkills().forEach(learn => {
             if (learn.Check()) {
                 result.push(learn)
             }
@@ -350,7 +407,10 @@
     App.Core.Study.LearndTimes = 0
     //判断是否到了minpot
     App.Core.Study.HitMinPot = () => {
-        let minpot = GetVariable("min_pot")
+        let minpot = App.Quests.Data.MinPot
+        if (!minpot == null) {
+            minpot = GetVariable("min_pot") - 0
+        }
         return (!isNaN(minpot) && App.Data.Player.HP["潜能"] < (minpot - 0)) || App.Data.Player.HP["潜能"] <= 10
     }
     //执行学习
@@ -380,6 +440,8 @@
                 } else {
                     App.Core.Study.CurrentSkill.Cooldown(120000)
                 }
+            } else {
+                // App.Core.Timeslice.Change("")
             }
         }
         App.Next()
@@ -393,25 +455,30 @@
                 case "":
                 case "#tihuimax":
                     let data = action.Data.trim()
-                    if (action.Data && !isNaN(action.Data)) {
+                    if (data && !isNaN(data)) {
                         App.Core.Study.Jiqu.Max = data - 0
                     }
                     break
                 case "#cmd":
                     App.Core.Study.Jiqu.Commands.push(action.Data)
                     break
+                case "#limit":
+                    let limit = action.Data.trim()
+                    if (limit && !isNaN(limit)) {
+                        App.Core.Study.Jiqu.Limit = limit - 0
+                    }
+                    break
             }
         })
         if (App.Core.Study.Jiqu.Max == null) {
-            let skill = App.Data.Player.Skills["martial-cognize"]
-            let level = skill ? skill["等级"] : 0
-            if (level > 500) {
-                App.Core.Study.Jiqu.Max = 500
-            } else if (level > 200) {
-                App.Core.Study.Jiqu.Max = 200
-            } else {
-                App.Core.Study.Jiqu.Max = 100
+            let max = (App.Data.Player.HPM["体会上限"] * 0.5).toFixed(0)
+            if (max < 100) {
+                max = 0
             }
+            if (max > 8000) {
+                max = 8000
+            }
+            App.Core.Study.Jiqu.Max = max
         }
 
         if (App.Core.Study.Jiqu.Commands.length == 0) {
@@ -514,8 +581,7 @@
     }
     //注册#yanjiu别名
     App.Sender.RegisterAlias("#yanjiu", function (data) {
-        let minpot = GetVariable("min_pot")
-        if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
+        if (!App.Core.Study.HitMinPot()) {
             let skill = App.Core.Study.FilterSkill()
             if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
@@ -551,9 +617,9 @@
     //注册#yanjiulian别名
     App.Sender.RegisterAlias("#yanjiulian", function (data) {
         let skill
-        let minpot = GetVariable("min_pot")
+        let minpot = GetVariable("min_pot") - 0
         let learned = false//防止发送多个hp
-        if (isNaN(minpot) || App.Data.Player.HP["潜能"] > minpot) {
+        if (!App.Core.Study.HitMinPot()) {
             skill = App.Core.Study.FilterSkill()
             if (skill && skill.Type == "yanjiu") {
                 let times = data - 0
@@ -586,22 +652,92 @@
             App.Send("yun recover;yun regenerate;hp")
         }
     })
+    let JiquNoPause = () => {
+        let ts = App.Core.Timeslice.Current()
+        App.Commands.PushCommands(
+            $.Timeslice("修整-汲取"),
+            App.Move.NewToCommand(App.Params.LocDazuo),
+            App.NewNobusyCommand(),
+            App.Commands.NewDoCommand("yun regenerate;yun recover"),
+            App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
+            App.NewNobusyCommand(),
+            App.Commands.NewDoCommand("hp"),
+            App.NewSyncCommand(),
+            $.Timeslice(ts),
+        )
+        App.Next()
+    }
+    let JiquPauseContext = {}
+
+    let JiquPause = () => {
+        App.Core.Timeslice.Change("修整-汲取")
+        App.Core.Study.LastTihui = App.Data.Player.HP["体会"]
+        App.Commands.PushCommands(
+            App.Commands.NewFunctionCommand(JiquPauseNext)
+        )
+        App.Next()
+    }
+    let matcherJiquFinish = "你将实战中获得的体会心得充分的消化吸收了。"
+    let matcherJiquFail = "似乎没有必要为吸收这点体会下功夫。"
+    let matcherFull = "你感觉自己的实战经验还有欠缺，还无法领会更高境界的武学修养。"
+    let PlanJiqu = new App.Plan(App.Positions["Connect"],
+        function (task) {
+            task.AddTrigger(matcherJiquFinish)
+            task.AddTrigger(matcherJiquFail)
+            task.AddTrigger(matcherFull, (tir, result) => {
+                App.Send("hp -m;cha")
+            })
+            task.AddTimer(1100)
+            App.Send(App.Random(App.Core.Study.Jiqu.Commands))
+        }, function (result) {
+            App.Next()
+        })
+
+    let JiquPauseNext = () => {
+        if (App.Data.Player.HP["体会"] > 60 && App.Core.Study.CanJiqu()) {
+            App.Insert(App.Commands.NewFunctionCommand(JiquPauseNext))
+            App.Commands.PushCommands(
+                $.Prepare("common", JiquPauseContext),
+                App.Move.NewToCommand(App.Params.LocDazuo),
+                App.Commands.NewFunctionCommand(() => {
+                    $.RaiseStage("pause")
+                    App.Next()
+                }),
+                App.Commands.NewDoCommand("yun regenerate;yun recover"),
+                $.Plan(PlanJiqu),
+                App.Commands.NewDoCommand("halt;hp"),
+                App.NewSyncCommand(),
+            )
+        } else {
+            // App.Core.Timeslice.Change("")
+        }
+        App.Next()
+    }
+    App.Core.Study.CanJiqu = () => {
+        if (App.Data.Player.HP["经验"] > 30000 && App.Core.Player.GetSkillLevelByID("martial-cognize") < App.Data.Player.HPM["当前等级"]) {
+            if (App.Core.Study.Jiqu.Limit > 0 && App.Core.Player.GetSkillLevelByID("martial-cognize") >= App.Core.Study.Jiqu.Limit) {
+                return false
+            }
+            if (GetVariable("max_exp").trim().startsWith("+") && App.Params.JiquMaxAhead >= 0) {
+                let maxskill = App.Core.GetMaxSkillLevel(["martial-cognize"])
+                if (App.Core.Player.GetSkillLevelByID("martial-cognize") - (maxskill ? maxskill["等级"] : 0) > App.Params.JiquMaxAhead) {
+                    return false
+                }
+            }
+            return true
+        }
+        return false
+    }
     //注册jiqu准备
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (!App.Quests.IsStopped() && App.Quests.Data.NoJiqu == true) {
+            return null
+        }
         let max = context["JiquMax"] != null ? context["JiquMax"] : App.Core.Study.Jiqu.Max
-        if (App.Data.Player.HP["经验"] > 100000 && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
-            return function () {
-                App.Commands.PushCommands(
-                    App.Move.NewToCommand(App.Params.LocDazuo),
-                    App.NewNobusyCommand(),
-                    App.Commands.NewDoCommand("yun regenerate;yun recover"),
-                    App.Commands.NewDoCommand(App.Random(App.Core.Study.Jiqu.Commands)),
-                    App.NewNobusyCommand(),
-                    App.Commands.NewDoCommand("hp"),
-                    App.NewSyncCommand(),
-                )
-                App.Next()
-            }
+        if (App.Core.Study.CanJiqu() && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
+            JiquPauseContext = Object.create(context)
+            JiquPauseContext.NeiliMin = 15
+            return App.Params.JiquPause == "t" ? JiquPause : JiquNoPause
         }
         return null
     }))
@@ -623,6 +759,7 @@
                 let data = Object.create(context)
                 data.NeiliMin = 15
                 return () => {
+                    App.Core.Timeslice.Change("修整-学习")
                     $.PushCommands(
                         $.Function(() => { App.Core.Study.DoLearn(data) })
                     )
@@ -655,7 +792,9 @@
     })
     //注册#jiqu别名
     App.Sender.RegisterAlias("#jiqu", function (data) {
-        App.Send(App.Random(App.Core.Study.Jiqu.Commands))
+        if (App.Core.Study.CanJiqu) {
+            App.Send(App.Random(App.Core.Study.Jiqu.Commands))
+        }
     })
     //注册#jifa指令
     App.UserQueue.UserQueue.RegisterCommand("#jifa", function (uq, data) {

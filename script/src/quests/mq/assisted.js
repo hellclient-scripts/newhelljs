@@ -395,7 +395,7 @@ $.Module(function (App) {
         Assisted.Prepare()
     }
     //#start后清零
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(()=> {
         Assisted.Data.kills = 0
         Assisted.Data.helpded = 0
         Assisted.Data.start = null

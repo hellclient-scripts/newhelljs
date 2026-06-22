@@ -20,6 +20,18 @@
         let newlength = str.length + offset
         return front ? str.padStart(newlength, " ") : str.padEnd(newlength, " ")
     }
+    module.CountDisplayLength = (str) => {
+        str = str || ""
+        let count = 0
+        for (var i = 0; i < str.length; i++) {
+            if (str.charCodeAt(i) < 256) {
+                count += 1
+            } else {
+                count += 2
+            }
+        }
+        return count
+    }
     module.Cut = (str, length, overflowtoken) => {
         str = str || ""
         length = length || 1
@@ -145,11 +157,23 @@
             num = num / 1000
             unit = "M"
         }
+        if (num >= 999) {
+            num = num / 1000
+            unit = "B"
+        }
+        if (num >= 999) {
+            num = num / 1000
+            unit = "T"
+        }
         if (tofixed) {
             let pow = Math.pow(10, tofixed)
             num = Math.floor(num / pow) * pow
         } else {
-            num = Math.floor(num)
+            if (num < 10) {
+                num = Math.floor(num * 10) / 10
+            } else {
+                num = Math.floor(num)
+            }
         }
         return num + unit
     }

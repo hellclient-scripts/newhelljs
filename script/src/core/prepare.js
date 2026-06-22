@@ -2,8 +2,17 @@
 (function (App) {
     let proposalsModule = App.RequireModule("helllibjs/proposals/proposals.js")
     App.Core.Prepare = {}
+    App.Core.Prepare.Current = ""
+    App.Core.Prepare.Last = ""
+    App.Core.Prepare.LastNote = 0
+
     //准备的实例
     App.Proposals = new proposalsModule.Proposals()
+    App.Proposals.OnSuccess = function (id, context, excluded) {
+        if (App.Core.Prepare.Current == "") {
+            App.Core.Prepare.Current = id
+        }
+    }
     //注册prepare指令
     App.Commands.RegisterExecutor("prepare", function (commands, running) {
         running.OnStart = function (arg) {
@@ -85,8 +94,16 @@
     //根据checker结果，执行准备
     let AfterCheck = function (id, context) {
         id = id || ""
+        App.Core.Prepare.Current = ""
+
         let submit = App.Proposals.Submit(id, context)
         if (submit) {
+            let now = $.Now()
+            if (now - App.Core.Prepare.LastNote > 1000 || App.Core.Prepare.Last != App.Core.Prepare.Current) {
+                Note(`准备[${App.Core.Prepare.Current}]`)
+                App.Core.Prepare.LastNote = now
+                App.Core.Prepare.Last = App.Core.Prepare.Current
+            }
             App.PushCommands(
                 App.Commands.NewFunctionCommand(submit),
                 App.NewPrepareCommand(id, context),

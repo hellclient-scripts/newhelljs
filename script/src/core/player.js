@@ -58,6 +58,7 @@
         Skills: {},
         Jifa: {},
     }
+    App.Core.Player={}
     //HP的checker
     let checkerHP = App.Checker.Register("hp", "yun recover;yun regenerate;hp", 5000)
     // ┌───个人状态────────────┬───────────────────┐
@@ -530,5 +531,24 @@
         })
     }
     App.BindEvent("core.donate0", App.Core.OnDonate0)
+    App.Core.Player.GetSkillLevelByID = function (id) {
+        if (App.Data.Player.Skills[id]) {
+            return App.Data.Player.Skills[id]["等级"]
+        }
+        return 0
+    }
+    App.Core.Player.GetSkillLevelByJifa = function (id) {
+        let jifa = App.Data.Player.Jifa[id]
+        if (!jifa) {
+            return 0
+        }
+        for (let key in App.Data.Player.Skills) {
+            let skill = App.Data.Player.Skills[key]
+            if (skill["名称"] == jifa.Skill) {
+                return skill["等级"]
+            }
+        }
+        return 0
+    }
 
 })(App)

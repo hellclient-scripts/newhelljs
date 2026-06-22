@@ -3,19 +3,19 @@
     let objectModule = App.RequireModule("helllibjs/object/object.js")
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     var natures = {};
-    ReadLines("data/natures.txt").forEach(line => { 
-        if (!line.endsWith("。")){
-            line=line+"。"
+    ReadLines("data/natures.txt").forEach(line => {
+        if (!line.endsWith("。")) {
+            line = line + "。"
         }
         natures[line] = true
-     })
-    App.Core.RoomsByName={}
+    })
+    App.Core.RoomsByName = {}
     App.Core.Room = {}
     App.Core.Room.Desc = []
-    App.Core.Room.MaxDescLines=10
+    App.Core.Room.MaxDescLines = 10
     App.Core.Room.DescStart = false
     App.Core.Room.Current = null
-    App.Core.RoomsByName={}
+    App.Core.RoomsByName = {}
     //创建实例，绑定position
     App.Map = new mapModule.Map(App.Positions["Room"], App.Positions["Move"])
     let initRoom = function () {
@@ -24,6 +24,10 @@
     initRoom()
     //处理房间名
     App.Engine.SetFilter("core.normalroomname", function (event) {
+        if (App.Core.RoomsByName[App.History.CurrentOutput.Text]) {
+            App.RaiseEvent(event)
+            return
+        }
         let words = App.History.CurrentOutput.Words
         if (words.length == 1 && words[0].Color != "" && words[0].Bold == true) {
             App.RaiseEvent(event)
@@ -31,14 +35,14 @@
     })
     App.Core.Room.OnName = function (event) {
         App.Core.Room.DescStart = true
-        App.Core.Room.Desc=[]
+        App.Core.Room.Desc = []
         App.Core.Room.Current = App.Map.NewRoom().
             WithName(App.History.Current).
             WithNameRaw(App.History.CurrentOutput)
     }
     App.BindEvent("core.roomname", App.Core.Room.OnName)
     App.Core.Room.OnDesc = function (event) {
-        if (App.Core.Room.DescStart&&App.Core.Room.Desc.length<=App.Core.Room.MaxDescLines){
+        if (App.Core.Room.DescStart && App.Core.Room.Desc.length <= App.Core.Room.MaxDescLines) {
             App.Core.Room.Desc.push(event.Data.Output)
         }
     }
@@ -46,20 +50,20 @@
     reExit = /[a-z]+/g
     //响应房间出口
     App.Core.Room.OnExit = function (event) {
-        App.Core.Room.DescStart=false
-        var rawdesc=App.Core.Room.Desc
-        App.Core.Room.Desc=[]
+        App.Core.Room.DescStart = false
+        var rawdesc = App.Core.Room.Desc
+        App.Core.Room.Desc = []
         rawdesc.pop()
-        let desc=[]
-        rawdesc.forEach(line=>{
-            if (!natures[line.trim()]){
+        let desc = []
+        rawdesc.forEach(line => {
+            if (!natures[line.trim()]) {
                 desc.push(line)
             }
-        })        
+        })
         App.Map.EnterNewRoom(App.Core.Room.Current)
         initRoom()
-        if (desc.length>0){
-            App.Core.Room.Current.WithData("Desc",desc.join("").trim())
+        if (desc.length > 0) {
+            App.Core.Room.Current.WithData("Desc", desc.join("").trim())
         }
         event.Context.Propose(function () {
             let result = [...event.Data.Wildcards[1].matchAll(reExit)].map(data => data[0]).sort()

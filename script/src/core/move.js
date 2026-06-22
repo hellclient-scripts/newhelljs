@@ -32,6 +32,10 @@
         }
     }
     App.Move = {}
+    App.Move._OnNextRoom = []
+    App.Move.BindNextRoom = (callback) => {
+        App.Move._OnNextRoom.push(callback)
+    }
     let refilter = /[。·！]/g;
     App.Move.Filterdir = function (dir) {
         dir = dir.replace(refilter, "");
@@ -141,6 +145,9 @@
                         case "blocked":
                             App.Move.OnBlocker(result.Data)
                             break
+                        case "moveblocked":
+                            App.Move.OnMoveBlocker(result.Data)
+                            break
                         case "blocked2":
                             App.Core.Blocker.BlockStepRetry()
                             break
@@ -182,8 +189,32 @@
     App.Move.OnBlocker = function (name) {
         App.Core.Blocker.KillBlocker(name)
     }
+    App.Move.OnMoveBlocker = function (name) {
+        if (App.Map.Move && App.Map.Move.Data["OnMoveBlocker"]) {
+            App.Map.Move.Data["OnMoveBlocker"](name)
+            return
+        }
+        App.Map.Room.Data["core.moveblocked"] = (App.Map.Room.Data["core.moveblocked"] || 0) + 1
+        if (App.Map.Room.Data["core.moveblocked"] < 5) {
+            App.Map.Resend()
+        } else {
+            App.Core.Blocker.KillMoveBlocker(name)
+        }
+    }
+    App.Move.NewOnMoveBlocker = function (callback) {
+        return App.Map.NewMoveData("OnMoveBlocker", callback)
+    }
+    App.Move.KillBlockers = function (npclist) {
+        return App.Map.NewMoveData("core.killblockers", npclist)
+    }
+
     //房间名回显
     App.BindEvent("core.roomentry", function (event) {
+        if (App.Move._OnNextRoom.length > 0) {
+            let cbs = App.Move._OnNextRoom
+            App.Move._OnNextRoom = []
+            cbs.forEach(callback => callback())
+        }
         event.Context.ProposeLater(function () {
             App.Map.OnWalking()
             if (App.Params.ShowRoomID.trim() == "t") {
@@ -221,8 +252,11 @@
                 target = [target]
             }
             if (target) {
-                Note(`${App.Map.Room.ID} 前往 ${target.join(",")}`)
+                target = App.Mapper.LoadMarkers(target)
+                label = target.length > 1 ? `${target[0]} 等 ${target.length} 个房间` : target[0]
+                Note(`${App.Map.Room.ID} 前往 ${label}`)
             }
+
             App.Move.NewTo(target, ...running.Command.Data.Initers).Execute()
         }
     })

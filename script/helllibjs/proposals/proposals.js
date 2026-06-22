@@ -1,6 +1,7 @@
 (function (app) {
     var module = {}
-
+    module.DefaultOnSuccess = function (id, context, excluded) {
+    }
     class Proposal {
         constructor(submit) {
             this.Submit = submit
@@ -9,6 +10,7 @@
     }
     class Proposals {
         #registered = {}
+        OnSuccess = module.DefaultOnSuccess
         Register(id, Proposal) {
             this.#registered[id] = Proposal
         }
@@ -40,7 +42,12 @@
             if (p == null) {
                 throw new Error("Proposal " + id + " not found.")
             }
-            return p.Submit(this, context, excluded)
+            let result = p.Submit(this, context, excluded)
+            if (result) {
+                this.OnSuccess(id, context, excluded)
+                return result
+            }
+            return null
         }
     }
     module.Proposals = Proposals

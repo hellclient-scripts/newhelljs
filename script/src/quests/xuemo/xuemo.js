@@ -569,7 +569,7 @@ $.Module(function (App) {
         )
         $.Next()
     }
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(()=> {
         Xuemo.All = 0
         Xuemo.Success = 0
     })

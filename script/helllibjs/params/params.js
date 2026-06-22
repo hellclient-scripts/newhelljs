@@ -18,10 +18,15 @@
             this.Intro = intro
             return this
         }
+        WithData(data) {
+            this.Data = data
+            return this
+        }
         Name = ""
         Desc = ""
         Intro = ""
         ID = ""
+        Data = null
         Value = null
         Type = Params.TypeString
     }

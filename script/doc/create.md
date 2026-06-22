@@ -2,14 +2,14 @@
 
 自创武功主要是依靠try任务来实现的，具体来说，任务设置大概是这样
 ```
-pot 150000>>try 2682 #wpoff;#touch;invent unarmed
+pot 150000>>try 2682 #wpoff;#touch;yun heal;invent unarmed
 lgt
 qinling
 mq
 ```
 或者
 ```
-pot 180000>>try 2682 #wpoff;#touch;create gundum-unarmed
+pot 180000>>try 2682 #wpoff;#touch;yun heal;create gundum-unarmed
 lgt
 qinling
 mq

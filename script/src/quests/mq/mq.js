@@ -166,6 +166,7 @@ $.Module(function (App) {
         App.Positions["Quest"],
         (task) => {
             let fled = false
+            let fail = false
             MQ.Data.NoMaster = false
             MQ.Data.NPC = null
             MQ.Data.current = null
@@ -177,14 +178,6 @@ $.Module(function (App) {
                 MQ.Data.NPC = new NPC(result[2])
                 return true
             })
-            task.AddTrigger(reStart, (tri, result) => {
-                if (MQ.Data.NPC) {
-                    MQ.Data.NPC.Zone = result[1].slice(0, 2)
-                    if (fled) {
-                        MQ.Data.NPC.Flee()
-                    }
-                }
-            })
             task.AddTrigger(reFlee, (tri, result) => {
                 if (MQ.Data.NPC && result[1].endsWith(MQ.Data.NPC.Name)) {
                     Note("NPC跑了。")
@@ -193,7 +186,8 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(reFail, () => {
-                App.Send("quest cancel")
+                fail = true
+                return true
             })
             task.AddTrigger(reNoMaster, () => {
                 MQ.Data.NoMaster = true
@@ -203,16 +197,27 @@ $.Module(function (App) {
                 MQ.Data.current = result[1] - 0
                 return true
             })
+            //reNoQuest和reSTart应该至少会触发一个
             task.AddTrigger(reNoQuest)
+            task.AddTrigger(reStart, (tri, result) => {
+                if (fail) {
+                    App.Send("quest cancel")
+                    return
+                }
+                if (MQ.Data.NPC) {
+                    MQ.Data.NPC.Zone = result[1].slice(0, 2)
+                    if (fled) {
+                        MQ.Data.NPC.Flee()
+                    }
+                }
+            })
             task.AddTrigger(/你现在没有领任何任务！/)
             task.AddTimer(3000)
             $.RaiseStage("mqgivehead")
             App.Send("give head to " + App.Params.MasterID + ";drop head")
             $.RaiseStage("mqbefore")
-            App.Sync(() => {
-                App.Send("quest " + App.Params.MasterID)
-                App.Send("quest")
-            })
+            App.Send("quest " + App.Params.MasterID)
+            App.Send("quest")
 
         },
         (result) => {
@@ -455,7 +460,7 @@ $.Module(function (App) {
                 $.Kill(MQ.Data.NPC.ID, App.NewCombat("mq").WithPlan(PlanCombat).WithKillInGroup(MQ.Data.NPC.NotKilled)),
                 $.Function(() => {
                     if (!(MQ.Data.NPC.Died || MQ.Data.NPC.Fled)) {
-                        $.Append($.Function(MQ.KillNear))
+                        $.Insert($.Function(MQ.KillNear))
                     }
                     App.Next()
                 })
@@ -829,7 +834,7 @@ $.Module(function (App) {
         planQuest.Execute()
         MQ.Prepare()
     }
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(()=> {
         MQ.Data = {
             kills: 0,
             helpded: 0,

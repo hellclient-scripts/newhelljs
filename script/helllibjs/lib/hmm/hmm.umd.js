@@ -12,6 +12,29 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./include/parseint.ts":
+/*!*****************************!*\
+  !*** ./include/parseint.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ParseInt = void 0;
+class ParseInt {
+    static Parse(val) {
+        if (val.indexOf(".") != -1) {
+            return undefined;
+        }
+        const parsed = parseInt(val, 10);
+        return isNaN(parsed) ? undefined : parsed;
+    }
+}
+exports.ParseInt = ParseInt;
+
+
+/***/ }),
+
 /***/ "./include/timestamp.ts":
 /*!******************************!*\
   !*** ./include/timestamp.ts ***!
@@ -690,7 +713,7 @@ class MapDatabase {
     }
 }
 exports.MapDatabase = MapDatabase;
-MapDatabase.Version = 1004;
+MapDatabase.Version = 1006;
 
 
 /***/ }),
@@ -954,6 +977,7 @@ class WalkingStep {
         this.Cost = 0;
         this.TotalCost = 0;
         this.Remain = 0;
+        this.Exit = null;
     }
     static FromExit(prev, from, exit, cost, TotalCost) {
         let result = new WalkingStep();
@@ -964,6 +988,7 @@ class WalkingStep {
         result.Cost = cost;
         result.TotalCost = TotalCost + cost;
         result.Remain = cost - 1;
+        result.Exit = exit;
         return result;
     }
     ToStep() {
@@ -974,7 +999,22 @@ exports.WalkingStep = WalkingStep;
 class Walking {
     constructor(mapper) {
         this.Walked = {};
+        this.Shortcuts = [];
         this.Mapper = mapper;
+    }
+    InitShortcuts() {
+        for (let key of Object.keys(this.Mapper.MapFile.Records.Shortcuts)) {
+            let s = this.Mapper.MapFile.Records.Shortcuts[key];
+            if (this.Mapper.ValidateExitStatic(s)) {
+                this.Shortcuts.push(s);
+            }
+        }
+        ;
+        this.Mapper.Context.Shortcuts.forEach(s => {
+            if (this.Mapper.ValidateExitStatic(s)) {
+                this.Shortcuts.push(s);
+            }
+        });
     }
     static BuildResult(last, targets) {
         let result = new step_1.QueryResult();
@@ -996,6 +1036,7 @@ class Walking {
         return result;
     }
     QueryPathAny(from, target, initTotalCost) {
+        this.InitShortcuts();
         from = from.filter(x => x !== "");
         target = target.filter(x => x !== "");
         if (from.length == 0 || target.length == 0) {
@@ -1025,7 +1066,7 @@ class Walking {
             step.From = "";
             step.Command = "";
             this.Walked[f] = step;
-            this.Mapper.AddRoomWalkingSteps(null, pending, f, initTotalCost);
+            this.AddRoomWalkingSteps(null, pending, f, initTotalCost);
         }
         while (pending.length > 0) {
             current = pending;
@@ -1037,7 +1078,11 @@ class Walking {
                             return Walking.BuildResult(step, target);
                         }
                         this.Walked[step.To] = step;
-                        this.Mapper.AddRoomWalkingSteps(step, pending, step.To, step.TotalCost);
+                        this.AddRoomWalkingSteps(step, pending, step.To, step.TotalCost);
+                        let sc = step.Exit;
+                        if (sc != null) {
+                            this.Shortcuts = this.Shortcuts.filter(s => s !== sc);
+                        }
                     }
                     else {
                         step.Remain--;
@@ -1049,6 +1094,7 @@ class Walking {
         return step_1.QueryResult.Fail;
     }
     Dilate(src, iterations) {
+        this.InitShortcuts();
         this.Walked = {};
         let current;
         let pending = [];
@@ -1058,7 +1104,7 @@ class Walking {
                 step.From = "";
                 step.Command = "";
                 this.Walked[f] = step;
-                this.Mapper.AddRoomWalkingSteps(null, pending, f, 0);
+                this.AddRoomWalkingSteps(null, pending, f, 0);
             }
         }
         let i = 0;
@@ -1068,7 +1114,11 @@ class Walking {
             for (let step of current) {
                 if (this.Walked[step.To] == null) {
                     this.Walked[step.To] = step;
-                    this.Mapper.AddRoomWalkingSteps(step, pending, step.To, step.TotalCost);
+                    let sc = step.Exit;
+                    if (sc != null) {
+                        this.Shortcuts = this.Shortcuts.filter(s => s !== sc);
+                    }
+                    this.AddRoomWalkingSteps(step, pending, step.To, step.TotalCost);
                 }
             }
             i++;
@@ -1126,6 +1176,71 @@ class Walking {
         }
         return result;
     }
+    GetRoomExitsWithoutShortcuts(room) {
+        let result = [...room.Exits];
+        //加入上下文中的临时出口
+        let list = this.Mapper.Context.Paths[room.Key];
+        if (list != null) {
+            result = result.concat(list);
+        }
+        return result;
+    }
+    //验证并转换路径
+    //如果路径无效，返回空
+    ValidateToWalkingStep(prev, from, exit, TotalCost) {
+        if (exit.To == "" || exit.To == from) {
+            return null;
+        }
+        let cost = this.Mapper.GetExitCost(exit);
+        //验证出口
+        if (!this.Mapper.ValidateExit(from, exit, cost)) {
+            return null;
+        }
+        //判断最大消耗
+        if (this.Mapper.Options.MaxTotalCost > 0 && this.Mapper.Options.MaxTotalCost < (cost + TotalCost)) {
+            return null;
+        }
+        //转换
+        return WalkingStep.FromExit(prev, from, exit, cost, TotalCost);
+    }
+    ValidateShortcutToWalkingStep(prev, from, shortcut, TotalCost) {
+        if (shortcut.To == "" || shortcut.To == from) {
+            return null;
+        }
+        let cost = this.Mapper.GetExitCost(shortcut);
+        //验证出口
+        if (!this.Mapper.ValidateExitDynamic(from, shortcut, cost)) {
+            return null;
+        }
+        //判断最大消耗
+        if (this.Mapper.Options.MaxTotalCost > 0 && this.Mapper.Options.MaxTotalCost < (cost + TotalCost)) {
+            return null;
+        }
+        //转换
+        return WalkingStep.FromExit(prev, from, shortcut, cost, TotalCost);
+    }
+    AddRoomWalkingSteps(prev, list, from, TotalCost) {
+        let room = this.Mapper.GetRoom(from);
+        if (room != null) {
+            for (let exit of this.GetRoomExitsWithoutShortcuts(room)) {
+                let step = this.ValidateToWalkingStep(prev, from, exit, TotalCost);
+                if (step != null) {
+                    list.push(step);
+                }
+            }
+            //判断是否禁用捷径(飞行)出口
+            if (!this.Mapper.Options.DisableShortcuts) {
+                for (let shortcut of this.Shortcuts) {
+                    if (base_1.ValueTag.ValidateConditions(this.Mapper.GetRoomTags(room), shortcut.RoomConditions)) {
+                        let step = this.ValidateShortcutToWalkingStep(prev, from, shortcut, TotalCost);
+                        if (step != null) {
+                            list.push(step);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 exports.Walking = Walking;
 class Mapper {
@@ -1158,6 +1273,14 @@ class Mapper {
         }
         return exit.Cost;
     }
+    GetRoomTags(room) {
+        let result = [...room.Tags];
+        let tags = this.Context.RoomTags[room.Key] || [];
+        result = result.concat(tags.map(x => new base_1.ValueTag(x.Key, x.Value)));
+        let publictags = this.Context.RoomTags[""] || [];
+        result = result.concat(publictags.map(x => new base_1.ValueTag(x.Key, x.Value)));
+        return result;
+    }
     GetRoomExits(room) {
         let result = [...room.Exits];
         let list = this.Context.Paths[room.Key];
@@ -1166,12 +1289,12 @@ class Mapper {
         }
         if (!this.Options.DisableShortcuts) {
             for (let key of Object.keys(this.MapFile.Records.Shortcuts)) {
-                if (base_1.ValueTag.ValidateConditions(room.Tags, this.MapFile.Records.Shortcuts[key].RoomConditions)) {
+                if (base_1.ValueTag.ValidateConditions(this.GetRoomTags(room), this.MapFile.Records.Shortcuts[key].RoomConditions)) {
                     result.push(this.MapFile.Records.Shortcuts[key]);
                 }
             }
             for (let shortcut of this.Context.Shortcuts) {
-                if (base_1.ValueTag.ValidateConditions(room.Tags, shortcut.RoomConditions)) {
+                if (base_1.ValueTag.ValidateConditions(this.GetRoomTags(room), shortcut.RoomConditions)) {
                     result.push(shortcut);
                 }
             }
@@ -1203,6 +1326,39 @@ class Mapper {
         }
         return true;
     }
+    ValidateExitStatic(exit) {
+        let room = this.GetRoom(exit.To);
+        if (room == null) {
+            return false;
+        }
+        //验证房间符合当前移动的上下文设置
+        if (!this.ValidateRoom(room)) {
+            return false;
+        }
+        //判断出口的条件是否匹配当前上下文
+        if (!this.Context.ValidateConditions(exit.Conditions)) {
+            return false;
+        }
+        if (!this.Options.ValidateCommand(exit.Command)) {
+            return false;
+        }
+        return true;
+    }
+    ValidateExitDynamic(start, exit, cost) {
+        //判断房间不在上下文中的拦截名单里
+        if (this.Context.IsBlocked(start, exit.To)) {
+            return false;
+        }
+        //判断出口不超时
+        if (this.Options.MaxExitCost > 0 && cost > this.Options.MaxExitCost) {
+            return false;
+        }
+        //判断出口不超过整个移动的最大消耗
+        if (this.Options.MaxTotalCost > 0 && cost > this.Options.MaxTotalCost) {
+            return false;
+        }
+        return true;
+    }
     ValidateRoom(room) {
         if (this.Context.Blacklist[room.Key] == true) {
             return false;
@@ -1220,30 +1376,6 @@ class Mapper {
             return false;
         }
         return this.ValidateExit(start, exit, this.GetExitCost(exit));
-    }
-    ValidateToWalkingStep(prev, from, exit, TotalCost) {
-        if (exit.To == "" || exit.To == from) {
-            return null;
-        }
-        let cost = this.GetExitCost(exit);
-        if (!this.ValidateExit(from, exit, cost)) {
-            return null;
-        }
-        if (this.Options.MaxTotalCost > 0 && this.Options.MaxTotalCost < (cost + TotalCost)) {
-            return null;
-        }
-        return WalkingStep.FromExit(prev, from, exit, cost, TotalCost);
-    }
-    AddRoomWalkingSteps(prev, list, from, TotalCost) {
-        let room = this.GetRoom(from);
-        if (room != null) {
-            for (let exit of this.GetRoomExits(room)) {
-                let step = this.ValidateToWalkingStep(prev, from, exit, TotalCost);
-                if (step != null) {
-                    list.push(step);
-                }
-            }
-        }
     }
 }
 exports.Mapper = Mapper;
@@ -1481,9 +1613,23 @@ exports.ItemKey = ItemKey;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Context = exports.Environment = exports.CommandCost = exports.Link = exports.Path = void 0;
+exports.Context = exports.Environment = exports.CommandCost = exports.Link = exports.Path = exports.RoomTag = void 0;
 const exit_1 = __webpack_require__(/*! ./exit */ "./src/models/exit.ts");
 const base_1 = __webpack_require__(/*! ./base */ "./src/models/base.ts");
+class RoomTag {
+    constructor(room, key, value) {
+        this.Room = "";
+        this.Key = "";
+        this.Value = 1;
+        this.Room = room;
+        this.Key = key;
+        this.Value = value;
+    }
+    static New(room, key, value) {
+        return new RoomTag(room, key, value);
+    }
+}
+exports.RoomTag = RoomTag;
 class Path extends exit_1.Exit {
     constructor() {
         super(...arguments);
@@ -1528,6 +1674,7 @@ class Environment {
         this.Blacklist = [];
         this.BlockedLinks = [];
         this.CommandCosts = [];
+        this.RoomTags = [];
     }
     static New() {
         return new Environment();
@@ -1545,6 +1692,7 @@ class Context {
         this.Paths = {};
         this.BlockedLinks = {};
         this.CommandCosts = {};
+        this.RoomTags = {};
     }
     static New() {
         return new Context();
@@ -1649,6 +1797,19 @@ class Context {
     IsBlocked(from, to) {
         return this.BlockedLinks[from] != null && this.BlockedLinks[from][to] != null;
     }
+    WithRoomTags(list) {
+        for (let item of list) {
+            if (this.RoomTags[item.Room] == null) {
+                this.RoomTags[item.Room] = [];
+            }
+            this.RoomTags[item.Room].push(new base_1.ValueTag(item.Key, item.Value));
+        }
+        return this;
+    }
+    ClearRoomTags() {
+        this.RoomTags = {};
+        return this;
+    }
     static FromEnvironment(env) {
         let context = new Context();
         context.WithTags(env.Tags);
@@ -1660,6 +1821,7 @@ class Context {
         context.WithPaths(env.Paths);
         context.WithBlockedLinks(env.BlockedLinks);
         context.WithCommandCosts(env.CommandCosts);
+        context.WithRoomTags(env.RoomTags);
         return context;
     }
     ToEnvironment() {
@@ -1685,6 +1847,11 @@ class Context {
         for (let c in this.CommandCosts) {
             for (let t in this.CommandCosts[c]) {
                 env.CommandCosts.push(new CommandCost(c, t, this.CommandCosts[c][t]));
+            }
+        }
+        for (let r in this.RoomTags) {
+            for (let item of this.RoomTags[r]) {
+                env.RoomTags.push(new RoomTag(r, item.Key, item.Value));
             }
         }
         return env;
@@ -1783,6 +1950,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HMMFormatter = exports.HMMLevel = exports.ToggleKeyValues = exports.ToggleKeyValue = exports.ToggleValue = exports.KeyValue = void 0;
 const base_1 = __webpack_require__(/*! ./base */ "./src/models/base.ts");
 const controlcode_1 = __webpack_require__(/*! ../utils/controlcode/controlcode */ "./src/utils/controlcode/controlcode.ts");
+const parseint_1 = __webpack_require__(/*! @include/parseint */ "./include/parseint.ts");
 class KeyValue {
     constructor(key, value) {
         this.Key = key;
@@ -1938,8 +2106,8 @@ class HMMFormatter {
         return HMMFormatter.Unescape(HMMFormatter.At(list, index));
     }
     static UnescapeInt(val, defaultValue) {
-        let result = Number.parseInt(HMMFormatter.Unescape(val));
-        return isNaN(result) || (val.indexOf(".") != -1) ? defaultValue : result;
+        let result = parseint_1.ParseInt.Parse(HMMFormatter.Unescape(val));
+        return result == undefined ? defaultValue : result;
     }
     static UnescapeIntAt(list, index, defaultValue) {
         return HMMFormatter.UnescapeInt(HMMFormatter.At(list, index), defaultValue);
@@ -2320,6 +2488,7 @@ class MapperOptions {
         this.MaxTotalCost = 0;
         this.DisableShortcuts = false;
         this.CommandWhitelist = {};
+        this.CommandNotContains = [];
     }
     static New() {
         return new MapperOptions();
@@ -2346,11 +2515,28 @@ class MapperOptions {
         this.CommandWhitelist = {};
         return this;
     }
+    WithCommandNotContains(list) {
+        this.CommandNotContains = list;
+        return this;
+    }
+    ClearCommandNotContains() {
+        this.CommandNotContains = [];
+        return this;
+    }
     ValidateCommand(cmd) {
-        if (Object.keys(this.CommandWhitelist).length === 0) {
-            return true;
+        if (Object.keys(this.CommandWhitelist).length !== 0) {
+            if (this.CommandWhitelist[cmd] === undefined) {
+                return false;
+            }
         }
-        return this.CommandWhitelist[cmd] === true;
+        if (this.CommandNotContains.length > 0) {
+            for (const str of this.CommandNotContains) {
+                if (cmd.includes(str)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 exports.MapperOptions = MapperOptions;
@@ -3653,8 +3839,8 @@ var exports = __webpack_exports__;
   \**********************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DefaultHmmEncoderHooks = exports.MapHeadData = exports.HMMEncoder = exports.MapperOptions = exports.SnapshotSearch = exports.SnapshotSearchResult = exports.SnapshotFilter = exports.QueryResult = exports.Step = exports.UniqueKeyUtil = exports.Environment = exports.CommandCost = exports.Link = exports.Path = exports.Context = exports.Records = exports.MapFile = exports.MapSettings = exports.MapEncoding = exports.MapInfo = exports.Map = exports.Command = exports.ControlCode = exports.SnapshotKey = exports.Snapshot = exports.Variable = exports.RoomConditionExit = exports.Shortcut = exports.Landmark = exports.LandmarkKey = exports.Region = exports.Trace = exports.Route = exports.RoomFilter = exports.Room = exports.Marker = exports.Exit = exports.ItemKey = exports.ToggleKeyValues = exports.ToggleValue = exports.KeyValue = exports.ToggleKeyValue = exports.HMMFormatter = exports.RegionItem = exports.RegionItemType = exports.Data = exports.TypedConditions = exports.ValueCondition = exports.ValueTag = exports.Condition = void 0;
-exports.SnapshotHelper = exports.APIListOption = exports.MapDatabase = exports.WalkingStep = exports.Walking = exports.Mapper = void 0;
+exports.MapHeadData = exports.HMMEncoder = exports.MapperOptions = exports.SnapshotSearch = exports.SnapshotSearchResult = exports.SnapshotFilter = exports.QueryResult = exports.Step = exports.UniqueKeyUtil = exports.RoomTag = exports.Environment = exports.CommandCost = exports.Link = exports.Path = exports.Context = exports.Records = exports.MapFile = exports.MapSettings = exports.MapEncoding = exports.MapInfo = exports.Map = exports.Command = exports.ControlCode = exports.SnapshotKey = exports.Snapshot = exports.Variable = exports.RoomConditionExit = exports.Shortcut = exports.Landmark = exports.LandmarkKey = exports.Region = exports.Trace = exports.Route = exports.RoomFilter = exports.Room = exports.Marker = exports.Exit = exports.ItemKey = exports.ToggleKeyValues = exports.ToggleValue = exports.KeyValue = exports.ToggleKeyValue = exports.HMMFormatter = exports.RegionItem = exports.RegionItemType = exports.Data = exports.TypedConditions = exports.ValueCondition = exports.ValueTag = exports.Condition = void 0;
+exports.SnapshotHelper = exports.APIListOption = exports.MapDatabase = exports.WalkingStep = exports.Walking = exports.Mapper = exports.DefaultHmmEncoderHooks = void 0;
 const base_1 = __webpack_require__(/*! ./models/base */ "./src/models/base.ts");
 Object.defineProperty(exports, "Condition", ({ enumerable: true, get: function () { return base_1.Condition; } }));
 Object.defineProperty(exports, "ValueTag", ({ enumerable: true, get: function () { return base_1.ValueTag; } }));
@@ -3713,6 +3899,7 @@ Object.defineProperty(exports, "Path", ({ enumerable: true, get: function () { r
 Object.defineProperty(exports, "Link", ({ enumerable: true, get: function () { return context_1.Link; } }));
 Object.defineProperty(exports, "CommandCost", ({ enumerable: true, get: function () { return context_1.CommandCost; } }));
 Object.defineProperty(exports, "Environment", ({ enumerable: true, get: function () { return context_1.Environment; } }));
+Object.defineProperty(exports, "RoomTag", ({ enumerable: true, get: function () { return context_1.RoomTag; } }));
 const uniquekeyutil_1 = __webpack_require__(/*! ./utils/uniquekeyutil */ "./src/utils/uniquekeyutil.ts");
 Object.defineProperty(exports, "UniqueKeyUtil", ({ enumerable: true, get: function () { return uniquekeyutil_1.UniqueKeyUtil; } }));
 const step_1 = __webpack_require__(/*! ./models/step */ "./src/models/step.ts");

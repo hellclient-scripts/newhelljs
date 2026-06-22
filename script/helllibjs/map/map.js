@@ -1,12 +1,16 @@
 (function (App) {
     let movementModule = App.RequireModule("helllibjs/map/movement.js")
     let hmm = App.Include("helllibjs/lib/hmm/hmm.js")
+    let lru = App.Include("helllibjs/lib/lru/lru.js")
     let module = {}
     module.DefaultStepTimeout = 3000
     module.DefaultResendDelay = 500
     module.HMM = hmm
     module.Database = new hmm.MapDatabase()
     module.DefaultOnModeChange = (map, oldmode, newmode) => {
+    }
+    module.DefaultOnMoveDiscard = (move, map) => {
+
     }
     class Room {
         ID = ""
@@ -70,6 +74,7 @@
             this.StepTimeout = module.DefaultStepTimeout
             this.ResendDelay = module.DefaultResendDelay
         }
+        LastHistory = []
         Context = new hmm.Context()
         CheckEnterMaze = DefaultCheckEnterMaze
         Position = null
@@ -86,6 +91,35 @@
         StepTimeout = 0
         ResendDelay = 0
         Mode = ""
+        #Cache = null
+        NewCache = (settings) => {
+            settings = settings || {}
+            const options = {
+                max: settings.Max || 1000,
+                updateAgeOnGet: true,
+                sizeCalculation: (value, key) => {
+                    return JSON.stringify(value).length + key.length
+                },
+                maxSize: settings.MaxSize || 5000,
+            }
+            return new lru(options)
+        }
+        WithCache(cache) {
+            this.#Cache = cache
+        }
+        LoadCache(mapperdata) {
+            if (this.#Cache) {
+                let cachekey = JSON.stringify(mapperdata)
+                return this.#Cache.get(cachekey)
+            }
+            return null
+        }
+        SetCache(mapperdata, result) {
+            if (this.#Cache) {
+                let cachekey = JSON.stringify(mapperdata)
+                this.#Cache.set(cachekey, result)
+            }
+        }
         ChangeMode(mode) {
             if (mode != this.Mode) {
                 let om = this.Mode
@@ -94,6 +128,7 @@
             }
         }
         OnModeChange = module.DefaultOnModeChange
+        OnMoveDiscard = module.DefaultOnMoveDiscard
         Mazes = {}
         Trace = DefaultTrace
         AppendInitiator(fn) {
@@ -163,6 +198,9 @@
         AddTemporaryPath(path) {
             this.#temporaryPaths.push(path)
         }
+        AddRoomTags(...tags) {
+            this.Context.WithRoomTags(...tags)
+        }
         BlockPath(from, to) {
             this.#blocked.push([from, to])
         }
@@ -195,15 +233,6 @@
             })
             this.Context.WithRooms(this.#temporaryRooms)
             this.Context.WithPaths(this.#temporaryPaths)
-
-        }
-        UpdateMapperOption(option) {
-            if (option.blockedpath == null) {
-                option.blockedpath = []
-            }
-            this.#blocked.forEach(val => {
-                option.blockedpath.push(val)
-            })
         }
         filterpath(path) {
             let result = []
@@ -215,15 +244,28 @@
             return result
 
         }
-        GetMapperPath(from, fly, to) {
+        GetMapperPath(from, fly, to, options) {
             if (typeof (to) != "object") {
                 to = [to]
             }
             if (to.length == 0) {
                 return []
             }
-            let result = module.Database.APIQueryPathAny([from], to, this.Context, this.GetMapperOptions(!fly))
-
+            let mapperdata = {
+                "From": [from],
+                "To": to,
+                "Key": "QueryAny",
+                "Context": this.Context,
+                "Options": this.#GetMapperOptions(!fly, options)
+            }
+            let result
+            let cached = this.LoadCache(mapperdata)
+            if (cached) {
+                result = cached.Data
+            } else {
+                result = module.Database.APIQueryPathAny([from], to, this.Context, this.#GetMapperOptions(!fly, options))
+                this.SetCache(mapperdata, { Data: result })
+            }
             if (result == null) {
                 return null
             }
@@ -233,8 +275,46 @@
             })
             return this.filterpath(path)
         }
-        GetMapperWalkAll(rooms, fly, distance) {
-            let result = module.Database.APIQueryPathAll(rooms[0], rooms, this.Context, this.GetMapperOptions(!fly).WithMaxTotalCost(distance))
+        GetNearestRoom(from, fly, to, options) {
+            let result = this.GetMapperPath(from, fly, to, options)
+            if (result && result.length > 0) {
+                return result[result.length - 1].Target
+            }
+            return null
+        }
+        Dilate(rooms, expand, context, options) {
+            let mapperdata = {
+                "Key": "Dilate",
+                "Roms": rooms,
+                "Expand": expand,
+                "Context": context,
+                "Options": options
+            }
+            let result
+            let cached = this.LoadCache(mapperdata)
+            if (cached) {
+                result = cached.Data
+            } else {
+                result = module.Database.APIDilate(rooms, expand, context, options)
+                this.SetCache(mapperdata, { Data: result })
+            }
+            return result
+        }
+        GetMapperWalkAll(rooms, fly, distance, options) {
+            let mapperdata = {
+                "Key": "QueryAll",
+                "Rooms": rooms,
+                "Context": this.Context,
+                "Options": this.#GetMapperOptions(!fly, options).WithMaxTotalCost(distance)
+            }
+            let result
+            let cached = this.LoadCache(mapperdata)
+            if (cached) {
+                result = cached.Data
+            } else {
+                result = module.Database.APIQueryPathAll(rooms[0], rooms, this.Context, this.#GetMapperOptions(!fly, options).WithMaxTotalCost(distance))
+                this.SetCache(mapperdata, { Data: result })
+            }
             if (result == null) {
                 return null
             }
@@ -247,7 +327,21 @@
         }
         GetMapperWalkOrdered(from, rooms, fly) {
             let path = []
-            let result = module.Database.APIQueryPathOrdered(from, rooms, this.Context, this.GetMapperOptions(!fly))
+            let mapperdata = {
+                "Key": "QueryOrdered",
+                "From":from,
+                "Rooms":rooms,
+                "Context": this.Context,
+                "Options": this.#GetMapperOptions(!fly)
+            }
+            let result
+            let cached = this.LoadCache(mapperdata)
+            if (cached) {
+                result = cached.Data
+            } else {
+                result = module.Database.APIQueryPathOrdered(from, rooms, this.Context, this.#GetMapperOptions(!fly))
+                this.SetCache(mapperdata, { Data: result })
+            }
             if (result == null) {
                 return null
             }
@@ -268,6 +362,17 @@
             if (this.Move != null) {
                 this.Move.Retry(this.Move, this)
             }
+        }
+        ResetMaze() {
+            if (this.Move != null) {
+                this.Move.ResetMaze(this.Move, this)
+            }
+        }
+        InMaze() {
+            if (this.Move != null) {
+                return this.Move.InMaze()
+            }
+            return false
         }
         TrySteps(steps) {
             if (this.Move != null) {
@@ -302,6 +407,7 @@
                 this.Move = null
                 move.OnFinish(this.Move, this)
                 this.MovePosition.StartNewTerm()
+                this.LastHistory = move.History
             }
         }
         CancelMove() {
@@ -316,6 +422,7 @@
             if (this.Move) {
                 this.Move = null
                 this.MovePosition.StartNewTerm()
+                this.OnMoveDiscard(this.Move, this)
             }
         }
         Snap() {
@@ -324,6 +431,7 @@
                 snap.Move = this.Move
                 this.Move = null
                 snap.Term = this.MovePosition.Snap()
+                this.OnMoveDiscard(this.Move, this)
                 return snap
             }
             return null
@@ -347,23 +455,47 @@
         NewTag(key, value) {
             return new Tag(key, value)
         }
+        NewRoomTag(room, key, value) {
+            return new RoomTag(room, key, value)
+        }
+        NewMoveData(name, value) {
+            return new MoveData(name, value)
+        }
         NewMaze() {
             return new Maze()
+        }
+        NewMove() {
+            return new Move()
+        }
+        SingleStep() {
+            return movementModule.SingleStep
+        }
+        NoFly() {
+            return NoFly
         }
         RegisterMaze(name, maze) {
             this.Mazes[name] = maze
         }
         GetRoomExits(rid, withouttemp = false, withoutfly = false) {
-            return module.Database.APIGetRoomExits(rid, !withouttemp ? this.Context : hmm.Context.New(), this.GetMapperOptions(withoutfly))
+            return module.Database.APIGetRoomExits(rid, !withouttemp ? this.Context : hmm.Context.New(), this.#GetMapperOptions(withoutfly))
         }
-        GetMapperOptions(withoutfly) {
-            return hmm.MapperOptions.New().WithDisableShortcuts(withoutfly)
+        #GetMapperOptions(withoutfly, base) {
+            if (base == null) {
+                base = hmm.MapperOptions.New()
+            }
+            return base.WithDisableShortcuts(withoutfly)
         }
     }
     class Step {
         constructor(command, target) {
             this.Command = command
             this.Target = target
+        }
+        Clone() {
+            return new Step(this.Command, this.Target)
+        }
+        CloneWithCommand(command) {
+            return new Step(command, this.Target)
         }
         Command = null
         Target = null
@@ -394,32 +526,40 @@
     let DefaultOnStepTimeout = function (move, map) {
         return true
     }
-    let DefaultMapperOptionCreator = function (move, map) {
+    let DefaultMapperOptionsCreator = function (move, map) {
         return null
     }
     class Move {
         StartCommand = ""
         Data = {}
+        History = []
+        #initiator = []
+        AppendInitiator(fn) {
+            this.#initiator.push(fn)
+        }
         Retry = DefaultMoveRetry
         Next = DefaultMoveNext
         OnRoom = DefaultMoveOnRoom
         OnArrive = DefaultMoveOnArrive
-        Vehicle = DefaultVehicle
+        Vehicle = module.DefaultVehicle
         OnFinish = module.DefaultOnFinish
         OnCancel = module.DefaultOnCancel
         OnInitTags = DefaultOnInitTags
         OnStepTimeout = DefaultOnStepTimeout
         OnStepFinsih = DefaultMoveOnStepFinish
-        MapperOptionCreator = DefaultMapperOptionCreator
+        MapperOptionsCreator = DefaultMapperOptionsCreator
         Option = new Option()
         #walking = []
         Pending = null
         #maze = null
+        InMaze() {
+            return this.#maze != null
+        }
+        ResetMaze(map) {
+            this.#maze = null
+        }
         Walk(map) {
             let steps
-            if (this.#maze && this.#maze.CheckEscaped(this.#maze, this, map)) {
-                this.#maze = null
-            }
             if (this.Pending && this.Pending.length) {
                 steps = this.Pending
                 this.Pending = null
@@ -468,31 +608,38 @@
             return map.GetMapperWalkOrdered(from, rooms, this.Option.Fly, this.GetMapperOptions(map))
         }
         GetMapperOptions(map) {
-            let opt = this.MapperOptionCreator(this, map)
+            let opt = this.MapperOptionsCreator(this, map)
             if (opt == null) {
-                opt = {}
+                opt = hmm.MapperOptions.New()
             }
-            map.UpdateMapperOption(opt)
+            this.Option.UpdateMapperOption(this, map, opt)
             return opt
         }
         StepTimeout(map) {
             return this.OnStepTimeout(this, map)
         }
+        //移动成功，核销移动，一般在进入新房间后调用
         OnWalking(map) {
+            if (this.#maze && this.#maze.CheckEscaped(this.#maze, this, map)) {
+                this.#maze = null
+            }
             if (this.#walking.length == 0) {
                 this.OnArrive(this, map)
                 return
             }
             let step = this.#walking.shift()
-            if (step.Target) {
+            if (step.Target && this.#maze == null) {
+                //这个必须判断下是否在迷宫，因为迷宫的话可能移动结果还没出去，会造成一步错位
                 map.Room.ID = step.Target
             }
             if (this.#maze) {
-                this.#maze.OnStepFinsih(move,map, step)
+                map.Room.ID = this.#maze.GetRoomID(this.#maze, this, map) || map.Room.ID
+                this.#maze.OnStepFinsih(this, map, step)
             } else {
                 this.OnStepFinsih(this, map, step)
             }
             this.OnRoom(this, map, step)
+            this.History.push(step)
             if (this.#walking.length == 0) {
                 this.OnArrive(this, map)
                 return
@@ -529,6 +676,7 @@
                         map.SetTag(key, value)
                     }
                 }
+                map.Context.WithRoomTags(this.Option.RoomTags)
                 this.Vehicle.OnInitTags(this, map)
                 this.OnInitTags(this, map)
             }
@@ -547,6 +695,8 @@
     module.MultipleStepSplit = function (paths) {
         return paths
     }
+    //抽象的移动选项
+    //在从hellclient的mapper到hmm的mapper迁移时做了封装，所以有有些地方有点别扭
     class Option {
         constructor() {
             this.MultipleStep = module.MultipleStep
@@ -555,11 +705,21 @@
         MultipleStep = false
         Fly = false
         Tags = {}
+        RoomTags = []
+        CommandWhitelist = []
+        CommandNotContains = []
         ApplyTo(move, map) {
             move.Option = this
         }
-
+        UpdateMapperOption(move, map, options) {
+            options.CommandWhitelist = this.CommandWhitelist
+            options.CommandNotContains = this.CommandNotContains
+        }
     }
+    var NoFly = (move, map) => {
+        move.Option.Fly = false
+    }
+
     class Tag {
         constructor(key = "", value = 1) {
             this.Key = key;
@@ -571,6 +731,30 @@
             move.Option.Tags[this.Key] = this.Value
         }
 
+    }
+    class RoomTag {
+        constructor(room = "", key = "", value = 1) {
+            this.Room = room;
+            this.Key = key;
+            this.Value = value;
+        }
+        Room = ""
+        Key = ""
+        Value = 1
+        ApplyTo(move, map) {
+            move.Option.RoomTags.push(hmm.RoomTag.New(this.Room, this.Key, this.Value))
+        }
+    }
+    class MoveData {
+        constructor(name = "", value = null) {
+            this.Name = name
+            this.Value = value
+        }
+        Name = ""
+        Value = null
+        ApplyTo(move, map) {
+            move.Data[this.Name] = this.Value
+        }
     }
     class Route {
         constructor(map, ...initiators) {
@@ -601,7 +785,10 @@
     let DefaultMazeWalk = function (maze, move, map) {
         return
     }
-    let DefaultMazeMoveOnStepFinish = function (move, map,step) {
+    let DefaultMazeGetRoomID = function (maze, move, map) {
+        return ""
+    }
+    let DefaultMazeMoveOnStepFinish = function (move, map, step) {
         move.OnStepFinsih(move, map, step)
         return
     }
@@ -609,6 +796,7 @@
         Data = null
         CheckEnter = DefaultMazeCheckEnter
         CheckEscaped = DefaultMazeEscaped
+        GetRoomID = DefaultMazeGetRoomID
         Walk = DefaultMazeWalk
         OnStepFinsih = DefaultMazeMoveOnStepFinish
         NextRoom = ""
@@ -627,6 +815,10 @@
             this.Walk = fn
             return this
         }
+        WithGetRoomID(fn) {
+            this.GetRoomID = fn
+            return this
+        }
     }
     module.Map = Map
     module.Room = Room
@@ -634,6 +826,10 @@
     module.Move = Move
     module.Tag = Tag
     module.Step = Step
+    module.RoomTag = RoomTag
+    moduleMoveData = MoveData
     module.Option = Option
+    module.DefaultVehicle = DefaultVehicle
+    module.DefaultVehicleSend = DefaultVehicleSend
     return module
 })

@@ -30,6 +30,10 @@
             }
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
+    ).WithGetRoomID(
+        function (maze, move, map) {
+            return App.Core.RoomsByName["南疆沙漠"][0]
+        }
     ))
     //戈壁滩
     App.Map.RegisterMaze("戈壁滩", App.Map.NewMaze().WithCheckEnter(
@@ -67,6 +71,10 @@
             maze.Data.Count = maze.Data.Count + 1
             map.TrySteps([cmd != maze.Data.Step.Command ? App.Map.NewStep(cmd) : maze.Data.Step])
         }
+    ).WithGetRoomID(
+        function (maze, move, map) {
+            return App.Core.RoomsByName["戈壁滩"][0]
+        }
     ))
 
     //桃花迷阵
@@ -87,6 +95,10 @@
             App.Eat(true)
             let cmd = App.Move.Filterdir(maze.Data.Command)
             map.TrySteps([App.Map.NewStep(cmd)])
+        }
+    ).WithGetRoomID(
+        function (maze, move, map) {
+            return App.Core.RoomsByName["桃花迷阵"][0]
         }
     ))
     App.Map.RegisterMaze("大沙漠", App.Map.NewMaze().WithCheckEnter(
@@ -125,6 +137,16 @@
                 )
             }
             App.Next()
+        }
+    ).WithGetRoomID(
+        function (maze, move, map) {
+            switch (App.Map.Room.Name) {
+                case "丝绸之路":
+                    return App.Mapper.Database.APITrackExit("2838", "e。")
+                case "戈壁":
+                    return App.Mapper.Database.APITrackExit("2838", "w。")
+            }
+            return App.Core.RoomsByName["大沙漠"][0]
         }
     ))
 })(App)

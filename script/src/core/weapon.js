@@ -181,6 +181,16 @@
         let weapon = App.Core.Weapon.GetWeapon(name)
         return weapon ? weapon.HideCommand() : ""
     }
+    //装备所有武器的指令
+    App.Core.Weapon.WieldAllCommand = function () {
+        let result = []
+        App.Core.Weapon.Wield.forEach(weapon => {
+            if (weapon.Command == "#wield") {
+                result.push(weapon.OnCommand())
+            }
+        })
+        return result.join(";")
+    }
     //解除所有武器的指令
     App.Core.Weapon.UnwieldAllCommand = function () {
         let result = []
@@ -264,6 +274,10 @@
     //注册解除武器的别名
     App.Sender.RegisterAlias("#wpoff", function (data) {
         App.Send(App.Core.Weapon.OffCommand(data))
+    })
+    //注册装备所有武器的别名
+    App.Sender.RegisterAlias("#wield", function (data) {
+        App.Sender.Send(App.Core.Weapon.WieldAllCommand(data))
     })
     //注册解除所有武器的别名
     App.Sender.RegisterAlias("#unwield", function (data) {
@@ -356,8 +370,11 @@
         if (App.Map.Room.ID) {
             App.Core.Stage.Raise("wpon-" + App.Map.Room.ID)
         }
-        App.Send("#wpon")
+        App.Send("#wield")
         App.RaiseEvent(event)
+        App.Move.BindNextRoom(() => {
+            App.Send("#unwield")
+        })
     })
     App.BindEvent("core.disarmed", (e) => {
         App.Core.Weapon.PickWeapon()

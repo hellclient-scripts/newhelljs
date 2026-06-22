@@ -180,7 +180,7 @@ $.Module(function (App) {
     App.BindEvent("core.relogin", (e) => {
         Quest.Cooldown(0)
     })
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(()=> {
         Qinling.Data = {
             HitAndRun: true,
             Finished: false,

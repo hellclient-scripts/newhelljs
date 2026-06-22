@@ -29,7 +29,7 @@
         FixedNames = []
         ParseNumber(str) {
             var result = 0
-            var lastnumber = 0
+            var lastnumber = -1
             var lastunit = 0
             for (let i = 0; i < str.length; i++) {
                 var char = str[i]

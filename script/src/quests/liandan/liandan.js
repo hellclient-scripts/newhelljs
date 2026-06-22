@@ -215,7 +215,7 @@ $.Module(function (App) {
         },
     )
     //#start后重置数据
-    App.BindEvent("core.queststart", (e) => {
+    App.Core.Quest.AppendInitor(() => {
         Liandan.Data = {
             Count: 0,
             ByName: {},

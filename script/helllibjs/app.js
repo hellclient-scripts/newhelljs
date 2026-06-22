@@ -60,6 +60,8 @@
             }
             catch (e) {
                 PrintSystem(e.message + "\n" + e.stack)
+                App.Log(e.message)
+                world.writelog(e.stack + "\n")
             }
         }
         OnTime() {

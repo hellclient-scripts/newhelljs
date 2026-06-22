@@ -185,6 +185,9 @@
                 }
                 keys.unshift(map.Room.ID)
                 let result = move.WalkAll(map, keys)
+                if (result == null) {
+                    return null
+                }
                 let rooms = []
                 result.forEach(step => {
                     if (step.Target) {

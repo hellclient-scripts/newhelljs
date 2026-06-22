@@ -2,6 +2,7 @@
 (function (App) {
     let mapModule = App.RequireModule("helllibjs/map/map.js")
     App.Mapper = {}
+    App.Mapper.Data = {}
     App.Mapper.CommonExits = ["west", "east", "south", "north", "up", "down", "enter", "out", "n", "s", "e", "w", "ne", "nw", "se", "sw", "u", "d", "northup", "northdown", "southup", "southdown", "eastup", "eastdown", "westup", "westdown", "nu", "nd", "eu", "ed", "wu", "wd", "su", "sd"]
     App.Mapper.HMM = mapModule.HMM
     App.Mapper.Database = mapModule.Database
@@ -39,6 +40,9 @@
             return App.Mapper.Data.Markers[key]
         }
         return key;
+    }
+    App.Mapper.LoadMarkers = (keys) => {
+        return keys.map(App.Mapper.LoadMarker)
     }
     App.Mapper.HouseID = null
     App.Mapper.HouseLoc = null
@@ -217,7 +221,6 @@
         }
         return App.Mapper.Database.APIDilate(rooms, expand, App.Mapper.Database.Context, opt)
     }
-    App.Mapper.Data = {}
     App.Mapper.InWinter = function () {
         return App.Mapper.Data.Winter ? (new Date().getTime() - App.Mapper.Data.Winter) < 100000 : false
     }

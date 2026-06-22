@@ -16,10 +16,32 @@
         let second = t.getSeconds().toString().padStart(2, "0")
         return `${year}-${month}-${day} ${hour}:${minute}:${second}`
     }
+    App.Core.Log.LoadLines = (num) => {
+        let result = []
+        let count = GetLinesInBufferCount()
+        for (let i = 0; i < num; i++) {
+            count--
+            let line = GetLineInfo(count, 1)
+            if (line) {
+                result.unshift(line)
+            }
+        }
+        return result
+    }
     //追加日志的方法
     App.Core.Log.Append = (msg) => {
+        PrintSystem(msg)
         App.Core.Log.Data = App.Core.Log.Data.Next().WithValue(`${App.Core.Log.FormatTime()} ${msg}`)
         App.RaiseEvent(new App.Event("core.onlog", msg))
+        if (App.Params.LogDetail > 0) {
+            let detail = App.Core.Log.LoadLines(App.Params.LogDetail).map(r => "  " + r).join("\n")
+            world.writelog(`${msg}\n${detail}`)
+        }
+    }
+    App.Core.Log.LogMore = (msg) => {
+        if (App.Params.LogDetail > 0) {
+            world.writelog(msg.split("\n").map(r => "  " + r).join("\n"))
+        }
     }
     //别名
     App.Log = App.Core.Log.Append
@@ -42,5 +64,16 @@
         }
         return result
     }
-
+    App.Core.Log.LogCurrent = (data, more) => {
+        PrintSystem(data)
+        App.Core.Log.Data = App.Core.Log.Data.Next().WithValue(`${App.Core.Log.FormatTime()} ${data}`)
+        App.RaiseEvent(new App.Event("core.onlog", data))
+        world.writelog(data + "\n")
+        if (more) {
+            App.Core.Log.LogMore(more)
+        }
+    }
+    App.BindEvent("core.transfer", (event) => {
+        App.Core.Log.LogCurrent(event.Data.Output)
+    })
 })(App)

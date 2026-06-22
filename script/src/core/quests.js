@@ -37,8 +37,13 @@
     App.BindEvent("core.stop", function () {
         App.Quests.Stop()
     })
+    App.Core.Quest.Initors = []
+    App.Core.Quest.AppendInitor = function (cb) {
+        App.Core.Quest.Initors.push(cb)
+    }
     App.Quests.OnStart = () => {
         App.Core.Quest.StartedAt = (new Date()).getTime()
+        App.Core.Quest.Initors.forEach(cb => cb())
         App.RaiseEvent(new App.Event("core.queststart"))
     }
     App.Quests.OnStop = () => {

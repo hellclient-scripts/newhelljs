@@ -1,6 +1,9 @@
 (function (app) {
     let module = {}
     module.Sep = /\|\||\n/
+    let DefaultFilter = function (quests, quest) {
+        return true
+    }
     module.DefaultParser = function (quests, line) {
         let result = []
         let data = line.split(module.Sep)
@@ -57,6 +60,21 @@
     let DefaultOnStop = (quests) => {
 
     }
+    let DefaultOnNext = function (quests) {
+    }
+    let DefaultOnExec = function (quests, ready) {
+    }
+    let DefaultHeadReady = function (quests) {
+        return null
+    }
+    let DefaultTailReady = function (quests) {
+        return null
+    }
+    let DefaultDelayFunction = function (quests) {
+        quests.Commands.PushCommands(
+            quests.Commands.NewWaitCommand(this.Delay),
+        )
+    }
     let DefaultReadyCreator = (r, exec, q) => {
         return new Ready(r, exec, q)
     }
@@ -69,6 +87,14 @@
         }
         Cooldown(interval) {
             this.CooldownTo = (new Date()).getTime() + (interval ? interval : 0)
+        }
+        TryCooldown(interval) {
+            let newcdto=(new Date()).getTime() + (interval ? interval : 0)
+            if (this.CooldownTo < newcdto) {
+                this.CooldownTo = newcdto
+                return true
+            }
+            return false
         }
         CooldownTo = 0
         ID = ""
@@ -101,15 +127,25 @@
                 this.Next()
             })
         }
+        Last = 0
         OnStart = DefaultOnStart
         OnStop = DefaultOnStop
+        OnNext = DefaultOnNext
+        OnExec = DefaultOnExec
+        DelayFunction = DefaultDelayFunction
+        Filter = DefaultFilter
+        HeadReady = DefaultHeadReady
+        TailReady = DefaultTailReady
         Running = null
         #nextcommand = null
         Position = null
         Commands = null
         Conditions = null
+        Data = {}
         Queue = []
-        Delay = 1000
+        Processing = -1
+        StartAt = 0
+        Delay = 500
         Stopped = true
         ReadyCreator = DefaultReadyCreator
         Parser = module.DefaultParser
@@ -133,6 +169,8 @@
             return this.Queue == null || this.Queue.length == 0
         }
         StartRunningQuests(quests) {
+            this.Data = {}
+            this.StartAt = (new Date()).getTime()
             this.OnStart(this)
             if (quests.length) {
                 this.Stopped = false
@@ -146,23 +184,33 @@
             this.Commands.Next()
         }
         GetReady() {
+            let headready = this.HeadReady(this)
+            if (headready) {
+                return this.ReadyCreator(null, headready, null)
+            }
             for (let i in this.Queue) {
+                this.Processing = i
                 let r = this.Queue[i]
                 let q = this.#registered[r.ID]
                 if (q == null) {
                     throw new Error("Quest " + r.ID + " not found")
                 }
-                if (q && !q.InCooldown() && r.Checker()) {
+                if (q && !q.InCooldown() && r.Checker() && this.Filter(this, q)) {
                     let exe = q.GetReady(q, r.Data)
                     if (exe) {
                         return this.ReadyCreator(r, exe, q)
                     }
                 }
             }
+            let tailready = this.TailReady(this)
+            if (tailready) {
+                return this.ReadyCreator(null, tailready, null)
+            }
             return null
         }
         ExecuteReady(ready) {
             if (ready) {
+                this.OnExec(this, ready)
                 this.Commands.PushCommands(
                     this.Commands.NewFunctionCommand(() => {
                         this.Running = ready.RunningQuest
@@ -178,11 +226,14 @@
         Next() {
             if (this.Stopped) {
                 this.Queue = []
-                this.Running=null
+                this.Running = null
                 this.OnStop(this)
                 this.Commands.Next()
                 return
             }
+            this.Processing = -1
+            this.Last = (new Date()).getTime()
+            this.OnNext(this)
             this.Position.StartNewTerm()
             let ready = this.GetReady()
             if (ready) {
@@ -192,9 +243,10 @@
             this.Loop()
         }
         Loop() {
-            this.Commands.PushCommands(
-                this.Commands.NewWaitCommand(this.Delay),
-            )
+            let now = (new Date()).getTime()
+            if ((now - this.Last) < this.Delay) {
+                this.DelayFunction(this)
+            }
             App.Next()
         }
         StartLine(line) {
