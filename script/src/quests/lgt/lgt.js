@@ -12,6 +12,9 @@ $.Module(function (App) {
     LGT.Data = {
         Level: 0,
         灵符: 0,
+        LastExp: 0,
+        LastPot: 0,
+        LastTihui: 0,
         Ready: 0,//0需要等待,1可以Check
         Entry: [],
     }
@@ -137,6 +140,18 @@ $.Module(function (App) {
             $.PushCommands(
                 $.Nobusy(),
                 $.Plan(PlanKnock),
+                $.Do("hp"),
+                $.Sync(),
+                $.Function(() => {
+                    LGT.Data.Count++
+                    let tihui = App.Data.Player.HP["体会"] - LGT.Data.LastTihui
+                    let exp = App.Data.Player.HP["经验"] - LGT.Data.LastExp
+                    let pot = App.Data.Player.HP["潜能"] - LGT.Data.LastPot
+                    App.Core.Analytics.Add(Quest.ID, exp, pot, tihui)
+                    LGT.Data.LastExp = App.Data.Player.HP["经验"]
+                    $.Next()
+                }),
+
                 $.Prepare(),
             )
             $.Next()
@@ -213,6 +228,14 @@ $.Module(function (App) {
         $.PushCommands(
             $.Prepare("", { WeaponDurationMin: 80 }),
             $.To("2902"),
+            $.Do("hp"),
+            $.Sync(),
+            $.Function(() => {
+                LGT.Data.LastExp = App.Data.Player.HP["经验"]
+                LGT.Data.LastPot = App.Data.Player.HP["潜能"]
+                LGT.Data.LastTihui = App.Data.Player.HP["体会"]
+                $.Next()
+            }),
             $.Nobusy(),
             $.Plan(PlanEnter),
         )
@@ -251,5 +274,6 @@ $.Module(function (App) {
         LGT.Start(data)
     }
     App.Quests.Register(Quest)
+    App.Core.Analytics.RegisterTask(Quest.ID, Quest.Name, Quest.Timeslice ? Quest.Timeslice : Quest.Name)
     App.Quests.LGT = LGT
 })

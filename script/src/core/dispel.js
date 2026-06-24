@@ -33,6 +33,7 @@
         if (App.Core.Dispel.Need && App.Data.Player.Jifa["force"] && App.Data.Player.Jifa["force"].Level > 100 && App.Data.Player.HP["内力上限"] >= 300) {
             return function () {
                 App.Commands.PushCommands(
+                    $.Timeslice("修整-解毒"),
                     App.Move.NewToCommand(App.Params.LocDazuo),
                     App.Commands.NewDoCommand("yun dispel;hp"),
                     App.NewNobusyCommand(),

@@ -774,6 +774,7 @@ $.Module(function (App) {
 
     let Quest = App.Quests.NewQuest("mq")
     Quest.Name = "师门任务"
+    Quest.Timeslice = "MQ"
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
@@ -806,6 +807,13 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddCatcher("core.giftbouns", (catcher, event) => {
+                if (event.Data.prompt == "通过这次锻炼") {
+                    App.Core.Analytics.Add(Quest.ID, App.CNumber.ParseNumber(event.Data.exp||""), App.CNumber.ParseNumber(event.Data.pot||""), App.CNumber.ParseNumber(event.Data.tihui||""))
+                }
+                return true
+            })
+
             task.AddTrigger(matcherreward, (tri, result) => {
                 let msg = "任务成功"
                 if (MQ.Data.kills == 0) {
@@ -834,7 +842,7 @@ $.Module(function (App) {
         planQuest.Execute()
         MQ.Prepare()
     }
-    App.Core.Quest.AppendInitor(()=> {
+    App.Core.Quest.AppendInitor(() => {
         MQ.Data = {
             kills: 0,
             helpded: 0,
@@ -843,5 +851,6 @@ $.Module(function (App) {
             eff: 0,
         }
     })
+    App.Core.Analytics.RegisterTask(Quest.ID, Quest.Name, Quest.Timeslice ? Quest.Timeslice : Quest.Name)
     App.Quests.Register(Quest)
 })

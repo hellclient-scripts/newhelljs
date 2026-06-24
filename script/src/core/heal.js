@@ -123,11 +123,15 @@
         let healBelow = context["HealBelow"] != null ? context["HealBelow"] : App.Params.HealBelow
         if (App.Data.Player.HP["气血百分比"] <= healBelow && jifaForce > 20) {
             return function () {
+                let ts = App.Core.Timeslice.Current()
+
                 App.Commands.PushCommands(
+                    $.Timeslice("修整-疗伤"),
                     App.Commands.NewDoCommand(App.Core.Dispel.Need ? "yun heal;yun dispel" : "yun heal"),//避免因为中毒不吃药卡住
                     App.NewNobusyCommand(),
                     App.Commands.NewDoCommand("yun recover;yun regenerate;hp"),
                     App.NewSyncCommand(),
+                    $.Timeslice(ts)
                 )
                 if (App.Map.Room.ID == App.Params.LocMaster || App.Core.Dispel.Need) {
                     App.Insert(App.Move.NewToCommand(App.Params.LocDazuo),)
@@ -166,9 +170,13 @@
         }
         if (App.Data.Player.HP["精气百分比"] <= 50 || (App.Data.Player.HP["精气百分比"] < 100 && App.Data.Player.HP["精气上限"] < 100)) {
             return function () {
+                let ts = App.Core.Timeslice.Current()
+                App.Core.Timeslice.Change("修整-吃药")
+
                 App.Commands.PushCommands(
                     App.Commands.NewDoCommand((App.Core.Dispel.Need ? "yun dispel;" : "") + "eat yangjing dan;yun recover;yun regenerate;hp;i"),
                     App.NewNobusyCommand(),
+                    $.Timeslice(ts),
                 )
                 if (!App.Data.Item.List.FindByIDLower("yangjing dan").First()) {
                     App.Commands.Insert(App.Goods.NewBuyCommand("yangjing dan"))

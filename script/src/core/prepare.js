@@ -104,9 +104,12 @@
                 App.Core.Prepare.LastNote = now
                 App.Core.Prepare.Last = App.Core.Prepare.Current
             }
+            let ts = App.Core.Timeslice.Current()
             App.PushCommands(
+                $.Timeslice("修整-其他"),
                 App.Commands.NewFunctionCommand(submit),
                 App.NewPrepareCommand(id, context),
+                $.Timeslice(ts),
             )
         }
         App.Next()
@@ -240,10 +243,13 @@
                 }
             }
             return function () {
+                let ts = App.Core.Timeslice.Current()
+                App.Core.Timeslice.Change("修整-放弃")
                 $.PushCommands(
                     $.To(App.Params.LocDazuo),
-                    $.Do("fangqi exp;hp"),
+                    $.Do("fangqi exp;hp;hp -m"),
                     $.Nobusy(),
+                    $.Timeslice(ts),
                 )
                 App.Next()
             }

@@ -13,6 +13,7 @@ $.Module(function (App) {
     let matcherYanfei = "看起来燕非想杀死你！"
     let matcherGift = /^你从打开的宝箱中拿出一.(.+)。/
     let matcherBox = "你把宝箱打开了。"
+    let matcherFinish = "太监大喜，连声称谢：壮士神勇，圣上必有重赏！"
     //铲除李莲英、宫廷转危为安，你获得了二千点经验、一千点潜能、五百点实战体会、二百点江湖阅历、能力得
     // 到了提升。
     //通过这次锻炼，你获得了一百四十九点经验、七十四点潜能、三十七点实通过这次锻炼，你获得了一百四十九点经验、七十四点潜能、三十七点实
@@ -22,7 +23,7 @@ $.Module(function (App) {
         App.Positions["Quest"],
         (task) => {
             task.AddCatcher("core.giftbouns", (catcher, event) => {
-                if (event.Data.prompt == "通过这次锻炼") {
+                if (event.Data.prompt == "铲除李莲英、宫廷转危为安") {
                     App.Core.Analytics.Add(Quest.ID, App.CNumber.ParseNumber(event.Data.exp), App.CNumber.ParseNumber(event.Data.pot), App.CNumber.ParseNumber(event.Data.tihui))
                 }
                 return true
@@ -38,6 +39,10 @@ $.Module(function (App) {
                 }
                 return true
             })
+            task.AddTrigger(matcherFinish, (tri, result) => {
+                Quest.Cooldown(0)
+                return true
+            })
             //统计奖品
             task.AddTrigger(matcherGift, (tri, result) => {
                 let gift = result[1]
@@ -50,10 +55,13 @@ $.Module(function (App) {
             })
             //副本失败
             task.AddCatcher("core.fubenfail", (catcher, event) => {
-                if (Prison.Data.Finished) {
+                if (Prison.Data.Finished || true) {
                     event.Context.Set("callback", () => {
                         Note("离开副本")
+                        Quest.Cooldown(0)
                     })
+                } else {
+                    Note("副本失败")
                 }
                 Quest.Cooldown(0)
                 return true
@@ -180,6 +188,12 @@ $.Module(function (App) {
             $.Do("report tai"),
             $.Sync(),
             $.To(["fuben-prison-exit"], App.Map.SingleStep(), App.Core.Fuben.InFuben, Prison.MoveData),
+            $.Function(() => {
+                Note("等待离开")
+                $.RaiseStage("wait")
+                $.Next()
+            }),
+            $.Wait(31000)
         )
         $.Next()
     }

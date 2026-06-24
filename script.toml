@@ -1072,6 +1072,36 @@ Timers = []
   Inverse = false
   Italic = false
   Variable = ""
+[[Triggers]]
+  ID = "d1h9hno4ii27lt71m7u4ea"
+  Name = "core.giftbouns"
+  Enabled = true
+  Match = "^(.+，你获得了[\\s\\S]+。)$"
+  Send = ""
+  ColourChangeType = 0
+  Colour = 0
+  Wildcard = 0
+  SoundFileName = ""
+  SoundIfInactive = false
+  Script = "App.FilterLineEvent(\"core.giftbouns\",\"core.giftbouns\")"
+  SendTo = 0
+  Sequence = 100
+  ExpandVariables = false
+  Temporary = false
+  OneShot = false
+  Regexp = true
+  Repeat = false
+  MultiLine = true
+  LinesToMatch = 2
+  WildcardLowerCase = false
+  Group = "event"
+  IgnoreCase = false
+  KeepEvaluating = true
+  OmitFromLog = false
+  OmitFromOutput = false
+  Inverse = false
+  Italic = false
+  Variable = ""
 
 [[Triggers]]
   ID = "d1g0nv3tsp0vip6o9bfl5"
