@@ -89,7 +89,7 @@
             this.CooldownTo = (new Date()).getTime() + (interval ? interval : 0)
         }
         TryCooldown(interval) {
-            let newcdto=(new Date()).getTime() + (interval ? interval : 0)
+            let newcdto = (new Date()).getTime() + (interval ? interval : 0)
             if (this.CooldownTo < newcdto) {
                 this.CooldownTo = newcdto
                 return true
@@ -214,6 +214,7 @@
                 this.Commands.PushCommands(
                     this.Commands.NewFunctionCommand(() => {
                         this.Running = ready.RunningQuest
+                        this.Position.StartNewTerm()
                         ready.Execute()
                     }),
                     this.Commands.NewFunctionCommand(() => {
@@ -234,7 +235,6 @@
             this.Processing = -1
             this.Last = (new Date()).getTime()
             this.OnNext(this)
-            this.Position.StartNewTerm()
             let ready = this.GetReady()
             if (ready) {
                 this.ExecuteReady(ready)
@@ -243,6 +243,7 @@
             this.Loop()
         }
         Loop() {
+            this.Position.StartNewTerm()
             let now = (new Date()).getTime()
             if ((now - this.Last) < this.Delay) {
                 this.DelayFunction(this)

@@ -15,7 +15,8 @@
         task.Exp += Exp
         task.Pot += Pot
         task.Tihui += Tihui
-    }
+        Note(`${ID}:${Exp},${Pot},${Tihui}`)
+   }
     App.Core.Analytics.List = () => {
         let result = []
         for (let key in App.Core.Analytics.Tasks) {

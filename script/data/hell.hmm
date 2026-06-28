@@ -1,15 +1,28 @@
 HMM1.0>UTF8
-Info>hellmap|1782110860|hell地图
+Info>hellmap|1782384201|hell地图
 Room>0|中央广场|||室外=|e,59,,1;enter dong,1927,,1;n,22,,1;s,40,,1;w,1,,1|
 Room>1|西大街|||室外=|e,0,,1;n,2,,1;s,5,,1;w,7,,1|
 Room>10|财主大院||||n,11,,1;s,9,,1|
 Room>100|石阶|||室外=|eu。,101,,1;wd,99,,1|
 Room>1000|民宅||||s,999,,1|
-Room>10001|天牢入口||||s,10002,,1|
-Room>10002|天牢入口||||n,10001,,1|
-Room>10003|天牢|||||
-Room>10004|天牢出口|||||
+Room>10000|天牢入口||||s,10001,,1|
+Room>10001|天牢入口||||n,10000,,1|
+Room>10002|天牢|||||
+Room>10003|天牢出口||||s,10004,,1|
+Room>10004|天牢出口||||n,10003,,1|
+Room>10005|墓园入口||||s,10006,,1|
+Room>10006|诡异墓园入口||||n,10005,,1|
+Room>10007|诡异墓园出口||||s,10008,,1|
+Room>10008|墓园出口||||n,10007,,1|
 Room>1001|黄土路|||室外=|n,1002,,1;se,999,,1|
+Room>10010|秦陵外宫入口|||||
+Room>10011|秦陵外宫出口|||||
+Room>10012|秦陵内宫北门|||||
+Room>10013|秦陵内宫东门|||||
+Room>10014|秦陵内宫南门|||||
+Room>10015|秦陵内宫西门|||||
+Room>10016|秦陵内宫入口|||||
+Room>10017|秦陵内宫出口|||||
 Room>1002|黄土路|||室外=|ne,1003,,1;s,1001,,1|
 Room>1003|渭汾流域|||室外=|n,1004,,1;ne,1712,,1;s,1025,,1;sw,1002,,1|
 Room>1004|黄河|||室外=|s,1003,,1;w,1005,,1|
@@ -2201,11 +2214,7 @@ Room>2973|黄土大道|||室外=|n,2972,,1;s,2974,,1;se,-1,,1|
 Room>2974|山边小路|||室外=|n,2973,,1;s,-1,,1;w,2975,,1|
 Room>2975|路边小店||||e,2974,,1;w,2976,,1|
 Room>2976|客房||||e,2975,,1;yun regenerate、ask dao ren about 回五毒教。,2931,wud^,1|
-Room>2978|墓园入口||||s,2979,,1|
-Room>2979|诡异墓园入口||||n,2978,,1|
 Room>298|大道|||室外=|e,297,,1;w,299,,1|
-Room>2980|诡异墓园出口||||s,2981,,1|
-Room>2981|墓园出口||||n,2980,,1|
 Room>2982|山路|||室外=;safe=|sw,2644,,1;nu,2983,,1|
 Room>2983|山路|||室外=|sd,2982,,1;nu,2984,,1|
 Room>2984|紫盖峰|||室外=|sd,2983,,1|
@@ -3008,9 +3017,22 @@ Room>997|碎石路|||室外=|ne,998,,1;se,995,,1;w,999,,1|
 Room>998|玄坛庙||||sw,997,,1|
 Room>999|西村口|||室外=|e,997,,1;n,1000,,1;nw,1001,,1|
 Marker>fuben|9000|fuben||
-Marker>fuben-prison-entry|10001|fuben|天牢副本入口|
-Marker>fuben-prison-entry2|10002|fuben|红色的天牢入口|
-Marker>fuben-prison-exit|10004|fuben|天牢副本出口|
+Marker>fuben-prison-entry|10000|fuben|天牢副本入口|
+Marker>fuben-prison-entry2|10001|fuben|红色的天牢入口|
+Marker>fuben-prison-exit|10003|fuben|天牢副本出口|
+Marker>fuben-prison-exit2|10004|fuben||
+Marker>fuben-qinling-door-e|10013|fuben||
+Marker>fuben-qinling-door-n|10012|fuben||
+Marker>fuben-qinling-door-s|10014|fuben||
+Marker>fuben-qinling-door-w|10015|fuben||
+Marker>fuben-qinling-entry|10010|fuben||
+Marker>fuben-qinling-entry2|10016|fuben||
+Marker>fuben-qinling-exit|10011|fuben||
+Marker>fuben-qinling-exit2|10017|fuben||
+Marker>fuben-xuemo-entry|10005|fuben||
+Marker>fuben-xuemo-entry2|10006|fuben||
+Marker>fuben-xuemo-exit|10007|fuben||
+Marker>fuben-xuemo-exit2|10008|fuben||
 Marker>a zi|1160|npc||阿紫\|1160\|a zi
 Marker>ai laozhe|2183|npc||矮老者\|2183\|ai laozhe
 Marker>bai shijing|1932|npc||白世镜\|1932\|bai shijing

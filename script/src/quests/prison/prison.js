@@ -2,6 +2,7 @@ $.Module(function (App) {
     let Prison = {}
     Prison.Data = {
         Success: 0,
+        All: 0,
         Gifts: {},
         Finished: false,
         Start: 0,
@@ -24,7 +25,9 @@ $.Module(function (App) {
         (task) => {
             task.AddCatcher("core.giftbouns", (catcher, event) => {
                 if (event.Data.prompt == "铲除李莲英、宫廷转危为安") {
+                    Prison.Data.Finished = true
                     App.Core.Analytics.Add(Quest.ID, App.CNumber.ParseNumber(event.Data.exp), App.CNumber.ParseNumber(event.Data.pot), App.CNumber.ParseNumber(event.Data.tihui))
+                    Prison.Data.Success++
                 }
                 return true
             })
@@ -40,7 +43,7 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(matcherFinish, (tri, result) => {
-                Quest.Cooldown(0)
+                Quest.Cooldown(120000)
                 return true
             })
             //统计奖品
@@ -55,15 +58,15 @@ $.Module(function (App) {
             })
             //副本失败
             task.AddCatcher("core.fubenfail", (catcher, event) => {
-                if (Prison.Data.Finished || true) {
+                if (Prison.Data.Finished) {
                     event.Context.Set("callback", () => {
                         Note("离开副本")
-                        Quest.Cooldown(0)
+                        Quest.Cooldown(120000)
                     })
                 } else {
                     Note("副本失败")
                 }
-                Quest.Cooldown(0)
+                Quest.Cooldown(120000)
                 return true
             })
         })
@@ -129,6 +132,7 @@ $.Module(function (App) {
         Quest.Cooldown(120000)
         App.Core.Fuben.Last = $.Now()
         Prison.LastRoom = ""
+        Prison.Data.All++
         $.PushCommands(
             $.Plan(PlanAccept),
             $.Path(["s"]),
@@ -187,14 +191,8 @@ $.Module(function (App) {
             $.To(["fuben-prison-entry"], App.Map.SingleStep(), App.Core.Fuben.InFuben, Prison.MoveData),
             $.Do("report tai"),
             $.Sync(),
-            $.To(["fuben-prison-exit"], App.Map.SingleStep(), App.Core.Fuben.InFuben, Prison.MoveData),
-            $.Function(() => {
-                Note("等待离开")
-                $.RaiseStage("wait")
-                $.Next()
-            }),
-            $.Wait(31000)
-        )
+            $.Function(Prison.Leave),
+        ).WithFailCommand($.Function(Prison.Leave))
         $.Next()
     }
     Prison.Maze = () => {
@@ -209,38 +207,6 @@ $.Module(function (App) {
         }
         Prison.AddApth()
         Prison.Go()
-    }
-    Prison.Migong = () => {
-        $.PushCommands(
-            $.Function(App.Core.Fuben.LoadMazeMap),
-            $.Function(() => {
-                if (!App.Core.Fuben.Current || !App.Core.Fuben.Current.Landmark["entry"] || !App.Core.Fuben.Current.Landmark["exit"] || !App.Core.Fuben.Current.Landmark["current"]) {
-                    App.Log("副本迷宫地图错误")
-                    App.Fail()
-                    return
-                }
-                Prison.Data.Migong = [...App.Core.Fuben.Current.Rooms].filter(v => v != App.Core.Fuben.Current.Landmark["exit"] && v != App.Core.Fuben.Current.Landmark["current"])
-                App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
-                $.Next()
-            }),
-            $.Function(() => {
-                if (App.QuestParams.prisonnosearch.trim() != "t") {
-                    $.Insert(
-                        $.Rooms(Prison.Data.Migong, App.Map.SingleStep(), Prison.Checker, App.Core.Fuben.InFuben),
-                    )
-                } else {
-                    Note("跳过搜索，直接离开")
-                }
-                $.Next()
-            }),
-            $.Function(() => {
-                Note("搜刮结束，离开")
-                $.Insert($.To(App.Core.Fuben.Current.Landmark["exit"], App.Map.SingleStep(), Prison.Checker, App.Core.Fuben.InFuben))
-                $.Next()
-            }),
-            $.Function(Prison.Leave)
-        )
-        $.Next()
     }
     Prison.Retry = () => {
         App.Commands.Drop()
@@ -275,33 +241,16 @@ $.Module(function (App) {
         $.Next()
     }
     Prison.Leave = () => {
-        if (App.Map.Room.Exits.indexOf("out") >= 0) {
-            App.PushCommands(
-                $.Do("i"),
-                $.Path(["out"]),
-                $.Function(() => {
-                    App.Map.Room.ID = $.RID("wm")
-                    Quest.Cooldown(120000)
-                    Prison.Data.Success++
-                    Prison.Data.Cost += $.Now() - Prison.Data.Start
-                    App.Next()
-                }),
-                // $.Timeslice(""),
-                $.Prepare("commonWithExp"),
-            )
-            if (App.QuestParams["prisonkillli"].trim() == "t") {
-                $.Insert(
-                    $.Function(() => {
-                        $.RaiseStage("prepare")
-                        $.Next()
-                    }),
-                    $.Kill("li lianying", App.NewCombat("lilianying").WithTags("李莲英").WithKillInGroup(true))
-                )
-            }
-            App.Next()
-            return true
-        }
-        App.Fail()
+        $.PushCommands(
+            $.To(["fuben-prison-exit2"], App.Map.SingleStep(), App.Core.Fuben.InFuben, Prison.MoveData),
+            $.Path(["out"]),
+            $.Function(() => {
+                Quest.Cooldown(120000)
+                App.Next()
+            }),
+            $.Prepare("commonWithExp"),
+        )
+        $.Next()
     }
     let matcherInjured = "你脚下一滑，差点摔个嘴啃泥，好不容易稳住身子，才感觉脚踝扭伤了，好痛啊..."
     let matcherInjured2 = "只听得一声机括脆响，你下意识的赶紧避让，却为时已晚，一支钢弩不偏不倚正好射中你。"
@@ -417,7 +366,8 @@ $.Module(function (App) {
         let eff = d > 0 ? (Prison.Data.Success * 3600 * 1000 / d).toFixed(0) + "次/小时" : "-"
         let box = Prison.Data.Success > 0 ? (Prison.Data.Box / Prison.Data.Success).toFixed(2) + "个" : "-"
         let rate = Prison.Data.Box > 0 ? (Prison.Data.GoodBox * 100 / Prison.Data.Box).toFixed(2) + "%" : "-"
-        return [`天牢-成功:${Prison.Data.Success}次 宝箱:${Prison.Data.Box} 出货:${Prison.Data.GoodBox} 毛效率:${eff} 平均耗时：${cost} 平均宝箱:${box} 出货率:${rate}`, `天牢-奖励： ${gift.join(" , ")}`]
+        let successrate = Prison.Data.All > 0 ? (Prison.Data.Success * 100 / Prison.Data.All).toFixed(2) + "%" : "-"
+        return [`天牢-成功:${Prison.Data.Success}次 成功率:${successrate} 宝箱:${Prison.Data.Box} 出货:${Prison.Data.GoodBox} 毛效率:${eff} 平均耗时：${cost} 平均宝箱:${box} 出货率:${rate}`, `天牢-奖励： ${gift.join(" , ")}`]
     }
     Quest.Start = function (data) {
         Prison.Start()
@@ -425,6 +375,7 @@ $.Module(function (App) {
     App.Core.Quest.AppendInitor((e) => {
         Prison.Data = {
             Success: 0,
+            All: 0,
             Gifts: {},
             Finished: false,
             Start: 0,

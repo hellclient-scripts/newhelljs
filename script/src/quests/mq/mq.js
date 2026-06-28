@@ -234,6 +234,7 @@ $.Module(function (App) {
                 $.Next()
             }),
             $.Do("give head to " + App.Params.MasterID + ";drop head"),
+            $.Sync(),
             // $.Function(MQ.Prepare),
         )
         $.Next()

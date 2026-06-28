@@ -137,12 +137,12 @@
                 case "trigger":
                     switch (result.Name) {
                         case "enter":
-                            App.RaiseEvent(new App.Event("core.entermud", false).WithType("system"))
                             App.RaiseEvent(new App.Event("core.relogin", false).WithType("system"))
+                            App.RaiseEvent(new App.Event("core.entermud", false).WithType("system"))
                             break
                         case "reenter":
-                            App.RaiseEvent(new App.Event("core.entermud", true).WithType("system"))
                             App.RaiseEvent(new App.Event("core.reconnect", false).WithType("system"))
+                            App.RaiseEvent(new App.Event("core.entermud", true).WithType("system"))
                             break
                         case "toofast":
                         case "toofast2":

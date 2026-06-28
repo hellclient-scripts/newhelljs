@@ -8,12 +8,13 @@
     //当前副本
     App.Core.Fuben.Current = null
     App.Core.Fuben.CurrentRooms = []
+    App.Core.Fuben.Loading = null
     //创建新的副本地图
-    App.Core.Fuben.NewMaze = () => {
+    App.Core.Fuben.NewMaze = (maze) => {
         if (App.Core.Fuben.Current) {
             App.Core.Fuben.Current.Destory()
         }
-        App.Core.Fuben.Current = new Maze()
+        App.Core.Fuben.Current = maze != null ? maze : new Maze()
 
     }
     App.Core.Fuben.InFuben = (move, map) => {
@@ -75,15 +76,16 @@
     let matcherLine = /^([◎─ ●│ ]+)$/
     // let matcherMigong = /^([ 　─│└┴┘★├┼┤┬┴]+)$/
     let matcherMigong = /^([ 　★├┼┤┬┴─│]+)$/
-    
+
 
     //处理副本地图的计划
     let PlanMazeMap = new App.Plan(
         App.Positions["Response"],
         (task) => {
+            App.Core.Fuben.Loading = new Maze()
             let y = 0
             let linenum = 0
-            App.Core.Fuben.NewMaze()
+            // App.Core.Fuben.NewMaze()
             // task.AddTrigger(matcherLine, (tri, result) => {
             //     task.Data = "ok"
             //     let data = result[0]
@@ -133,24 +135,24 @@
                     let x = 0
                     let pos = data.indexOf("★")
                     if (pos >= 0) {
-                        App.Core.Fuben.Current.Landmark["current"] = App.Core.Fuben.Current.GetRoomID(((pos - 1) / 2), y)
+                        App.Core.Fuben.Loading.Landmark["current"] = App.Core.Fuben.Loading.GetRoomID(((pos - 1) / 2), y)
                     }
                     App.History.CurrentOutput.Words.forEach((w) => {
                         switch (w.Background) {
                             case "White":
-                                App.Core.Fuben.Current.Landmark["entry"] = App.Core.Fuben.Current.GetRoomID(((x - 1) / 2), y)
+                                App.Core.Fuben.Loading.Landmark["entry"] = App.Core.Fuben.Loading.GetRoomID(((x - 1) / 2), y)
                                 break
                             case "Red":
-                                App.Core.Fuben.Current.Landmark["exit"] = App.Core.Fuben.Current.GetRoomID(((x - 1) / 2), y)
+                                App.Core.Fuben.Loading.Landmark["exit"] = App.Core.Fuben.Loading.GetRoomID(((x - 1) / 2), y)
                                 break
                         }
                         x += w.Text.replaceAll("  ", "　").length
                     })
                     x = 0
                     for (var i = 1; i < data.length; i = i + 2) {
-                        App.Core.Fuben.Current.AddRoom(x, y)
+                        App.Core.Fuben.Loading.AddRoom(x, y)
                         if (i > 0 && data[i - 1] == "　") {
-                            App.Core.Fuben.Current.AddRoomPath(x - 1, y, x, y, "e", "w")
+                            App.Core.Fuben.Loading.AddRoomPath(x - 1, y, x, y, "e", "w")
                         }
                         x++
                     }
@@ -159,7 +161,7 @@
                     let x = 0
                     for (var i = 1; i < data.length; i = i + 2) {
                         if (data[i] == "　") {
-                            App.Core.Fuben.Current.AddRoomPath(x, y - 1, x, y, "s", "n")
+                            App.Core.Fuben.Loading.AddRoomPath(x, y - 1, x, y, "s", "n")
                         }
                         x++
                     }
@@ -182,23 +184,109 @@
                     Note("等待重试")
                     App.Insert(
                         App.Commands.NewWaitCommand("5000"),
-                        $.Function(App.Core.Fuben.LoadMazeMap),
+                        $.Nobusy(),
+                        App.Commands.NewPlanCommand(PlanMazeMap),
                     )
                     App.Next()
                     return
                 case "ok":
-                    App.Core.Fuben.Current.Install()
                     App.Next()
                     return
             }
-            App.Core.Fuben.Current = null
+            App.Core.Fuben.Loading = null
         }
     )
     //加载副本地图
     App.Core.Fuben.LoadMazeMap = () => {
         App.Commands.PushCommands(
-            App.Commands.NewPlanCommand(PlanMazeMap)
+            $.Nobusy(),
+            App.Commands.NewPlanCommand(PlanMazeMap),
+            $.Function(() => {
+                if (App.Core.Fuben.Loading != null) {
+                    App.Core.Fuben.NewMaze(App.Core.Fuben.Loading)
+                    App.Core.Fuben.Current.Install()
+                } else {
+                    App.Core.Fuben.Current = null
+                }
+                App.Next()
+            })
         )
         App.Next()
     }
+    App.Core.Fuben.Locate = () => {
+        App.Commands.PushCommands(
+            $.Nobusy(),
+            App.Commands.NewPlanCommand(PlanMazeMap),
+            $.Function(() => {
+                if (App.Core.Fuben.Loading != null) {
+                    App.Map.Room.ID = App.Core.Fuben.Loading.Landmark["current"] || ""
+                    Note(`当前房间${App.Map.Room.ID}`)
+                } else {
+                    Note(`无法发现当前房间`)
+                }
+                App.Next()
+            })
+        )
+        App.Next()
+    }
+    App.Core.Fuben.To = (x, y) => {
+        $.PushCommands(
+            $.Function(() => {
+                App.Core.Fuben.LoadMazeMap()
+            }),
+            $.Sync(),
+            $.Function(() => {
+                App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
+                $.Insert(
+                    $.To(App.Core.Fuben.Current.GetRoomID(x, y), App.Map.SingleStep(), App.Core.Fuben.InFuben),
+                )
+                $.Next()
+            })
+        )
+        $.Next()
+    }
+    App.Core.Fuben.NoteRoomID = function (move, map) {
+        move.OnArrive = function (move, map) {
+            Note(App.Map.Room.ID)
+            move.Walk(map)
+        }
+    }
+    App.Core.Fuben.WalkAll = () => {
+        var current = ""
+        $.PushCommands(
+            $.Function(() => {
+                App.Core.Fuben.LoadMazeMap()
+            }),
+            $.Sync(),
+            $.Function(() => {
+                App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
+                let current = App.Map.Room.ID
+                $.Insert(
+                    $.Rooms(App.Core.Fuben.Current.Rooms, App.Map.SingleStep(), App.Core.Fuben.NoteRoomID, App.Core.Fuben.InFuben),
+                    $.To(current)
+                )
+                $.Next()
+            })
+        )
+        $.Next()
+    }
+    App.Core.Fuben.AliasTo = function (n, l, w) {
+        App.Core.Fuben.To(w["0"], w["1"])
+    }
+    App.BindEvent("core.fubenrandom", function (event) {
+        let snap = App.Map.Snap()
+        if (snap) {
+            $.Insert(
+                $.Sync(),
+                $.Function(App.Core.Fuben.Locate),
+                $.Function(() => {
+                    Note("恢复移动")
+                    App.Map.Rollback(snap)
+                    App.Map.InitTags()
+                    App.Map.Retry()
+                })
+            )
+            App.Next()
+        }
+    })
 })(App)

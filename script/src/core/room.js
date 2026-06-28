@@ -75,16 +75,16 @@
     App.BindEvent("core.onexit", App.Core.Room.OnExit)
     let matcherOnHeal = /^    (\S{2,8})正坐在地下(.+)。$/
     let matcherOnYanlian = /^    (\S{2,8})正在演练招式。$/
-    let matcherOnObj = /^    ((\S+) )?(\S*[「\(].+[\)」])?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
+    let matcherOnObj = /^    (([零一二三四五六七八九十百千万]+位)?(\S+) )?(\S*[「\(].+[\)」])?(\S+)\(([^\(\)]+)\)( \[.+\])?(( <.+>)*)$/
     //处理得到出口之后的信息(npc和道具列表)的计划
     var PlanOnExit = new App.Plan(App.Positions.Connect,
         function (task) {
             task.AddTrigger(matcherOnObj, function (trigger, result, event) {
-                let item = new objectModule.Object(result[4], result[5], App.History.CurrentOutput).
-                    WithParam("身份", result[2]).
-                    WithParam("外号", result[3]).
-                    WithParam("描述", result[6] || "").
-                    WithParam("状态", result[7] || "").
+                let item = new objectModule.Object((result[2]||"") + result[5], result[6], App.History.CurrentOutput).
+                    WithParam("身份", result[3]).
+                    WithParam("外号", result[4]).
+                    WithParam("描述", result[7] || "").
+                    WithParam("状态", result[8] || "").
                     WithParam("动作", "")
                 App.Map.Room.Data.Objects.Append(item)
                 event.Context.Set("core.room.onobject", true)

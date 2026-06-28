@@ -3,6 +3,9 @@ $.Module(function (App) {
     let Xuemo = {}
     Xuemo.All = 0
     Xuemo.Success = 0
+    Xuemo.Gifts = {}
+    Xuemo.Box = 0
+    Xuemo.GoodBox = 0
     Xuemo.Data = {
         Step: 0,
         "僵尸": false,
@@ -16,10 +19,35 @@ $.Module(function (App) {
         "尸煞": false,
         Finish: false,
     }
+    //墓园的危机解除，你获得了一万点经验、二点潜能、一点实战体会、五百点江湖阅历、十点威望、能力得到了
     //全局计划，统计每一种npc是否打完
+    let matcherGift = /^你从打开的宝箱中拿出一.(.+)。/
+    let matcherBox = "你把宝箱打开了。"
+
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
+            task.AddCatcher("core.giftbouns", (catcher, event) => {
+                if (event.Data.prompt == "墓园的危机解除") {
+                    App.Core.Analytics.Add(Quest.ID, App.CNumber.ParseNumber(event.Data.exp), App.CNumber.ParseNumber(event.Data.pot), App.CNumber.ParseNumber(event.Data.tihui))
+                }
+                return true
+            })
+            task.AddTrigger(matcherBox, (tri, result) => {
+                Xuemo.Box++
+                return true
+            })
+            //统计奖品
+            task.AddTrigger(matcherGift, (tri, result) => {
+                let gift = result[1]
+                if (!Xuemo.Gifts[gift]) {
+                    Xuemo.Gifts[gift] = 0
+                }
+                Xuemo.GoodBox++
+                Xuemo.Gifts[gift]++
+                return true
+            })
+
             task.AddTrigger("杀死 僵尸: 8/8。", () => {
                 Xuemo.Data.僵尸 = true
                 return true
@@ -117,7 +145,7 @@ $.Module(function (App) {
         App.Checker.GetCheck("weaponduration").Force()
         $.PushCommands(
             $.Prepare("commonWithStudy", { WeaponDurationMin: 80 }),
-            $.To("2977"),
+            $.To("fuben"),
             $.Plan(PlanEnter)
         )
         $.Next()
@@ -130,7 +158,7 @@ $.Module(function (App) {
                 task.Data = "ok"
                 return true
             })
-            App.Send("unride;enter door")
+            App.Send("unride;enter necropolis")
             App.Sync()
 
         },
@@ -159,10 +187,10 @@ $.Module(function (App) {
         $.Next()
     }
     Xuemo.AddApth = () => {
-        App.Core.Fuben.Current.AddPath("2979", App.Core.Fuben.Current.Landmark["entry"], "s")
-        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], "2979", "n")
-        App.Core.Fuben.Current.AddPath("2980", App.Core.Fuben.Current.Landmark["exit"], "n")
-        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], "2980", "s")
+        App.Core.Fuben.Current.AddPath($.RID("fuben-xuemo-entry2"), App.Core.Fuben.Current.Landmark["entry"], "s")
+        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["entry"], $.RID("fuben-xuemo-entry2"), "n")
+        App.Core.Fuben.Current.AddPath($.RID("fuben-xuemo-exit"), App.Core.Fuben.Current.Landmark["exit"], "n")
+        App.Core.Fuben.Current.AddPath(App.Core.Fuben.Current.Landmark["exit"], $.RID("fuben-xuemo-exit"), "s")
     }
     let macherAnswer = /^丁一有气无力地说道：这位.+，能听我一言吗？\(answer yes\/no\)$/
     //找丁一的计划
@@ -199,7 +227,7 @@ $.Module(function (App) {
     )
     //找丁一
     Xuemo.FindDingyi = () => {
-        App.Map.Room.ID = "2978"
+        App.Map.Room.ID = $.RID("fuben-xuemo-entry")
         Xuemo.AddApth()
         if (App.Map.Room.Data.Objects.FindByID("Ding yi").First()) {
             Note("已经有丁一了，不是新副本，尝试离开")
@@ -216,12 +244,13 @@ $.Module(function (App) {
     //离开副本
     Xuemo.Leave = () => {
         $.PushCommands(
-            $.To("2981"),
+            $.To("fuben-xuemo-exit2", App.Core.Fuben.InFuben),
             $.Path(["out"]),
             $.Function(() => {
                 Quest.Cooldown(120000)
                 App.Next()
-            })
+            }),
+            $.Prepare("commonWithStudy")
         )
         $.Next()
     }
@@ -245,8 +274,8 @@ $.Module(function (App) {
             $.Sync(),
             $.Function(() => {
                 $.RaiseStage("prepare")
-                $.Sync(),
-                    App.Map.Rollback(snap)
+                // $.Sync(),
+                App.Map.Rollback(snap)
                 switch (Xuemo.Data.Step) {
                     case 1:
                         if (Xuemo.Data.僵尸 && Xuemo.Data.骷髅 && Xuemo.Data.幽灵) {
@@ -287,10 +316,10 @@ $.Module(function (App) {
 
     }
     //检查是否有巫妖
-    Xuemo.ChecSkeletonLich = () => {
+    Xuemo.CheckSkeletonLich = () => {
         if (App.Map.Room.Name != "聚灵法阵") {
             App.Commands.Insert(
-                $.To(Xuemo.Data.聚灵法阵),
+                $.To(Xuemo.Data.聚灵法阵, App.Core.Fuben.InFuben),
                 $.Function(Xuemo.KillSkeletonLich)
             )
             App.Next()
@@ -324,23 +353,53 @@ $.Module(function (App) {
         App.Commands.Insert(
             App.NewKillCommand("", App.NewCombat("xuemo").WithCommand(killcmd).WithTags(sklive ? "sklich" : `step-${Xuemo.Data.Step}`).WithKillInGroup(sklive)),
             $.Rest(),
-            $.To(Xuemo.Data.聚灵法阵),
+            $.Function(() => {
+                App.Look()
+                $.Next()
+            }),
+            $.Sync(),
+            $.Function(Xuemo.AfterKillSkeletonLich),
+        )
+        App.Next()
+    }
+    Xuemo.AfterKillSkeletonLich = () => {
+        $.Insert($.Function(Xuemo.AfterKillSkeletonLich2))
+        if (App.Map.Room.Name != "聚灵法阵") {
+            $.Insert(
+                $.Function(App.Core.Fuben.LoadMazeMap),
+                $.Function(() => {
+                    Xuemo.AddApth()
+                    App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
+                    $.Next()
+                })
+            )
+        }
+        $.Next()
+    }
+    Xuemo.AfterKillSkeletonLich2 = () => {
+        App.Commands.Insert(
+            $.To(Xuemo.Data.聚灵法阵, App.Core.Fuben.InFuben),
             $.Function(() => {
                 App.Send("get bone staff;get zombie blood;get ghost fire;i")
                 App.Look()
                 $.Next()
             }),
             $.Sync(),
-            $.Function(Xuemo.ChecSkeletonLich)
+            $.Function(Xuemo.CheckSkeletonLich)
         )
         App.Next()
+
     }
+
     //遍历
     Xuemo.Wanted = (move, map, step) => {
         move.Option.MultipleStep = false
         move.OnArrive = function (move, map) {
             if (!Xuemo.Data.聚灵法阵 && App.Map.Room.Name == "聚灵法阵") {
                 Xuemo.Data.聚灵法阵 = App.Map.Room.ID
+            }
+            if (App.Map.Room.Data.Objects.FindByLabel("宝箱").First()) {
+                App.Send("open bao xiang;get all from bao xiang")
             }
             let objs = App.Map.Room.Data.Objects.ExcludeID("Corpse")
             switch (Xuemo.Data.Step) {
@@ -430,8 +489,8 @@ $.Module(function (App) {
         $.RaiseStage("prepare")
         $.Sync(),
             $.PushCommands(
-                $.Rooms(App.Core.Fuben.Current.Rooms, Xuemo.Wanted),
-                $.To("2978"),
+                $.Rooms(App.Core.Fuben.Current.Rooms, App.Core.Fuben.InFuben, Xuemo.Wanted),
+                $.To("fuben-xuemo-entry", App.Core.Fuben.InFuben),
                 $.Function(() => {
                     if (Xuemo.Data.Step == 4) {
                         App.Send("give all to ding yi")
@@ -478,7 +537,7 @@ $.Module(function (App) {
                 if (Xuemo.Data.Step == 5) {
                     $.PushCommands(
                         $.Wait(2000),
-                        $.To(Xuemo.Data.聚灵法阵),
+                        $.To(Xuemo.Data.聚灵法阵, App.Core.Fuben.InFuben),
                         $.Wait(3000),
                         $.Do("team talk 血魔副本杀亡灵"),
                         $.Function(() => {
@@ -569,9 +628,12 @@ $.Module(function (App) {
         )
         $.Next()
     }
-    App.Core.Quest.AppendInitor(()=> {
+    App.Core.Quest.AppendInitor(() => {
         Xuemo.All = 0
         Xuemo.Success = 0
+        Xuemo.Gifts = {}
+        Xuemo.Box = 0
+        Xuemo.GoodBox = 0
     })
     //任务实例
     let Quest = App.Quests.NewQuest("xuemo")
@@ -593,11 +655,28 @@ $.Module(function (App) {
     }
     Quest.OnReport = () => {
         let rate = Xuemo.All > 0 ? (Xuemo.Success * 100 / Xuemo.All).toFixed(0) + "%" : "-"
-        return [`血魔-成功 ${Xuemo.Success}次 共计 ${Xuemo.All}次 成功率 ${rate}`]
+        let gift = []
+        let giftdata = []
+        for (var name in Xuemo.Gifts) {
+            let giftrate = (Xuemo.Gifts[name] * 100 / Xuemo.Box).toFixed(2) + "%"
+            giftdata.push({ label: `${name}:${Xuemo.Gifts[name]}件 (${giftrate})`, sum: Xuemo.Gifts[name] })
+        }
+        if (giftdata.length > 0) {
+            giftdata.sort((a, b) => {
+                return b.sum - a.sum
+            })
+            gift = giftdata.map(v => v.label)
+        }
+        let box = Xuemo.Success > 0 ? (Xuemo.Box / Xuemo.Success).toFixed(2) + "个" : "-"
+        let boxrate = Xuemo.Box > 0 ? (Xuemo.GoodBox * 100 / Xuemo.Box).toFixed(2) + "%" : "-"
+        return [`血魔-成功 ${Xuemo.Success}次 共计 ${Xuemo.All}次 成功率 ${rate} 宝箱:${Xuemo.Box} 出货:${Xuemo.GoodBox} 平均宝箱:${box} 出货率:${boxrate}`, `血魔-奖励： ${gift.join(" , ")}`]
     }
     Quest.Start = function (data) {
         Xuemo.Start()
     }
     App.Quests.Register(Quest)
+    Quest.TimeCost = 30
+    App.Core.Analytics.RegisterTask(Quest.ID, Quest.Name, Quest.Timeslice ? Quest.Timeslice : Quest.Name)
+
     App.Quests.Xuemo = Xuemo
 })

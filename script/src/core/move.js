@@ -207,7 +207,9 @@
     App.Move.KillBlockers = function (npclist) {
         return App.Map.NewMoveData("core.killblockers", npclist)
     }
-
+    App.Move.IgnoreRoomEntry = function () {
+        App.Map.Room.Data["core.ignoreRoomEntry"] = true
+    }
     //房间名回显
     App.BindEvent("core.roomentry", function (event) {
         if (App.Move._OnNextRoom.length > 0) {
@@ -216,9 +218,11 @@
             cbs.forEach(callback => callback())
         }
         event.Context.ProposeLater(function () {
-            App.Map.OnWalking()
-            if (App.Params.ShowRoomID.trim() == "t") {
-                Note(`R:${App.Map.Room.ID}`)
+            if (App.Map.Room.Data["core.ignoreRoomEntry"] !== true) {
+                App.Map.OnWalking()
+                if (App.Params.ShowRoomID.trim() == "t") {
+                    Note(`R:${App.Map.Room.ID}`)
+                }
             }
         })
     })

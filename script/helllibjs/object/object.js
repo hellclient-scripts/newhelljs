@@ -12,7 +12,7 @@
     }
     module.DataParaser = function (obj) {
         obj.Data = new ObjectData()
-        let result = module.CNumber.Convert(obj.Label)
+        let result = module.CNumber.Convert(obj.NumberLabel)
         obj.Data.Count = result.Count
         obj.Data.Unit = result.Unit
         obj.Data.Name = result.Name
@@ -22,6 +22,7 @@
             this.ID = id
             this.IDLower = id.toLowerCase()
             this.Label = label
+            this.NumberLabel = label
             this.#raw = raw
         }
         GetData(noparse) {
@@ -36,6 +37,10 @@
         }
         GetRaw() {
             return this.#raw
+        }
+        WithNumberLabel(label) {
+            this.NumberLabel = label
+            return this
         }
         WithKey(key) {
             this.Key = key

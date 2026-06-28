@@ -15,7 +15,7 @@
                 break
             case "":
             case "id"://id 匹配,默认
-                if (!(rule.Data.UserData.includes(asset.Item.ID))) {
+                if (!(rule.Data.UserData.includes(asset.Item.IDLower))) {
                     return
                 }
                 break
@@ -24,6 +24,52 @@
                     return
                 }
                 break
+            case "end"://后缀匹配
+                if (asset.Item.ID.indexOf(" ") < 0) {
+                    return
+                }
+                var matched = false
+                for (let type of rule.Data.UserData) {
+                    if (asset.Item.GetData().Name.endsWith(type)) {
+                        matched = true
+                        break
+                    }
+                }
+                if (!matched) {
+                    return
+                }
+                break
+            case "start"://后缀匹配
+                if (asset.Item.ID.indexOf(" ") < 0) {
+                    return
+                }
+                var matched = false
+                for (let type of rule.Data.UserData) {
+                    if (asset.Item.GetData().Name.startsWith(type)) {
+                        matched = true
+                        break
+                    }
+                }
+                if (!matched) {
+                    return
+                }
+                break
+            case "contain"://包含匹配
+                if (asset.Item.ID.indexOf(" ") < 0) {
+                    return
+                }
+                var matched = false
+                for (let type of rule.Data.UserData) {
+                    if (asset.Item.GetData().Name.indexOf(type) >= 0) {
+                        matched = true
+                        break
+                    }
+                }
+                if (!matched) {
+                    return
+                }
+                break
+
             default:
                 return
         }
@@ -33,6 +79,7 @@
         }
         return rule.Data.Command
     }
+
     //将单行文本解析为处理规则
     App.Core.Assets.ParseRule = function (data) {
         return App.Assets.Parse(data, App.Core.Assets.MatchFunction)
