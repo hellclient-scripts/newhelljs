@@ -43,7 +43,7 @@ $.Module(function (App) {
                 return true
             })
             task.AddTrigger(matcherFinish, (tri, result) => {
-                Quest.Cooldown(120000)
+                // Quest.Cooldown(120000)
                 return true
             })
             //统计奖品
@@ -61,12 +61,12 @@ $.Module(function (App) {
                 if (Prison.Data.Finished) {
                     event.Context.Set("callback", () => {
                         Note("离开副本")
-                        Quest.Cooldown(120000)
+                        // Quest.Cooldown(120000)
                     })
                 } else {
                     Note("副本失败")
                 }
-                Quest.Cooldown(120000)
+                // Quest.Cooldown(120000)
                 return true
             })
         })
@@ -129,7 +129,7 @@ $.Module(function (App) {
     Prison.Entered = () => {
         Prison.Data.Start = $.Now()
         Note("进入副本，打探地图")
-        Quest.Cooldown(120000)
+        // Quest.Cooldown(120000)
         App.Core.Fuben.Last = $.Now()
         Prison.LastRoom = ""
         Prison.Data.All++

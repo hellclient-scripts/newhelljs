@@ -4,6 +4,9 @@
     App.UI.Assist.Show = () => {
         var status = App.Quests.Stopped ? "已停止" : "正在进行"
         var list = Userinput.newlist("助理", "当前任务" + status + ",请选择你需要的帮助", false)
+        if (App.UI.Wizard.Check()) {
+            list.append("wizard", "设置引导")
+        }
         list.append("report", "工作汇报")
         if (App.Quests.Stopped) {
             if (GetVariable("quest").trim()) {
@@ -26,6 +29,9 @@
     }
     App.UI.Assist.OnClick = (name, id, code, data) => {
         switch (data) {
+            case "wizard":
+                App.UI.Wizard.Next()
+                break
             case "start":
                 Execute("#start")
                 break

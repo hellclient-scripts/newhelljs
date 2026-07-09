@@ -7,4 +7,5 @@
     App.Include("src/ui/report.js")
     App.Include("src/ui/help.js")
     App.Include("src/ui/push.js")
+    App.Include("src/ui/wizard.js")
 })(App)
