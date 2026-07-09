@@ -34,9 +34,9 @@
             App.Positions[key].Discard()
         }
         App.Map.Room.ID = ""
+        App.Map.DiscardMove()
         App.Combat.Discard()
         App.Commands.Discard()
-        App.Move.DiscardMove()
         if (!App.Quests.IsStopped()) {
             App.Commands.Append(
                 App.Commands.NewWaitCommand(2000),
