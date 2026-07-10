@@ -42,7 +42,7 @@
         cmd = cmd.trim()
         if ((Mode == 0 || canretry()) && cmd) {
             Mode = 1
-            App.Send(cmd + ";whistle;" + cmd)
+            App.Send(cmd + ";yun regenerate;whistle;" + cmd)
             App.RaiseEvent(event)
             return
         }

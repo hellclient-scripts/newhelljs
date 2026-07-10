@@ -46,4 +46,10 @@
     App.NamedParams.AddString("Echo", "t").WithName("指令回显").WithDesc("设为f关闭回显")
     App.NamedParams.AddString("MapEditing", "f").WithName("地图编辑模式").WithDesc("设为t开启地图编辑模式，加载World文件夹下的export.hmm")
 
+    App.NamedParams.AddNumber("JiquMaxAhead", 10).WithName("自动经验武学最大领先").WithDesc("自动经验上限时，武学体会超过其他技能最多说少级。超过这个级别停止汲取。小于0不限制")
+    App.NamedParams.AddString("JiquPause", "t").WithName("汲取暂停，汲取时会每秒halt一下，执行pause指令").WithDesc("设为f关闭汲取暂停")
+    App.NamedParams.AddNumber("FullTihui", 7000).WithName("Full的体会").WithDesc("体会超过多少进入Full状态，小于等于0不会进入Full")
+    App.NamedParams.AddNumber("FullPot", 0).WithName("Full的潜能").WithDesc("潜能超过多少进入Full状态，小于等于0不会进入Full")
+    App.NamedParams.AddNumber("LogDetail", 0).WithName("日志详细程度").WithDesc("日志详细程度，0为不记录详情，大于0为记录的行数")
+
 })()

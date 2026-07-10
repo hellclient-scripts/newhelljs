@@ -75,6 +75,8 @@
         )
         if (!App.Quests.IsStopped()) {
             App.Commands.Append(
+                App.Do("yun recover;yun regenerate;hp"),
+                App.Sync(),
                 App.NewPrepareCommand(""),
                 App.Commands.NewFunctionCommand(() => {
                     Note("重新执行任务队列")

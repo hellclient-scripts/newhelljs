@@ -17,7 +17,7 @@
         if (!GetVariable("id")) {
             return "id"
         }
-        if (!GetVariable("passwd")) {
+        if (!GetVariable("passw")) {
             return "password"
         }
         if (!GetVariable("jifa")) {
@@ -85,7 +85,7 @@
     }
     App.UI.Wizard.OnPassword = function (name, id, code, data) {
         if (code == 0) {
-            SetVariable("passwd", data)
+            SetVariable("passw", data)
             App.UI.Wizard.Next()
         }
     }

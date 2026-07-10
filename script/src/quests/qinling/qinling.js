@@ -152,7 +152,9 @@ $.Module(function (App) {
             }
             $.PushCommands(
                 $.To(next, App.Core.Fuben.InFuben, App.Map.SingleStep()),
+                $.Do("yun recover;yun regenerate;hp"),
                 $.Sync(),
+                $.Rest(),
                 $.Function(Qinling.InUnlockRoom)
             )
             $.Next()
