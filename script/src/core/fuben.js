@@ -17,6 +17,14 @@
         App.Core.Fuben.Current = maze != null ? maze : new Maze()
 
     }
+    App.Core.Fuben.OnBox = (move, map) => {
+        move.OnArrive = function (move, map) {
+            if (App.Map.Room.Data.Objects.FindByLabel("宝箱").First()) {
+                App.Send("open bao xiang;get all from bao xiang")
+            }
+            move.Walk(map)
+        }
+    }
     App.Core.Fuben.InFuben = (move, map) => {
         move.Data.InFuben = true
         move.Option.Fly = false
@@ -238,7 +246,7 @@
             $.Function(() => {
                 App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
                 $.Insert(
-                    $.To(App.Core.Fuben.Current.GetRoomID(x, y), App.Map.SingleStep(), App.Core.Fuben.InFuben),
+                    $.To(App.Core.Fuben.Current.GetRoomID(x, y), App.Map.SingleStep(), App.Core.Fuben.InFuben, App.Core.Fuben.OnBox),
                 )
                 $.Next()
             })
@@ -262,7 +270,7 @@
                 App.Map.Room.ID = App.Core.Fuben.Current.Landmark["current"]
                 let current = App.Map.Room.ID
                 $.Insert(
-                    $.Rooms(App.Core.Fuben.Current.Rooms, App.Map.SingleStep(), App.Core.Fuben.NoteRoomID, App.Core.Fuben.InFuben),
+                    $.Rooms(App.Core.Fuben.Current.Rooms, App.Map.SingleStep(), App.Core.Fuben.NoteRoomID, App.Core.Fuben.InFuben, App.Core.Fuben.OnBox),
                     $.To(current)
                 )
                 $.Next()

@@ -1,5 +1,5 @@
 HMM1.0>UTF8
-Info>hellmap|1782384201|hell地图
+Info>hellmap|1783922746|hell地图
 Room>0|中央广场|||室外=|e,59,,1;enter dong,1927,,1;n,22,,1;s,40,,1;w,1,,1|
 Room>1|西大街|||室外=|e,0,,1;n,2,,1;s,5,,1;w,7,,1|
 Room>10|财主大院||||n,11,,1;s,9,,1|
@@ -24,6 +24,10 @@ Room>10015|秦陵内宫西门|||||
 Room>10016|秦陵内宫入口|||||
 Room>10017|秦陵内宫出口|||||
 Room>1002|黄土路|||室外=|ne,1003,,1;s,1001,,1|
+Room>10020|魔窟入口||||s,10021,,1|
+Room>10021|魔窟入口||||n,10020,,1|
+Room>10022|魔窟出口||||s,10023,,1|
+Room>10023|魔窟出口||||n,10022,,1|
 Room>1003|渭汾流域|||室外=|n,1004,,1;ne,1712,,1;s,1025,,1;sw,1002,,1|
 Room>1004|黄河|||室外=|s,1003,,1;w,1005,,1|
 Room>1005|河套|||室外=|e,1004,,1;sw,1007,,1;w,1006,,1|
@@ -3033,6 +3037,10 @@ Marker>fuben-xuemo-entry|10005|fuben||
 Marker>fuben-xuemo-entry2|10006|fuben||
 Marker>fuben-xuemo-exit|10007|fuben||
 Marker>fuben-xuemo-exit2|10008|fuben||
+Marker>fuben-xueying-entry|10020|fuben||
+Marker>fuben-xueying-entry2|10021|fuben||
+Marker>fuben-xueying-exit|10022|fuben||
+Marker>fuben-xueying-exit2|10023|fuben||
 Marker>a zi|1160|npc||阿紫\|1160\|a zi
 Marker>ai laozhe|2183|npc||矮老者\|2183\|ai laozhe
 Marker>bai shijing|1932|npc||白世镜\|1932\|bai shijing
