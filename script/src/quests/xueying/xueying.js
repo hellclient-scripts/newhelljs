@@ -208,7 +208,7 @@ $.Module(function (App) {
         let d = $.Now() - App.Quests.StartAt
         let eff = d > 0 ? (Xueying.Data.Success * 3600 * 1000 / d).toFixed(0) + "次/小时" : "-"
         let successrate = Xueying.Data.All > 0 ? (Xueying.Data.Success * 100 / Xueying.Data.All).toFixed(2) + "%" : "-"
-        return [`血影-成功:${Xueying.Data.Success}次 成功率:${successrate} 毛效率:${eff} 平均耗时：${cost}`]
+        return [`血影-成功:${Xueying.Data.Success}次 成功率:${successrate} 毛效率:${eff}`]
     }
     Quest.Start = function (data) {
         Xueying.Start()
