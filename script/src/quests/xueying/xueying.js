@@ -6,7 +6,6 @@ $.Module(function (App) {
         All: 0,
         Finished: false,
         Start: 0,
-        Cost: 0,
     }
     //血影魔窟建功，你获得了二万点经验、一点潜能、一点实战体会、二百点江湖阅历、能力得到了提升。
     let PlanQuest = new App.Plan(
@@ -206,7 +205,6 @@ $.Module(function (App) {
             })
             gift = giftdata.map(v => v.label)
         }
-        let cost = Xueying.Data.Success > 0 ? (Xueying.Data.Cost / Xueying.Data.Success / 1000).toFixed() + "秒" : "-"
         let d = $.Now() - App.Quests.StartAt
         let eff = d > 0 ? (Xueying.Data.Success * 3600 * 1000 / d).toFixed(0) + "次/小时" : "-"
         let successrate = Xueying.Data.All > 0 ? (Xueying.Data.Success * 100 / Xueying.Data.All).toFixed(2) + "%" : "-"
@@ -222,7 +220,6 @@ $.Module(function (App) {
             Gifts: {},
             Finished: false,
             Start: 0,
-            Cost: 0,
             Box: 0,
             GoodBox: 0,
             Migong: [],
