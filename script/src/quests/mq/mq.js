@@ -662,6 +662,9 @@ $.Module(function (App) {
             if (city == "") {
                 return
             }
+            if (MQ.Data.NPC.ID&&MQ.Data.NPC.ID!=id) {
+                return
+            }
             if (!MQ.Data.NPC.ID && id) {
                 MQ.Data.NPC.ID = id.toLowerCase()
             }
