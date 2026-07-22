@@ -233,7 +233,7 @@ $.Module(function (App) {
             App.Log("位置丢失")
             return
         }
-        $.RaiseStage("preapre")
+        $.RaiseStage("prepare")
         $.Insert(
             $.To(Qinling.Data.Maze.Goldman.shift(), App.Map.SingleStep(), App.Core.Fuben.InFuben),
             $.Function(() => {
@@ -255,7 +255,7 @@ $.Module(function (App) {
             $.To("mazemap-5-4", App.Core.Fuben.InFuben, App.Map.SingleStep()),
             $.Sync(),
             $.Function(() => {
-                $.RaiseStage("preapre")
+                $.RaiseStage("prepare")
                 $.Next()
             }),
             $.Do(`turn ${Qinling.Data.Maze.Password}`),
