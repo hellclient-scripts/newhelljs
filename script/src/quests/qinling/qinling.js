@@ -258,8 +258,8 @@ $.Module(function (App) {
                 $.RaiseStage("prepare")
                 $.Next()
             }),
-            $.Do(`turn ${Qinling.Data.Maze.Password}`),
             $.Nobusy(),
+            $.Do(`turn ${Qinling.Data.Maze.Password}`),
             App.NewKillCommand("qin shihuang", App.NewCombat("qinling").WithTags("qinshihuang").WithKillInGroup(true)),
             $.Function(() => {
                 App.Look()

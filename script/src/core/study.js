@@ -415,7 +415,7 @@
     }
     //执行学习
     App.Core.Study.DoLearn = (context) => {
-        if (!App.Core.Study.HitMinPot()) {
+        if (!App.Core.Study.HitMinPot() && !App.Quests.Stopped) {
             if (App.Core.Study.CurrentSkill == null) {
                 let skill = App.Core.Study.FilterSkill()
                 if (skill) {
@@ -694,7 +694,7 @@
         })
 
     let JiquPauseNext = () => {
-        if (App.Data.Player.HP["体会"] > 60 && App.Core.Study.CanJiqu()) {
+        if (App.Data.Player.HP["体会"] > 60 && App.Core.Study.CanJiqu() && !App.Quests.Stopped()) {
             App.Insert(App.Commands.NewFunctionCommand(JiquPauseNext))
             App.Commands.PushCommands(
                 $.Prepare("common", JiquPauseContext),
@@ -730,6 +730,9 @@
     }
     //注册jiqu准备
     App.Proposals.Register("jiqu", App.Proposals.NewProposal(function (proposals, context, exclude) {
+        if (!App.Quests.Stopped) {
+            return null
+        }
         if (!App.Quests.IsStopped() && App.Quests.Data.NoJiqu == true) {
             return null
         }
@@ -743,7 +746,7 @@
     }))
     //注册study准备
     App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Core.Study.HitMinPot()) {
+        if (App.Core.Study.HitMinPot() || App.Quests.Stopped) {
             return null
         }
         if (App.Core.Dispel.Need) {

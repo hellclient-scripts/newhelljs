@@ -79,7 +79,21 @@
             App.Core.Stage.ChangeStance(q.Group)
             exec()
         }, q)
-
+    }
+    App.Quests.ForceStop = function () {
+        Note("立刻停止运行")
+        App.RaiseEvent(new App.Event("core.stop"))
+        App.Quests.Reset()
+        App.Next()
+    }
+    App.Quests.Reset = function () {
+        for (var key in App.Positions) {
+            App.Positions[key].Discard()
+        }
+        App.Map.Room.ID = ""
+        App.Map.DiscardMove()
+        App.Combat.Discard()
+        App.Commands.Discard()
     }
     let matcherGiftBouns = /^(?<prompt>.+)，你获得了((?<exp>.+)点经验、)?((?<pot>.+)点潜能、)?((?<tihui>.+)点实战体会、)?((?<zhen>.+)点正神、)?((?<fu>.+)点负神、)?((?<yueli>.+)点江湖阅历、)?((?<weiwang>.+)点威望、)?((?<gongxian>.+)点门派贡献、)?能力得到了提升。$/
     App.Engine.SetFilter("core.giftbouns", function (event) {

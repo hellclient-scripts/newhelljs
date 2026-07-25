@@ -30,13 +30,7 @@
     })
     //重置
     App.Core.Emergency.Reset = () => {
-        for (var key in App.Positions) {
-            App.Positions[key].Discard()
-        }
-        App.Map.Room.ID = ""
-        App.Map.DiscardMove()
-        App.Combat.Discard()
-        App.Commands.Discard()
+        App.Quests.Reset()
         if (!App.Quests.IsStopped()) {
             App.Commands.Append(
                 App.Commands.NewWaitCommand(2000),
