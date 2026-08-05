@@ -121,11 +121,6 @@
         let rq = App.Quests.Running
         return rq && rq.ID == data
     }))
-    //注册quest 条件
-    App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("quest", function (data, target) {
-        let rq = App.Quests.Running
-        return rq && rq.ID == data
-    }))
     // //注册full 条件
     // App.Quests.Conditions.RegisterMatcher(App.Quests.Conditions.NewMatcher("full", function (data, target) {
     //     if (App.Params.FullTihui > 0 && (App.Data.Player.HP["体会"] >= App.Params.FullTihui || App.Data.Player.HP["体会"] >= App.Data.Player.HPM["体会上限"]) && App.Core.Study.CanJiqu()) {

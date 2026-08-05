@@ -156,6 +156,7 @@ $.Module(function (App) {
     }
     let reQuest = /^([^：()\[\]]{2,5})对你道：“我早就看(.*)不顺眼，听说他最近在(.*)，你去做了他，带他的人头来交差！/
     let reQuest2 = /^([^：()\[\]]{2,5})对你道：“(.*)(这个败类打家劫舍，无恶不作，听说他最近在|这个所谓大侠屡次和我派作对，听说他最近在)/
+    let reQuest3 = /^最近(.*)在(.*)作恶多端，你去把他除了，提头来见。”$/
     let reStart = /^据说此人前不久曾经在(.*)出没。/
     let reFlee = /(.{2,5})在(.*)失踪了！现在不知道去了哪里！/
     let reFail = /^([^：()\[\]]{2,5})一脸怒容对你道：“我不是让你.+前杀了/
@@ -176,6 +177,10 @@ $.Module(function (App) {
             })
             task.AddTrigger(reQuest2, (tri, result) => {
                 MQ.Data.NPC = new NPC(result[2])
+                return true
+            })
+            task.AddTrigger(reQuest3, (tri, result) => {
+                MQ.Data.NPC = new NPC(result[1])
                 return true
             })
             task.AddTrigger(reFlee, (tri, result) => {
