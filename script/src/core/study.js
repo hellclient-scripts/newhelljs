@@ -408,7 +408,7 @@
     //判断是否到了minpot
     App.Core.Study.HitMinPot = () => {
         let minpot = App.Quests.Data.MinPot
-        if (!minpot == null) {
+        if (minpot == null) {
             minpot = GetVariable("min_pot") - 0
         }
         return (!isNaN(minpot) && App.Data.Player.HP["潜能"] < (minpot - 0)) || App.Data.Player.HP["潜能"] <= 10
@@ -746,7 +746,7 @@
     }))
     //注册study准备
     App.Proposals.Register("study", App.Proposals.NewProposal(function (proposals, context, exclude) {
-        if (App.Core.Study.HitMinPot() || App.Quests.Stopped||App.Quests.Data.NoStudy) {
+        if (App.Core.Study.HitMinPot() || App.Quests.Stopped || App.Quests.Data.NoStudy) {
             return null
         }
         if (App.Core.Dispel.Need) {

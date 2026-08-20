@@ -224,7 +224,7 @@
     App.Mapper.InWinter = function () {
         return App.Mapper.Data.Winter ? (new Date().getTime() - App.Mapper.Data.Winter) < 100000 : false
     }
-
+    App.Core.SkillTags = ["force", "dodge"]
     App.Mapper.InitTag = function (map) {
         if (App.Mapper.HomeRooms.length) {
             map.AddTemporaryRooms(App.Mapper.HomeRooms)
@@ -241,6 +241,15 @@
         } else {
             map.SetTag("winter", 0)
         }
+        for (var tag in App.Core.SkillTags) {
+            let val
+            val = Math.floor(App.Core.Player.GetSkillLevelByID[tag] / 50) * 50
+            if (val > 1000) {
+                val = 1000
+            }
+            App.Map.SetTag(`skill-${tag}`, val)
+        }
+
     }
     App.Map.AppendInitiator(App.Mapper.InitTag)
     //额外地图定位

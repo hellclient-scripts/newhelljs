@@ -29,6 +29,8 @@
     App.Include("src/quests/qinling/qinling.js")
     App.Include("src/quests/prison/prison.js")
     App.Include("src/quests/xueying/xueying.js")
+    App.Include("src/quests/canghai/canghai.js")
+    App.Include("src/quests/leize/leize.js")
     App.Include("src/quests/lgt/lgt.js")
     App.Include("src/quests/baohu/baohu.js")
     App.Include("src/quests/jiedu/jiedu.js")

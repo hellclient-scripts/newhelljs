@@ -20,3 +20,5 @@
 少林派|1887|xuanci dashi|1924|1886|sl
 将军府|2850|wu qian|2865|2849|jjf
 崆峒派|3006|mulingzi|179|178|kt
+唐门|3010|tang zhennan|179|178|tang
+明教|2508|zhang wuji||179|178|mj
