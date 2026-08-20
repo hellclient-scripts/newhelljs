@@ -233,21 +233,21 @@ $.Module(function (App) {
     }
 
     let Quest = App.Quests.NewQuest("leize")
-    Quest.Name = "苍海"
+    Quest.Name = "雷泽"
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Group = "leize"
     Quest.OnHUD = () => {
         return [
-            new App.HUD.UI.Word("苍海:"),
+            new App.HUD.UI.Word("雷泽:"),
             new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Leize.Data.Success), 5, true),
         ]
 
     }
     Quest.OnSummary = () => {
         return [
-            new App.HUD.UI.Word("苍:"),
+            new App.HUD.UI.Word("雷:"),
             new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Leize.Data.Success), 5, true),
         ]
 
@@ -268,7 +268,7 @@ $.Module(function (App) {
         let d = $.Now() - App.Quests.StartAt
         let eff = d > 0 ? (Leize.Data.Success * 3600 * 1000 / d).toFixed(0) + "次/小时" : "-"
         let successrate = Leize.Data.All > 0 ? (Leize.Data.Success * 100 / Leize.Data.All).toFixed(2) + "%" : "-"
-        return [`苍海-成功:${Leize.Data.Success}次 成功率:${successrate} 毛效率:${eff}`]
+        return [`雷泽-成功:${Leize.Data.Success}次 成功率:${successrate} 毛效率:${eff}`]
     }
     Quest.Start = function (data) {
         Leize.Start()
