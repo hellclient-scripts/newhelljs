@@ -23,6 +23,7 @@
         list.append("questparams", "任务参数设置")
         list.append("lian", "初始化练习清单")
         list.append("advance", "高级设置")
+        list.append("togglehud", App.HUD.Closed ? "打开HUD" : "关闭HUD")
         list.append("push", "推送设置")
         list.append("help", "使用帮助")
         list.publish("App.UI.Assist.OnClick")
@@ -46,6 +47,9 @@
                 break
             case "reload":
                 App.ReloadVariable()
+                break
+            case "togglehud":
+                App.HUD.Toggle()
                 break
             case "npc":
                 App.UI.Assist.NPCShow()

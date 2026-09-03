@@ -55,6 +55,7 @@
             return this
         }
     }
+    App.Core.Combat.Last = (new Date()).getTime()
     //战斗的配置列表
     App.Core.Combat.Actions = null
     //战斗的区块列表
@@ -176,6 +177,7 @@
     }
     //战斗结束处理函数
     App.Combat.OnStop = function (combat, reason) {
+        App.Core.Combat.Last = (new Date()).getTime()
         if (reason == "fail") {
             App.Send("yun recover;yun regenerate;hp;i")
             App.Fail()

@@ -2,19 +2,45 @@
 (function (App) {
     let uiModule = App.RequireModule("helllibjs/utils/ui.js")
 
-    SetHUDSize(7)
     App.HUD = {}
     App.HUD.UI = uiModule
+    App.HUD.Closed = false
+    if (GetVariable("_newhelljs_hud_closed")) {
+        App.HUD.Closed = true
+    }
+    SetHUDSize(App.HUD.Closed ? 0 : 7)
+    App.HUD.Toggle = () => {
+        App.HUD.Closed = !App.HUD.Closed
+        SetVariable("_newhelljs_hud_closed", App.HUD.Closed ? "t" : "")
+        SetHUDSize(App.HUD.Closed ? 0 : 7)
+        App.HUD.Update()
+    }
+    App.HUD.NoCombatDuration = () => {
+        let now = (new Date()).getTime()
+        let duration = ((now - App.Core.Combat.Last) / 60000).toFixed(0)
+        if (duration < 0) {
+            return "0"
+        }
+        if (duration > 99) {
+            return "99+"
+        }
+        return duration
+    }
     App.Word = App.HUD.UI.Word
     App.HUD.Update = () => {
         let line1 = App.HUD.Line1()
-        let line2 = App.HUD.Line2()
-        let line3 = App.HUD.Line3()
-        let line4 = App.HUD.Line4()
-        let linelog = App.HUD.LineLog()
+        if (App.HUD.Closed) {
+            UpdateHUD(0, JSON.stringify([]))
+        } else {
+            let line2 = App.HUD.Line2()
+            let line3 = App.HUD.Line3()
+            let line4 = App.HUD.Line4()
+            let linelog = App.HUD.LineLog()
+            UpdateHUD(0, JSON.stringify([line1, line2, line3, line4, ...linelog]))
+        }
         let summaryline1 = App.HUD.SummaryLine1()
         let summaryline2 = App.HUD.SummaryLine2()
-        UpdateHUD(0, JSON.stringify([line1, line2, line3, line4, ...linelog]))
+
         SetSummary(JSON.stringify([summaryline1, summaryline2]))
     }
     App.HUD.Space = new App.Word(" ")
@@ -91,11 +117,11 @@
         let exp = new App.Word(App.Data.Player.HP["经验"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["经验"]) : "-", 4, true).WithColor("white")
         let potLabel = new App.Word(" 潜:").WithColor("BrightWhite")
         let pot = new App.Word(App.Data.Player.HP["潜能"] != null ? App.HUD.UI.ShortNumber(App.Data.Player.HP["潜能"]) : "-", 4, true).WithColor("white")
-        let gongLabel = new App.Word(" 贡:").WithColor("BrightWhite")
-        let gong = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Score["门贡"] || 0), 4, true).WithColor("white")
+        let noCombatLabel = new App.Word(" 闲:").WithColor("BrightWhite")
+        let noCombat = new App.Word(App.HUD.NoCombatDuration(), 4, true).WithColor("white")
         let donateLabel = new App.Word(" 集:").WithColor("BrightWhite")
         let donate = new App.Word(App.HUD.UI.ShortNumber(App.Data.Player.Donate || 0), 4, true).WithColor("white")
-        return App.Word.Join(expLabel, exp, potLabel, pot, banklabel, bank, bondlabel, bond, gongLabel, gong, donateLabel, donate)
+        return App.Word.Join(expLabel, exp, potLabel, pot, banklabel, bank, bondlabel, bond, noCombatLabel, noCombat, donateLabel, donate)
     }
     App.HUD.SummaryLine2 = () => {
         let dup = {}
@@ -133,7 +159,6 @@
             App.HUD.Update()
         }
     })
-
     App.HUD.Show = () => {
         var list = Userinput.newlist("信息", "请选择你要查看的信息", false)
         list.append("log", "完整日志")
