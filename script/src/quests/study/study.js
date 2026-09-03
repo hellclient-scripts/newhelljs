@@ -20,7 +20,7 @@ $.Module(function (App) {
                     $.Function(() => { Study.Start() }),
                 )
             }
-        } 
+        }
         App.Next()
     }
     //定义任务
@@ -49,7 +49,6 @@ $.Module(function (App) {
         return [`学习进度 (${all.length}/${App.Core.Study.Learn.length}):${all.join(",")}`]
     }
     Quest.GetReady = function (q, data) {
-        App.Quests.Data.NoStudy=true
         if (App.Core.Study.HitMinPot()) {
             return null
         }
@@ -61,8 +60,11 @@ $.Module(function (App) {
         }
         return null
     }
+    Quest.Preflight = function () {
+        App.Quests.Data.NoStudy = true
+    }
     Quest.Start = function () {
-       Study.Start()
+        Study.Start()
     }
     Quest.Group = "study"
     App.Quests.Register(Quest)

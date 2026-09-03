@@ -7,12 +7,12 @@ $.Module(function (App) {
         Finished: false,
         Start: 0,
     }
-    //苍海窟建功，你获得了二万点经验、一点潜能、一点实战体会、二百点江湖阅历、能力得到了提升。
+    //沧海窟建功，你获得了二万点经验、一点潜能、一点实战体会、二百点江湖阅历、能力得到了提升。
     let PlanQuest = new App.Plan(
         App.Positions["Quest"],
         (task) => {
             task.AddCatcher("core.giftbouns", (catcher, event) => {
-                if (event.Data.prompt == "苍海窟建功") {
+                if (event.Data.prompt == "沧海窟建功") {
                     Canghai.Data.Finished = true
                     App.Core.Analytics.Add(Quest.ID, App.CNumber.ParseNumber(event.Data.exp), App.CNumber.ParseNumber(event.Data.pot), App.CNumber.ParseNumber(event.Data.tihui))
                     Canghai.Data.Success++
@@ -173,21 +173,21 @@ $.Module(function (App) {
     }
 
     let Quest = App.Quests.NewQuest("canghai")
-    Quest.Name = "苍海"
+    Quest.Name = "沧海"
     Quest.Desc = ""
     Quest.Intro = ""
     Quest.Help = ""
     Quest.Group = "canghai"
     Quest.OnHUD = () => {
         return [
-            new App.HUD.UI.Word("苍海:"),
+            new App.HUD.UI.Word("沧海:"),
             new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Canghai.Data.Success), 5, true),
         ]
 
     }
     Quest.OnSummary = () => {
         return [
-            new App.HUD.UI.Word("苍:"),
+            new App.HUD.UI.Word("沧:"),
             new App.HUD.UI.Word(App.HUD.UI.ShortNumber(Canghai.Data.Success), 5, true),
         ]
 
@@ -208,7 +208,7 @@ $.Module(function (App) {
         let d = $.Now() - App.Quests.StartAt
         let eff = d > 0 ? (Canghai.Data.Success * 3600 * 1000 / d).toFixed(0) + "次/小时" : "-"
         let successrate = Canghai.Data.All > 0 ? (Canghai.Data.Success * 100 / Canghai.Data.All).toFixed(2) + "%" : "-"
-        return [`苍海-成功:${Canghai.Data.Success}次 成功率:${successrate} 毛效率:${eff}`]
+        return [`沧海-成功:${Canghai.Data.Success}次 成功率:${successrate} 毛效率:${eff}`]
     }
     Quest.Start = function (data) {
         Canghai.Start()

@@ -40,6 +40,9 @@
         Quest = null
         Execute = null
     }
+    let DefaultPreflight = () => {
+
+    }
     let DefaultOnHUD = () => {
         return null
     }
@@ -108,6 +111,7 @@
         OnHUD = DefaultOnHUD
         OnSummary = DefaultOnSummary
         OnReport = DefaultOnReport
+        Preflight = DefaultPreflight
     }
     let DefaultChecker = function () {
         return true
@@ -175,6 +179,7 @@
             if (quests.length) {
                 this.Stopped = false
                 this.Queue = quests
+                this.Preflight()
                 this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             }
             this.Commands.Next()
@@ -182,6 +187,21 @@
         Restart() {
             this.Commands.Push().WithReadyCommand(this.#nextcommand).WithFailCommand(this.#nextcommand)
             this.Commands.Next()
+        }
+        Preflight() {
+            this.Queue.forEach(q => {
+                let preflighted = {}
+                this.Queue.forEach(q => {
+                    if (preflighted[q.ID]) {
+                        return;
+                    }
+                    preflighted[q.ID] = true;
+                    let quest = this.#registered[q.ID]
+                    if (quest) {
+                        quest.Preflight()
+                    }
+                });
+            });
         }
         GetReady() {
             let headready = this.HeadReady(this)
