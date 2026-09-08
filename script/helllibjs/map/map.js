@@ -1,7 +1,6 @@
 (function (App) {
     let movementModule = App.RequireModule("helllibjs/map/movement.js")
     let hmm = App.Include("helllibjs/lib/hmm/hmm.js")
-    let lru = App.Include("helllibjs/lib/lru/lru.js")
     let module = {}
     module.DefaultStepTimeout = 3000
     module.DefaultResendDelay = 500
@@ -91,35 +90,6 @@
         StepTimeout = 0
         ResendDelay = 0
         Mode = ""
-        #Cache = null
-        NewCache = (settings) => {
-            settings = settings || {}
-            const options = {
-                max: settings.Max || 1000,
-                updateAgeOnGet: true,
-                sizeCalculation: (value, key) => {
-                    return JSON.stringify(value).length + key.length
-                },
-                maxSize: settings.MaxSize || 5000,
-            }
-            return new lru(options)
-        }
-        WithCache(cache) {
-            this.#Cache = cache
-        }
-        LoadCache(mapperdata) {
-            if (this.#Cache) {
-                let cachekey = JSON.stringify(mapperdata)
-                return this.#Cache.get(cachekey)
-            }
-            return null
-        }
-        SetCache(mapperdata, result) {
-            if (this.#Cache) {
-                let cachekey = JSON.stringify(mapperdata)
-                this.#Cache.set(cachekey, result)
-            }
-        }
         ChangeMode(mode) {
             if (mode != this.Mode) {
                 let om = this.Mode
@@ -251,21 +221,7 @@
             if (to.length == 0) {
                 return []
             }
-            let mapperdata = {
-                "From": [from],
-                "To": to,
-                "Key": "QueryAny",
-                "Context": this.Context,
-                "Options": this.#GetMapperOptions(!fly, options)
-            }
-            let result
-            let cached = this.LoadCache(mapperdata)
-            if (cached) {
-                result = cached.Data
-            } else {
-                result = module.Database.APIQueryPathAny([from], to, this.Context, this.#GetMapperOptions(!fly, options))
-                this.SetCache(mapperdata, { Data: result })
-            }
+            let result = module.Database.APIQueryPathAny([from], to, this.Context, this.#GetMapperOptions(!fly, options))
             if (result == null) {
                 return null
             }
@@ -290,14 +246,7 @@
                 "Context": context,
                 "Options": options
             }
-            let result
-            let cached = this.LoadCache(mapperdata)
-            if (cached) {
-                result = cached.Data
-            } else {
-                result = module.Database.APIDilate(rooms, expand, context, options)
-                this.SetCache(mapperdata, { Data: result })
-            }
+            let result = module.Database.APIDilate(rooms, expand, context, options)
             return result
         }
         GetMapperWalkAll(rooms, fly, distance, options) {
@@ -307,14 +256,7 @@
                 "Context": this.Context,
                 "Options": this.#GetMapperOptions(!fly, options).WithMaxTotalCost(distance)
             }
-            let result
-            let cached = this.LoadCache(mapperdata)
-            if (cached) {
-                result = cached.Data
-            } else {
-                result = module.Database.APIQueryPathAll(rooms[0], rooms, this.Context, this.#GetMapperOptions(!fly, options).WithMaxTotalCost(distance))
-                this.SetCache(mapperdata, { Data: result })
-            }
+            let result = module.Database.APIQueryPathAll(rooms[0], rooms, this.Context, this.#GetMapperOptions(!fly, options).WithMaxTotalCost(distance))
             if (result == null) {
                 return null
             }
@@ -334,14 +276,7 @@
                 "Context": this.Context,
                 "Options": this.#GetMapperOptions(!fly)
             }
-            let result
-            let cached = this.LoadCache(mapperdata)
-            if (cached) {
-                result = cached.Data
-            } else {
-                result = module.Database.APIQueryPathOrdered(from, rooms, this.Context, this.#GetMapperOptions(!fly))
-                this.SetCache(mapperdata, { Data: result })
-            }
+            let result = module.Database.APIQueryPathOrdered(from, rooms, this.Context, this.#GetMapperOptions(!fly))
             if (result == null) {
                 return null
             }
