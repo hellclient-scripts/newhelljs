@@ -739,7 +739,7 @@
         let max = context["JiquMax"] != null ? context["JiquMax"] : App.Core.Study.Jiqu.Max
         if (App.Core.Study.CanJiqu() && max && max > 0 && App.Core.Study.Jiqu.Commands.length && App.Data.Player.HP["体会"] > max && App.Data.Player.HP["精气百分比"] > 70) {
             JiquPauseContext = Object.create(context)
-            JiquPauseContext.NeiliMin = 15
+            JiquPauseContext.NeiliMin = App.Params.StudyNeiliMin
             return App.Params.JiquPause == "t" ? JiquPause : JiquNoPause
         }
         return null
@@ -760,7 +760,7 @@
                 App.Core.Study.LastPot = 0
                 App.Core.Study.LearndTimes = 0
                 let data = Object.create(context)
-                data.NeiliMin = 15
+                data.NeiliMin = App.Params.StudyNeiliMin
                 return () => {
                     App.Core.Timeslice.Change("修整-学习")
                     $.PushCommands(

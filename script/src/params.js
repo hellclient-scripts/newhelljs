@@ -29,6 +29,7 @@
     App.NamedParams.AddNumber("NumDazuo", 0).WithName("打坐数值").WithDesc("每次打坐时的打坐数量，为0会自动判断")
     App.NamedParams.AddNumber("NumTuna", 0).WithName("吐纳数值").WithDesc("每次吐纳时的吐纳数量，为0会自动判断")
     App.NamedParams.AddNumber("NeiliMin", 40).WithName("最小内力百分比").WithDesc("判断打坐睡觉的内力百分比比率")
+    App.NamedParams.AddNumber("StudyNeiliMin", 15).WithName("学习最小内力百分比").WithDesc("学习汲取等非战斗阶段的内力设置")
     App.NamedParams.AddNumber("NumJingliMin", 400).WithName("最小精力值").WithDesc("判断打吐纳的精力值，绝对数值")
     App.NamedParams.AddNumber("GoldMax", 20).WithName("最大黄金数").WithDesc("超过这个数量会去银行存黄金")
     App.NamedParams.AddNumber("GoldKeep", 2).WithName("最小黄金数").WithDesc("身上保持的最少黄金的数量")

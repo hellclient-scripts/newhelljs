@@ -47,9 +47,9 @@
     App.Tools.HMM.GetPath = (from, to) => {
         let before = Date.now()
         // let result = App.Map.GetMapperPath(from, true, to);
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 1000; i++) {
             let result=App.Mapper.Database.APIQueryPathAny(["0"], ["1948"], App.Mapper.HMM.Context.New(), App.Mapper.HMM.MapperOptions.New())
         }
-        print("耗时" + (Date.now() - before)/10 + "ms")
+        print("耗时" + (Date.now() - before)/1000 + "ms")
     }
 })(App)
