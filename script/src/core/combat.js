@@ -236,19 +236,36 @@
         App.Combat.Data = data
         App.Core.Combat.Actions = null
         App.Core.Combat.Pending = {}
+        let killcmds = []
         pickActions()
         App.Core.Combat.FilterActions("#before").forEach(action => {
-            App.Send(App.Core.Combat.ReplaceCommand(action.Data))
+            if (action.Param == "do") {
+                killcmds = killcmds.concat(App.Core.Combat.ReplaceCommand(action.Data).split(/[;\n]/))
+            } else {
+                App.Send(App.Core.Combat.ReplaceCommand(action.Data))
+            }
         })
         let commands = []
+        var killcmd = ""
         if (data.Command) {
-            commands.push(data.Command)
+            killcmd = data.Command
         } else if (id) {
-            commands.push("kill " + id)
+            killcmd = "kill " + id
         }
+        killcmds = killcmds.concat(killcmd.split(/[;\n]/))
         App.Core.Combat.FilterActions("#start").forEach(action => {
-            commands.push(App.Core.Combat.ReplaceCommand(action.Data))
+            if (action.Param == "do") {
+                killcmds = killcmds.concat(App.Core.Combat.ReplaceCommand(action.Data).split(/[;\n]/))
+            } else {
+                commands.push(App.Core.Combat.ReplaceCommand(action.Data))
+            }
         })
+        killcmds = killcmds.filter(cmd => cmd.trim() !== "")
+        if (killcmds.length == 1) {
+            commands.unshift(killcmds[0])
+        } else if (killcmds.length > 1) {
+            commands.unshift(`do ${killcmds.join(",")}`)
+        }
         App.Send(commands.join(";"), data.KillInGroup)
         App.Send(checkCombatCmd)
         App.Combat.Start(id, data)

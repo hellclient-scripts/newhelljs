@@ -16,6 +16,9 @@ OnBuffer = ""
 OnSubneg = ""
 OnBufferMin = 0
 OnBufferMax = 0
+OnLine = ""
+OnAfterLine = ""
+OnSend = ""
 Channel = "zsz-self.jvs"
 Timers = []
 
@@ -2009,6 +2012,7 @@ Timers = []
   ReverseSpeedwalk = false
   OmitFromOutput = false
   OmitFromCommandHistory = false
+
 [[Aliases]]
   ID = "d1fv6bbo0pupo8726vq6111"
   Name = "App.Alias.Stop"
@@ -2031,7 +2035,6 @@ Timers = []
   ReverseSpeedwalk = false
   OmitFromOutput = false
   OmitFromCommandHistory = false
-
 
 [[Aliases]]
   ID = "d1fvd8m57s7g4i72l2d67r"
@@ -2101,6 +2104,7 @@ Timers = []
   ReverseSpeedwalk = false
   OmitFromOutput = false
   OmitFromCommandHistory = false
+
 [[Aliases]]
   ID = "d1g0ithkt1a40a72ii59as1"
   Name = "spwk"
